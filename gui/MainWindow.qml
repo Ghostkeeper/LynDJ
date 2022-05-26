@@ -25,5 +25,8 @@ ApplicationWindow {
 			top: parent.top
 			topMargin: Lyn.Theme.size["margin"].height
 		}
+
+		currentDirectory: Lyn.Preferences.preferences["browse_path"]
+		onCurrentDirectoryChanged: Lyn.Preferences.set("browse_path", currentDirectory)
 	}
 }

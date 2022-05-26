@@ -12,8 +12,11 @@ import Lyn 1.0 as Lyn
 import "." as Widgets
 
 Item {
+	id: directory_field
 	width: Lyn.Theme.size["control"].width * 2
 	height: childrenRect.height
+
+	property alias currentDirectory: directory.text
 
 	Widgets.Button {
 		id: browseButton
@@ -35,7 +38,7 @@ Item {
 	FolderDialog {
 		id: browseDialog
 
-		currentFolder: directory.text
+		currentFolder: "file:\/\/" + directory_field.currentDirectory
 		acceptLabel: "Select"
 
 		onAccepted: {

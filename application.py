@@ -5,9 +5,11 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import logging
+import PyQt6.QtCore
 import PyQt6.QtGui  # This is a GUI application.
 import PyQt6.QtQml  # To register types with the QML engine.
 
+import os
 import preferences
 import theme
 
@@ -25,6 +27,15 @@ class Application(PyQt6.QtGui.QGuiApplication):
 		"""
 		logging.info("Starting application.")
 		super().__init__(argv)
+
+		# TODO: Move creation of browse path preference to path browser class.
+		prefs = preferences.Preferences.getInstance()
+		music_locations = PyQt6.QtCore.QStandardPaths.standardLocations(PyQt6.QtCore.QStandardPaths.StandardLocation.MusicLocation)
+		if music_locations:
+			browse_path = music_locations[0]
+		else:
+			browse_path = os.path.expanduser("~/")
+		prefs.add("browse_path", browse_path)
 
 		logging.debug("Registering QML types.")
 		PyQt6.QtQml.qmlRegisterSingletonType(preferences.Preferences, "Lyn", 1, 0, preferences.Preferences.getInstance, "Preferences")
