@@ -105,6 +105,8 @@ class Preferences(PyQt6.QtCore.QObject):
 
 		changed = {}
 		for key, value in self.values.items():
+			if key not in self.defaults:  # Value is not defined in defaults. Possibly edited preferences file.
+				continue
 			if self.defaults[key] != value:  # Not equal to default.
 				changed[key] = value
 		with open(filepath, "w") as f:
