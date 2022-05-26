@@ -8,6 +8,10 @@ import sys
 
 import application
 
+"""
+Entry point for the application. This starts a QtApplication.
+"""
+
 if __name__ == "__main__":
     app = application.Application(sys.argv)
     sys.exit(app.exec())

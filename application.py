@@ -8,7 +8,17 @@ import PyQt6.QtGui
 import PyQt6.QtQml
 
 class Application(PyQt6.QtGui.QGuiApplication):
+    """
+    The Qt application that runs the whole thing.
+
+    This provides a QML engine and keeps it running until the application quits.
+    """
+
     def __init__(self, argv):
+        """
+        Starts the application.
+        :param argv: Command-line parameters provided to the application. Qt understands some of these.
+        """
         super().__init__(argv)
         self.engine = PyQt6.QtQml.QQmlApplicationEngine()
         self.engine.quit.connect(self.quit)
