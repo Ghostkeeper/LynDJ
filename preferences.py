@@ -94,7 +94,7 @@ class Preferences(PyQt6.QtCore.QObject):
     valuesChanged = PyQt6.QtCore.pyqtSignal()
 
     @PyQt6.QtCore.pyqtProperty("QVariantMap", notify=valuesChanged)
-    def values(self) -> typing.Dict[str, typing.Union[str, int, float, list, dict]]:
+    def preferences(self) -> typing.Dict[str, typing.Union[str, int, float, list, dict]]:
         """
         Get a dictionary of all the current preferences.
         :return: All current preference values.
