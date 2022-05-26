@@ -1,12 +1,14 @@
 {
 	"sizes": {
 		"margin": [10, 10],
-		"control": [100, 20],
+		"control": [100, 32],
 		"lining": [1, 1]
 	},
 	"colours": {
 		"background": [255, 255, 255, 255],
-		"foreground": [16, 16, 16, 255],
+		"foreground": [15, 15, 15, 255],
+		"disabled_background": [239, 239, 239, 255],
+		"disabled_foreground": [63, 63, 63, 255],
 
 		"lining": "foreground"
 	}

@@ -13,13 +13,12 @@ TextField {
 	width: Lyn.Theme.size["control"].width
 	height: Lyn.Theme.size["control"].height
 
+	color: Lyn.Theme.colour[enabled ? "foreground": "disabled_foreground"]
 	background: Rectangle {
 		anchors.fill: parent
 
+		color: Lyn.Theme.colour[enabled ? "background" : "disabled_background"]
 		border.width: Lyn.Theme.size["lining"].width
-		border.color: {
-			print(Object.keys(Lyn.Theme.colour));
-			return Lyn.Theme.colour["lining"]
-		}
+		border.color: Lyn.Theme.colour["lining"]
 	}
 }
