@@ -5,7 +5,8 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import logging
-import sys
+import signal  # To catch interrupts that need to stop the application.
+import sys  # Return correct exit code.
 
 import application
 
@@ -17,5 +18,6 @@ if __name__ == "__main__":
 	# Set logging to our preferences.
 	logging.basicConfig(format="%(levelname)s:%(asctime)s | %(message)s", level=logging.INFO)
 
+	signal.signal(signal.SIGINT, signal.SIG_DFL)  # Python is not handling SIGINT, so let the kernel do that.
 	app = application.Application(sys.argv)
 	sys.exit(app.exec())
