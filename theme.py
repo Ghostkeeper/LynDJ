@@ -44,6 +44,7 @@ class Theme(PyQt6.QtCore.QObject):
 
 		self.sizes = {}
 		self.colours = {}
+		self.fonts = {}
 
 		self.load(update_gui=False)
 
@@ -60,6 +61,14 @@ class Theme(PyQt6.QtCore.QObject):
 		"""
 		return self.colours
 
+	@PyQt6.QtCore.pyqtProperty("QVariantMap", notify=themeChanged)
+	def font(self) -> typing.Dict[str, PyQt6.QtGui.QFont]:
+		"""
+		Get the dictionary of fonts.
+		:return: A dictionary of all fonts.
+		"""
+		return self.fonts
+
 	def load(self, update_gui=True) -> None:
 		"""
 		Load the theme from the theme file.
@@ -74,13 +83,22 @@ class Theme(PyQt6.QtCore.QObject):
 		with open(theme_file) as f:
 			theme_dict = json.load(f)
 			for key, dimensions in theme_dict["sizes"].items():
-				while type(dimensions) == str:  # Refers to a different theme entry.
+				while type(dimensions) is str:  # Refers to a different theme entry.
 					dimensions = theme_dict["sizes"][dimensions]
 				self.sizes[key] = PyQt6.QtCore.QSizeF(dimensions[0], dimensions[1])
 			for key, channels in theme_dict["colours"].items():
-				while type(channels) == str:  # Refers to a different theme entry.
+				while type(channels) is str:  # Refers to a different theme entry.
 					channels = theme_dict["colours"][channels]
 				self.colours[key] = PyQt6.QtGui.QColor(channels[0], channels[1], channels[2], channels[3])  # RGBA.
+			for key, parameters in theme_dict["fonts"].items():
+				while type(parameters) is str:
+					parameters = theme_dict["fonts"][parameters]
+				font = PyQt6.QtGui.QFont()
+				font.setFamily(parameters["family"])
+				font.setPointSize(parameters["size"])
+				font.setWeight(parameters["weight"])
+				font.setItalic(parameters.get("italic", False))
+				self.fonts[key] = font
 			if update_gui:
 				self.themeChanged.emit()
 

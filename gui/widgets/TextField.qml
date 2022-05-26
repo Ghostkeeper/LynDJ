@@ -14,6 +14,8 @@ TextField {
 	height: Lyn.Theme.size["control"].height
 
 	color: Lyn.Theme.colour[enabled ? "foreground": "disabled_foreground"]
+	font: Lyn.Theme.font["default"]
+
 	background: Rectangle {
 		anchors.fill: parent
 

@@ -11,5 +11,12 @@
 		"disabled_foreground": [63, 63, 63, 255],
 
 		"lining": "foreground"
+	},
+	"fonts": {
+		"default": {
+			"family": "sans",
+			"size": 10,
+			"weight": 500
+		}
 	}
 }
