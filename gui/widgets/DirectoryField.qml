@@ -6,6 +6,7 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Dialogs
 
 import Lyn 1.0 as Lyn
 import "." as Widgets
@@ -19,11 +20,29 @@ Item {
 		anchors.right: parent.right
 
 		text: "Browse..."
+
+		onClicked: browseDialog.open()
 	}
+
 	Widgets.TextField {
+		id: directory
 		anchors {
 			left: parent.left
 			right: browseButton.left
+		}
+	}
+
+	FolderDialog {
+		id: browseDialog
+
+		currentFolder: directory.text
+		acceptLabel: "Select"
+
+		onAccepted: {
+			var path = selectedFolder.toString();
+			path = path.replace(/^file:\/{2}/, ""); //Remove file:// schema.
+			path = decodeURIComponent(path); //Unescape HTML-encoded characters.
+			directory.text = path;
 		}
 	}
 }
