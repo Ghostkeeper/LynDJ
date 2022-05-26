@@ -7,23 +7,23 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-import "./widgets" as Widgets
 import Lyn 1.0 as Lyn
+import "." as Widgets
 
-ApplicationWindow {
-	width: 1280
-	height: 720
-	visible: true
-	title: "LynDJ"
+Item {
+	width: Lyn.Theme.size["control"].width * 2
+	height: childrenRect.height
 
-	color: Lyn.Theme.colour["background"]
+	Button {
+		id: browseButton
+		anchors.right: parent.right
 
-	Widgets.DirectoryField {
+		text: "Browse..."
+	}
+	Widgets.TextField {
 		anchors {
 			left: parent.left
-			leftMargin: Lyn.Theme.size["margin"].width
-			top: parent.top
-			topMargin: Lyn.Theme.size["margin"].height
+			right: browseButton.left
 		}
 	}
 }
