@@ -8,6 +8,7 @@ import json  # Preferences are stored in JSON format, which interfaces nicely wi
 import os  # To know where to store the preferences file.
 import os.path  # To construct the path to the preferences file.
 import PyQt6.QtCore  # To allow preferences to be reached from QML.
+import typing
 
 class Preferences(PyQt6.QtCore.QObject):
     """
@@ -26,11 +27,12 @@ class Preferences(PyQt6.QtCore.QObject):
         self.values = {}
         self.load()
 
+    @PyQt6.QtCore.pyqtSlot(str, PyQt6.QtCore.QObject)
     def add(self, key, default) -> None:
         """
         Add a new preference entry.
         :param key: The identifier for the preference.
-        :param default: The default value for the preference.
+        :param default: The default value for the preference. This should be a data type that JSON can store.
         """
         if key in self.defaults:
             raise KeyError(f"A preference with the key {key} already exists.")
@@ -46,6 +48,15 @@ class Preferences(PyQt6.QtCore.QObject):
         if not os.path.exists(filepath):  # No preferences file. First time this got launched.
             with open(filepath, "w") as f:
                 f.write("{}")  # No overrides to start with.
+
+    @PyQt6.QtCore.pyqtSlot(str, result=PyQt6.QtCore.QObject)
+    def get(self, key) -> typing.Union[str, int, float, list, dict]:
+        """
+        Get the current value of a preference.
+        :param key: The preference to get the value of.
+        :return: The current value of the preference.
+        """
+        return self.values.get(key, self.defaults[key])  # Get from the values, and if not present there, get from the defaults.
 
     def load(self) -> None:
         """
