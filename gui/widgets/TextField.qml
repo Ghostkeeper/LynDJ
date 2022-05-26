@@ -15,6 +15,7 @@ TextField {
 
 	color: Lyn.Theme.colour[enabled ? "foreground": "disabled_foreground"]
 	font: Lyn.Theme.font["default"]
+	selectByMouse: true
 
 	background: Rectangle {
 		anchors.fill: parent
