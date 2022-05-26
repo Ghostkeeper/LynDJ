@@ -13,130 +13,130 @@ import PyQt6.QtCore  # To allow preferences to be reached from QML.
 import typing
 
 class Preferences(PyQt6.QtCore.QObject):
-    """
-    Stores application preferences and makes sure they get reloaded.
-    """
+	"""
+	Stores application preferences and makes sure they get reloaded.
+	"""
 
-    """
-    This class is a singleton. This is the singleton instance.
-    """
-    _instance = None
+	"""
+	This class is a singleton. This is the singleton instance.
+	"""
+	_instance = None
 
-    @classmethod
-    def getInstance(cls, _engine=None, _script=None) -> "Preferences":
-        """
-        Gets an instance of the preferences class.
+	@classmethod
+	def getInstance(cls, _engine=None, _script=None) -> "Preferences":
+		"""
+		Gets an instance of the preferences class.
 
-        This ensures that only one instance of the preferences class exists, thus ensuring that all users of the
-        preferences talk with the same instance. This allows communicating between these users, whether they be in
-        Python or in QML.
-        :return: The preferences object.
-        """
-        if cls._instance is None:
-            logging.debug("Creating preferences instance.")
-            cls._instance = Preferences()
-        return cls._instance
+		This ensures that only one instance of the preferences class exists, thus ensuring that all users of the
+		preferences talk with the same instance. This allows communicating between these users, whether they be in
+		Python or in QML.
+		:return: The preferences object.
+		"""
+		if cls._instance is None:
+			logging.debug("Creating preferences instance.")
+			cls._instance = Preferences()
+		return cls._instance
 
-    def __init__(self) -> None:
-        """
-        Creates the preferences object
-        :param parent:
-        """
-        super().__init__(None)
-        self.ensure_exists()
+	def __init__(self) -> None:
+		"""
+		Creates the preferences object
+		:param parent:
+		"""
+		super().__init__(None)
+		self.ensure_exists()
 
-        self.defaults = {}
-        self.values = {}
-        self.load()
+		self.defaults = {}
+		self.values = {}
+		self.load()
 
-    @PyQt6.QtCore.pyqtSlot(str, "QVariant")
-    def add(self, key, default) -> None:
-        """
-        Add a new preference entry.
-        :param key: The identifier for the preference.
-        :param default: The default value for the preference. This should be a data type that JSON can store.
-        """
-        if key in self.defaults:
-            raise KeyError(f"A preference with the key {key} already exists.")
-        logging.debug(f"Adding preference {key} with default {default}.")
-        self.defaults[key] = default
+	@PyQt6.QtCore.pyqtSlot(str, "QVariant")
+	def add(self, key, default) -> None:
+		"""
+		Add a new preference entry.
+		:param key: The identifier for the preference.
+		:param default: The default value for the preference. This should be a data type that JSON can store.
+		"""
+		if key in self.defaults:
+			raise KeyError(f"A preference with the key {key} already exists.")
+		logging.debug(f"Adding preference {key} with default {default}.")
+		self.defaults[key] = default
 
-    def ensure_exists(self) -> None:
-        """
-        Ensure that the preference file storage exists.
-        """
-        filepath = self.storage_location()
-        directory = os.path.dirname(filepath)
+	def ensure_exists(self) -> None:
+		"""
+		Ensure that the preference file storage exists.
+		"""
+		filepath = self.storage_location()
+		directory = os.path.dirname(filepath)
 
-        if not os.path.exists(directory):
-            logging.info(f"Preference directory didn't exist yet. Creating it in: {directory}")
-            os.makedirs(directory)
-        if not os.path.exists(filepath):  # No preferences file. First time this got launched.
-            logging.info(f"Preference file didn't exist yet. Creating it in: {filepath}")
-            with open(filepath, "w") as f:
-                f.write("{}")  # No overrides to start with.
+		if not os.path.exists(directory):
+			logging.info(f"Preference directory didn't exist yet. Creating it in: {directory}")
+			os.makedirs(directory)
+		if not os.path.exists(filepath):  # No preferences file. First time this got launched.
+			logging.info(f"Preference file didn't exist yet. Creating it in: {filepath}")
+			with open(filepath, "w") as f:
+				f.write("{}")  # No overrides to start with.
 
-    def get(self, key) -> typing.Union[str, int, float, list, dict]:
-        """
-        Get the current value of a preference.
-        :param key: The preference to get the value of.
-        :return: The current value of the preference.
-        """
-        return self.values.get(key, self.defaults[key])  # Get from the values, and if not present there, get from the defaults.
+	def get(self, key) -> typing.Union[str, int, float, list, dict]:
+		"""
+		Get the current value of a preference.
+		:param key: The preference to get the value of.
+		:return: The current value of the preference.
+		"""
+		return self.values.get(key, self.defaults[key])  # Get from the values, and if not present there, get from the defaults.
 
-    def load(self) -> None:
-        """
-        Load up the preferences from disk.
-        """
-        filepath = self.storage_location()
-        logging.info(f"Loading preferences from: {filepath}")
-        with open(filepath) as f:
-            self.values = json.load(f)
+	def load(self) -> None:
+		"""
+		Load up the preferences from disk.
+		"""
+		filepath = self.storage_location()
+		logging.info(f"Loading preferences from: {filepath}")
+		with open(filepath) as f:
+			self.values = json.load(f)
 
-    def save(self) -> None:
-        """
-        Store the current state of the preferences to disk.
-        """
-        filepath = self.storage_location()
-        logging.debug(f"Saving preferences.")
-        with open(filepath, "w") as f:
-            json.dump(self.values, f)
+	def save(self) -> None:
+		"""
+		Store the current state of the preferences to disk.
+		"""
+		filepath = self.storage_location()
+		logging.debug(f"Saving preferences.")
+		with open(filepath, "w") as f:
+			json.dump(self.values, f)
 
-    @PyQt6.QtCore.pyqtSlot(str, "QVariant")
-    def set(self, key, value) -> None:
-        """
-        Change the current value of a preference.
-        :param key: The preference to set.
-        :param value: The new value of the preference. This should be a data type that JSON can store.
-        """
-        logging.debug(f"Changing preference {key} to {value}.")
-        self.values[key] = value
-        self.save()  # Immediately save this to disk.
-        self.valuesChanged.emit()
+	@PyQt6.QtCore.pyqtSlot(str, "QVariant")
+	def set(self, key, value) -> None:
+		"""
+		Change the current value of a preference.
+		:param key: The preference to set.
+		:param value: The new value of the preference. This should be a data type that JSON can store.
+		"""
+		logging.debug(f"Changing preference {key} to {value}.")
+		self.values[key] = value
+		self.save()  # Immediately save this to disk.
+		self.valuesChanged.emit()
 
-    def storage_location(self) -> str:
-        """
-        Get the path to the preferences file on this computer.
-        :return: A file path to a JSON file where the preferences are stored.
-        """
-        try:
-            os_path = os.environ["XDG_CONFIG_HOME"]  # XDG standard storage location.
-        except KeyError:
-            os_path = os.path.expanduser("~/.config")  # Most Linux machines.
+	def storage_location(self) -> str:
+		"""
+		Get the path to the preferences file on this computer.
+		:return: A file path to a JSON file where the preferences are stored.
+		"""
+		try:
+			os_path = os.environ["XDG_CONFIG_HOME"]  # XDG standard storage location.
+		except KeyError:
+			os_path = os.path.expanduser("~/.config")  # Most Linux machines.
 
-        return os.path.join(os_path, "lyndj", "preferences.json")  # Our own addition to the path.
+		return os.path.join(os_path, "lyndj", "preferences.json")  # Our own addition to the path.
 
-    """
-    Triggered when any preference value changed.
-    """
-    valuesChanged = PyQt6.QtCore.pyqtSignal()
+	"""
+	Triggered when any preference value changed.
+	"""
+	valuesChanged = PyQt6.QtCore.pyqtSignal()
 
-    @PyQt6.QtCore.pyqtProperty("QVariantMap", notify=valuesChanged)
-    def preferences(self) -> typing.Dict[str, typing.Union[str, int, float, list, dict]]:
-        """
-        Get a dictionary of all the current preferences.
-        :return: All current preference values.
-        """
-        result = copy.copy(self.defaults)
-        result.update(self.values)
-        return result
+	@PyQt6.QtCore.pyqtProperty("QVariantMap", notify=valuesChanged)
+	def preferences(self) -> typing.Dict[str, typing.Union[str, int, float, list, dict]]:
+		"""
+		Get a dictionary of all the current preferences.
+		:return: All current preference values.
+		"""
+		result = copy.copy(self.defaults)
+		result.update(self.values)
+		return result

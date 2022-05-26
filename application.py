@@ -12,27 +12,27 @@ import preferences
 import theme
 
 class Application(PyQt6.QtGui.QGuiApplication):
-    """
-    The Qt application that runs the whole thing.
+	"""
+	The Qt application that runs the whole thing.
 
-    This provides a QML engine and keeps it running until the application quits.
-    """
+	This provides a QML engine and keeps it running until the application quits.
+	"""
 
-    def __init__(self, argv):
-        """
-        Starts the application.
-        :param argv: Command-line parameters provided to the application. Qt understands some of these.
-        """
-        logging.info("Starting application.")
-        super().__init__(argv)
+	def __init__(self, argv):
+		"""
+		Starts the application.
+		:param argv: Command-line parameters provided to the application. Qt understands some of these.
+		"""
+		logging.info("Starting application.")
+		super().__init__(argv)
 
-        logging.debug("Registering QML types.")
-        PyQt6.QtQml.qmlRegisterSingletonType(preferences.Preferences, "Lyn", 1, 0, preferences.Preferences.getInstance, "Preferences")
-        PyQt6.QtQml.qmlRegisterSingletonType(theme.Theme, "Lyn", 1, 0, theme.Theme.getInstance, "Theme")
+		logging.debug("Registering QML types.")
+		PyQt6.QtQml.qmlRegisterSingletonType(preferences.Preferences, "Lyn", 1, 0, preferences.Preferences.getInstance, "Preferences")
+		PyQt6.QtQml.qmlRegisterSingletonType(theme.Theme, "Lyn", 1, 0, theme.Theme.getInstance, "Theme")
 
-        logging.debug("Loading QML engine.")
-        self.engine = PyQt6.QtQml.QQmlApplicationEngine()
-        self.engine.quit.connect(self.quit)
-        self.engine.load("gui/MainWindow.qml")
+		logging.debug("Loading QML engine.")
+		self.engine = PyQt6.QtQml.QQmlApplicationEngine()
+		self.engine.quit.connect(self.quit)
+		self.engine.load("gui/MainWindow.qml")
 
-        logging.info("Start-up complete.")
+		logging.info("Start-up complete.")

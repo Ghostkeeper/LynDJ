@@ -8,13 +8,13 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 ApplicationWindow {
-    width: 1280
-    height: 720
-    visible: true
-    title: "LynDJ"
+	width: 1280
+	height: 720
+	visible: true
+	title: "LynDJ"
 
-    Text {
-        anchors.centerIn: parent
-        text: "Test"
-    }
+	Text {
+		anchors.centerIn: parent
+		text: "Test"
+	}
 }

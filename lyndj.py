@@ -14,8 +14,8 @@ Entry point for the application. This starts a QtApplication.
 """
 
 if __name__ == "__main__":
-    # Set logging to our preferences.
-    logging.basicConfig(format="%(levelname)s:%(asctime)s | %(message)s", level=logging.INFO)
+	# Set logging to our preferences.
+	logging.basicConfig(format="%(levelname)s:%(asctime)s | %(message)s", level=logging.INFO)
 
-    app = application.Application(sys.argv)
-    sys.exit(app.exec())
+	app = application.Application(sys.argv)
+	sys.exit(app.exec())
