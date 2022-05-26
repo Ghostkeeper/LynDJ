@@ -49,7 +49,7 @@ class Preferences(PyQt6.QtCore.QObject):
         self.values = {}
         self.load()
 
-    @PyQt6.QtCore.pyqtSlot(str, PyQt6.QtCore.QObject)
+    @PyQt6.QtCore.pyqtSlot(str, "QVariant")
     def add(self, key, default) -> None:
         """
         Add a new preference entry.
@@ -93,7 +93,16 @@ class Preferences(PyQt6.QtCore.QObject):
         with open(filepath) as f:
             self.values = json.load(f)
 
-    @PyQt6.QtCore.pyqtSlot(str, PyQt6.QtCore.QObject)
+    def save(self) -> None:
+        """
+        Store the current state of the preferences to disk.
+        """
+        filepath = self.storage_location()
+        logging.debug(f"Saving preferences.")
+        with open(filepath, "w") as f:
+            json.dump(self.values, f)
+
+    @PyQt6.QtCore.pyqtSlot(str, "QVariant")
     def set(self, key, value) -> None:
         """
         Change the current value of a preference.
@@ -102,6 +111,7 @@ class Preferences(PyQt6.QtCore.QObject):
         """
         logging.debug(f"Changing preference {key} to {value}.")
         self.values[key] = value
+        self.save()  # Immediately save this to disk.
         self.valuesChanged.emit()
 
     def storage_location(self) -> str:
