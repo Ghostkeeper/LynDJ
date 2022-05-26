@@ -45,7 +45,9 @@ class Preferences(PyQt6.QtCore.QObject):
         """
         filepath = self.storage_location()
         directory = os.path.dirname(filepath)
-        os.makedirs(directory)
+
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         if not os.path.exists(filepath):  # No preferences file. First time this got launched.
             with open(filepath, "w") as f:
                 f.write("{}")  # No overrides to start with.
