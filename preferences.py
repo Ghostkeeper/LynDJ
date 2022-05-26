@@ -14,7 +14,7 @@ class Preferences(PyQt6.QtCore.QObject):
     Stores application preferences and makes sure they get reloaded.
     """
 
-    def __init__(self, parent = None):
+    def __init__(self, parent = None) -> None:
         """
         Creates the preferences object
         :param parent:
@@ -25,6 +25,16 @@ class Preferences(PyQt6.QtCore.QObject):
         self.defaults = {}
         self.values = {}
         self.load()
+
+    def add(self, key, default) -> None:
+        """
+        Add a new preference entry.
+        :param key: The identifier for the preference.
+        :param default: The default value for the preference.
+        """
+        if key in self.defaults:
+            raise KeyError(f"A preference with the key {key} already exists.")
+        self.defaults[key] = default
 
     def ensure_exists(self) -> None:
         """
@@ -37,10 +47,17 @@ class Preferences(PyQt6.QtCore.QObject):
             with open(filepath, "w") as f:
                 f.write("{}")  # No overrides to start with.
 
-    def load(self):
+    def load(self) -> None:
+        """
+        Load up the preferences from disk.
+        """
         filepath = self.storage_location()
         with open(filepath) as f:
             self.values = json.load(f)
 
-    def storage_location(self):
+    def storage_location(self) -> str:
+        """
+        Get the path to the preferences file on this computer.
+        :return: A file path to a JSON file where the preferences are stored.
+        """
         return os.path.join(os.environ["XDG_CONFIG_HOME"], "lyndj", "preferences.json")
