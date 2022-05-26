@@ -6,11 +6,16 @@
 	},
 	"colours": {
 		"background": [255, 255, 255, 255],
-		"foreground": [15, 15, 15, 255],
-		"disabled_background": [239, 239, 239, 255],
-		"disabled_foreground": [63, 63, 63, 255],
+		"foreground": [17, 14, 6, 255],
+		"primary": [205, 178, 114, 255],
+		"secondary": [115, 173, 206, 255],
+		"disabled_background": [227, 224, 216, 255],
+		"disabled_foreground": [68, 55, 24, 255],
 
-		"lining": "foreground"
+		"lining": "foreground",
+
+		"error": [206, 118, 115, 255],
+		"success": [173, 206, 115, 255]
 	},
 	"fonts": {
 		"default": {
