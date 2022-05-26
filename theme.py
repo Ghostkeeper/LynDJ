@@ -9,6 +9,7 @@ import logging
 import os.path  # To find the theme file.
 import PyQt6.QtCore  # To allow QML to get the theme data, and to export sizes.
 import PyQt6.QtGui  # To export colours.
+import typing
 
 import preferences  # To get which theme to load.
 
@@ -44,15 +45,45 @@ class Theme(PyQt6.QtCore.QObject):
         self.sizes = {}
         self.colours = {}
 
-        self.load()
+        self.load(update_gui=False)
 
-    def load(self):
-        logging.info("Loading theme.")
+    """
+    Triggered when the theme changes.
+    """
+    themeChanged = PyQt6.QtCore.pyqtSignal()
+
+    @PyQt6.QtCore.pyqtProperty("QVariantMap", notify=themeChanged)
+    def colour(self) -> typing.Dict[str, PyQt6.QtGui.QColor]:
+        """
+        Get the dictionary of colours.
+        :return: A dictionary of all colours.
+        """
+        return self.colours
+
+    def load(self, update_gui=True) -> None:
+        """
+        Load the theme from the theme file.
+
+        The currently set theme from the preferences will be used for this.
+        :param trigger_change: Whether to notify the GUI that the theme changed. This should not be done for the initial
+        load of the theme, to prevent essentially loading the GUI twice.
+        """
         theme_name = preferences.Preferences.getInstance().get("theme")
         theme_file = os.path.join("theme", theme_name + ".json")
+        logging.info(f"Loading theme from: {theme_file}")
         with open(theme_file) as f:
             theme_dict = json.load(f)
             for key, dimensions in theme_dict["sizes"].items():
                 self.sizes[key] = PyQt6.QtCore.QSizeF(dimensions[0], dimensions[1])
             for key, channels in theme_dict["colours"].items():
                 self.colours[key] = PyQt6.QtGui.QColor(channels[0], channels[1], channels[2], channels[3])  # RGBA.
+            if update_gui:
+                self.themeChanged.emit()
+
+    @PyQt6.QtCore.pyqtProperty("QVariantMap", notify=themeChanged)
+    def size(self) -> typing.Dict[str, PyQt6.QtCore.QSizeF]:
+        """
+        Get the dictionary of sizes.
+        :return: A dictionary of all theme sizes.
+        """
+        return self.sizes
