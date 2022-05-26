@@ -4,6 +4,7 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import copy
 import json  # Preferences are stored in JSON format, which interfaces nicely with Python.
 import os  # To know where to store the preferences file.
 import os.path  # To construct the path to the preferences file.
@@ -49,7 +50,6 @@ class Preferences(PyQt6.QtCore.QObject):
             with open(filepath, "w") as f:
                 f.write("{}")  # No overrides to start with.
 
-    @PyQt6.QtCore.pyqtSlot(str, result=PyQt6.QtCore.QObject)
     def get(self, key) -> typing.Union[str, int, float, list, dict]:
         """
         Get the current value of a preference.
@@ -74,6 +74,7 @@ class Preferences(PyQt6.QtCore.QObject):
         :param value: The new value of the preference. This should be a data type that JSON can store.
         """
         self.values[key] = value
+        self.valuesChanged.emit()
 
     def storage_location(self) -> str:
         """
@@ -81,3 +82,18 @@ class Preferences(PyQt6.QtCore.QObject):
         :return: A file path to a JSON file where the preferences are stored.
         """
         return os.path.join(os.environ["XDG_CONFIG_HOME"], "lyndj", "preferences.json")
+
+    """
+    Triggered when any preference value changed.
+    """
+    valuesChanged = PyQt6.QtCore.pyqtSignal()
+
+    @PyQt6.QtCore.pyqtProperty("QVariantMap", notify=valuesChanged)
+    def values(self) -> typing.Dict[str, typing.Union[str, int, float, list, dict]]:
+        """
+        Get a dictionary of all the current preferences.
+        :return: All current preference values.
+        """
+        result = copy.copy(self.defaults)
+        result.update(self.values)
+        return result
