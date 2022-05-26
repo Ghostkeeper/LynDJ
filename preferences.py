@@ -6,6 +6,7 @@
 
 import copy
 import json  # Preferences are stored in JSON format, which interfaces nicely with Python.
+import logging
 import os  # To know where to store the preferences file.
 import os.path  # To construct the path to the preferences file.
 import PyQt6.QtCore  # To allow preferences to be reached from QML.
@@ -32,6 +33,7 @@ class Preferences(PyQt6.QtCore.QObject):
         :return: The preferences object.
         """
         if cls._instance is None:
+            logging.debug("Creating preferences instance.")
             cls._instance = Preferences()
         return cls._instance
 
@@ -56,6 +58,7 @@ class Preferences(PyQt6.QtCore.QObject):
         """
         if key in self.defaults:
             raise KeyError(f"A preference with the key {key} already exists.")
+        logging.debug(f"Adding preference {key} with default {default}.")
         self.defaults[key] = default
 
     def ensure_exists(self) -> None:
@@ -66,8 +69,10 @@ class Preferences(PyQt6.QtCore.QObject):
         directory = os.path.dirname(filepath)
 
         if not os.path.exists(directory):
+            logging.info(f"Preference directory didn't exist yet. Creating it in: {directory}")
             os.makedirs(directory)
         if not os.path.exists(filepath):  # No preferences file. First time this got launched.
+            logging.info(f"Preference file didn't exist yet. Creating it in: {filepath}")
             with open(filepath, "w") as f:
                 f.write("{}")  # No overrides to start with.
 
@@ -84,6 +89,7 @@ class Preferences(PyQt6.QtCore.QObject):
         Load up the preferences from disk.
         """
         filepath = self.storage_location()
+        logging.info(f"Loading preferences from: {filepath}")
         with open(filepath) as f:
             self.values = json.load(f)
 
@@ -94,6 +100,7 @@ class Preferences(PyQt6.QtCore.QObject):
         :param key: The preference to set.
         :param value: The new value of the preference. This should be a data type that JSON can store.
         """
+        logging.debug(f"Changing preference {key} to {value}.")
         self.values[key] = value
         self.valuesChanged.emit()
 
