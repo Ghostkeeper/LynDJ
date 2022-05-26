@@ -81,7 +81,12 @@ class Preferences(PyQt6.QtCore.QObject):
         Get the path to the preferences file on this computer.
         :return: A file path to a JSON file where the preferences are stored.
         """
-        return os.path.join(os.environ["XDG_CONFIG_HOME"], "lyndj", "preferences.json")
+        try:
+            os_path = os.environ["XDG_CONFIG_HOME"]  # XDG standard storage location.
+        except KeyError:
+            os_path = os.path.expanduser("~/.config")  # Most Linux machines.
+
+        return os.path.join(os_path, "lyndj", "preferences.json")  # Our own addition to the path.
 
     """
     Triggered when any preference value changed.
