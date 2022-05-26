@@ -75,13 +75,11 @@ class Theme(PyQt6.QtCore.QObject):
 			theme_dict = json.load(f)
 			for key, dimensions in theme_dict["sizes"].items():
 				while type(dimensions) == str:  # Refers to a different theme entry.
-					key = dimensions
-					dimensions = theme_dict["sizes"][key]
+					dimensions = theme_dict["sizes"][dimensions]
 				self.sizes[key] = PyQt6.QtCore.QSizeF(dimensions[0], dimensions[1])
 			for key, channels in theme_dict["colours"].items():
 				while type(channels) == str:  # Refers to a different theme entry.
-					key = channels
-					channels = theme_dict["colours"][key]
+					channels = theme_dict["colours"][channels]
 				self.colours[key] = PyQt6.QtGui.QColor(channels[0], channels[1], channels[2], channels[3])  # RGBA.
 			if update_gui:
 				self.themeChanged.emit()
