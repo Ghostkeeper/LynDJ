@@ -7,6 +7,8 @@
 import PyQt6.QtGui
 import PyQt6.QtQml
 
+import preferences
+
 class Application(PyQt6.QtGui.QGuiApplication):
     """
     The Qt application that runs the whole thing.
@@ -20,6 +22,11 @@ class Application(PyQt6.QtGui.QGuiApplication):
         :param argv: Command-line parameters provided to the application. Qt understands some of these.
         """
         super().__init__(argv)
+
+        PyQt6.QtQml.qmlRegisterSingletonType(preferences.Preferences, "Lyn", 1, 0, preferences.Preferences.getInstance, "Preferences")
+
+        preferences.Preferences.getInstance().add("language", "en_US")
+
         self.engine = PyQt6.QtQml.QQmlApplicationEngine()
         self.engine.quit.connect(self.quit)
         self.engine.load("gui/MainWindow.qml")

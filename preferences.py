@@ -16,12 +16,31 @@ class Preferences(PyQt6.QtCore.QObject):
     Stores application preferences and makes sure they get reloaded.
     """
 
-    def __init__(self, parent = None) -> None:
+    """
+    This class is a singleton. This is the singleton instance.
+    """
+    _instance = None
+
+    @classmethod
+    def getInstance(cls, _engine=None, _script=None) -> "Preferences":
+        """
+        Gets an instance of the preferences class.
+
+        This ensures that only one instance of the preferences class exists, thus ensuring that all users of the
+        preferences talk with the same instance. This allows communicating between these users, whether they be in
+        Python or in QML.
+        :return: The preferences object.
+        """
+        if cls._instance is None:
+            cls._instance = Preferences()
+        return cls._instance
+
+    def __init__(self) -> None:
         """
         Creates the preferences object
         :param parent:
         """
-        super().__init__(parent)
+        super().__init__(None)
         self.ensure_exists()
 
         self.defaults = {}
