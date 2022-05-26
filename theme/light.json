@@ -9,8 +9,13 @@
 		"foreground": [17, 14, 6, 255],
 		"primary": [205, 178, 114, 255],
 		"secondary": [115, 173, 206, 255],
+
 		"disabled_background": [227, 224, 216, 255],
 		"disabled_foreground": [68, 55, 24, 255],
+
+		"highlight_primary": [216, 195, 145, 255],
+
+		"active_primary": [170, 137, 60, 255],
 
 		"lining": "foreground",
 

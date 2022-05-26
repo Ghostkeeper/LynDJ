@@ -8,22 +8,35 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 import Lyn 1.0 as Lyn
-import "." as Widgets
 
-Item {
-	width: Lyn.Theme.size["control"].width * 2
-	height: childrenRect.height
+Button {
+	width: Lyn.Theme.size["control"].width
+	height: Lyn.Theme.size["control"].height
 
-	Widgets.Button {
-		id: browseButton
-		anchors.right: parent.right
+	font: Lyn.Theme.font["default"]
 
-		text: "Browse..."
+	background: Rectangle {
+		anchors.fill: parent
+
+		color: Lyn.Theme.colour["primary"]
 	}
-	Widgets.TextField {
-		anchors {
-			left: parent.left
-			right: browseButton.left
+
+	states: [
+		State {
+			name: "hovered"
+			when: hovered && !pressed
+			PropertyChanges {
+				target: background
+				color: Lyn.Theme.colour["highlight_primary"]
+			}
+		},
+		State {
+			name: "pressed"
+			when: pressed
+			PropertyChanges {
+				target: background
+				color: Lyn.Theme.colour["active_primary"]
+			}
 		}
-	}
+	]
 }
