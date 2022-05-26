@@ -60,7 +60,8 @@ class Preferences(PyQt6.QtCore.QObject):
 			raise KeyError(f"A preference with the key {key} already exists.")
 		logging.debug(f"Adding preference {key} with default {default}.")
 		self.defaults[key] = default
-		self.values[key] = default
+		if key not in self.values:
+			self.values[key] = default
 
 	def ensure_exists(self) -> None:
 		"""
