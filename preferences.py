@@ -66,6 +66,15 @@ class Preferences(PyQt6.QtCore.QObject):
         with open(filepath) as f:
             self.values = json.load(f)
 
+    @PyQt6.QtCore.pyqtSlot(str, PyQt6.QtCore.QObject)
+    def set(self, key, value) -> None:
+        """
+        Change the current value of a preference.
+        :param key: The preference to set.
+        :param value: The new value of the preference. This should be a data type that JSON can store.
+        """
+        self.values[key] = value
+
     def storage_location(self) -> str:
         """
         Get the path to the preferences file on this computer.
