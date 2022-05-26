@@ -7,23 +7,19 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-import "./widgets" as Widgets
 import Lyn 1.0 as Lyn
 
-ApplicationWindow {
-	width: 1280
-	height: 720
-	visible: true
-	title: "LynDJ"
+TextField {
+	width: Lyn.Theme.size["control"].width
+	height: Lyn.Theme.size["control"].height
 
-	color: Lyn.Theme.colour["background"]
+	background: Rectangle {
+		anchors.fill: parent
 
-	Widgets.TextField {
-		anchors {
-			left: parent.left
-			leftMargin: Lyn.Theme.size["margin"].width
-			top: parent.top
-			topMargin: Lyn.Theme.size["margin"].height
+		border.width: Lyn.Theme.size["lining"].width
+		border.color: {
+			print(Object.keys(Lyn.Theme.colour));
+			return Lyn.Theme.colour["lining"]
 		}
 	}
 }
