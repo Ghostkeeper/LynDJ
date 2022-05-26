@@ -18,7 +18,7 @@ class Preferences(PyQt6.QtCore.QObject):
 	"""
 
 	"""
-	This class is a singleton. This is the singleton instance.
+	This class is a singleton. This is the one instance.
 	"""
 	_instance = None
 
@@ -60,6 +60,7 @@ class Preferences(PyQt6.QtCore.QObject):
 			raise KeyError(f"A preference with the key {key} already exists.")
 		logging.debug(f"Adding preference {key} with default {default}.")
 		self.defaults[key] = default
+		self.values[key] = default
 
 	def ensure_exists(self) -> None:
 		"""
@@ -82,7 +83,7 @@ class Preferences(PyQt6.QtCore.QObject):
 		:param key: The preference to get the value of.
 		:return: The current value of the preference.
 		"""
-		return self.values.get(key, self.defaults[key])  # Get from the values, and if not present there, get from the defaults.
+		return self.values[key]
 
 	def load(self) -> None:
 		"""
@@ -91,7 +92,8 @@ class Preferences(PyQt6.QtCore.QObject):
 		filepath = self.storage_location()
 		logging.info(f"Loading preferences from: {filepath}")
 		with open(filepath) as f:
-			self.values = json.load(f)
+			self.values = copy.deepcopy(self.defaults)
+			self.values.update(json.load(f))
 
 	def save(self) -> None:
 		"""
@@ -99,8 +101,13 @@ class Preferences(PyQt6.QtCore.QObject):
 		"""
 		filepath = self.storage_location()
 		logging.debug(f"Saving preferences.")
+
+		changed = {}
+		for key, value in self.values.items():
+			if self.defaults[key] != value:  # Not equal to default.
+				changed[key] = value
 		with open(filepath, "w") as f:
-			json.dump(self.values, f)
+			json.dump(changed, f)
 
 	@PyQt6.QtCore.pyqtSlot(str, "QVariant")
 	def set(self, key, value) -> None:
@@ -137,6 +144,4 @@ class Preferences(PyQt6.QtCore.QObject):
 		Get a dictionary of all the current preferences.
 		:return: All current preference values.
 		"""
-		result = copy.copy(self.defaults)
-		result.update(self.values)
-		return result
+		return self.values
