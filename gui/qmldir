@@ -1,0 +1,4 @@
+module Gui
+
+AllMusic   1.0 AllMusic.qml
+MainWindow 1.0 MainWindow.qml

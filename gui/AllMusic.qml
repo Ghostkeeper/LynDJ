@@ -5,38 +5,24 @@
 //You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import QtQuick 2.15
-import QtQuick.Controls 2.15
 
-import "./widgets" as Widgets
-import "." as Gui
 import Lyn 1.0 as Lyn
 
-ApplicationWindow {
-	width: 1280
-	height: 720
-	visible: true
-	title: "LynDJ"
+ListView {
+	id: all_music
+	width: 200
+	height: 400
 
-	color: Lyn.Theme.colour["background"]
+	property alias directory: music_directory.directory
 
-	Widgets.DirectoryField {
-		id: directory_field
-		anchors {
-			left: parent.left
-			leftMargin: Lyn.Theme.size["margin"].width
-			top: parent.top
-			topMargin: Lyn.Theme.size["margin"].height
-		}
+	model: Lyn.MusicDirectory{
+		id: music_directory
 
-		currentDirectory: Lyn.Preferences.preferences["browse_path"]
-		onCurrentDirectoryChanged: Lyn.Preferences.set("browse_path", currentDirectory)
+		directory: Lyn.Preferences.preferences["browse_path"]
 	}
-	Gui.AllMusic {
-		anchors {
-			left: parent.left
-			leftMargin: Lyn.Theme.size["margin"].width
-			top: directory_field.bottom
-			topMargin: Lyn.Theme.size["margin"].height
-		}
+	delegate: Text {
+		text: title
+		width: 200
+		height: 20
 	}
 }

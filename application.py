@@ -5,12 +5,14 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import logging
+import os
 import PyQt6.QtCore
 import PyQt6.QtGui  # This is a GUI application.
 import PyQt6.QtQml  # To register types with the QML engine.
 
-import os
+import music_directory
 import preferences
+import storage
 import theme
 
 class Application(PyQt6.QtGui.QGuiApplication):
@@ -40,6 +42,7 @@ class Application(PyQt6.QtGui.QGuiApplication):
 		logging.debug("Registering QML types.")
 		PyQt6.QtQml.qmlRegisterSingletonType(preferences.Preferences, "Lyn", 1, 0, preferences.Preferences.getInstance, "Preferences")
 		PyQt6.QtQml.qmlRegisterSingletonType(theme.Theme, "Lyn", 1, 0, theme.Theme.getInstance, "Theme")
+		PyQt6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
 
 		logging.debug("Loading QML engine.")
 		self.engine = PyQt6.QtQml.QQmlApplicationEngine()
