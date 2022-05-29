@@ -12,6 +12,8 @@ import os.path  # To construct the path to the preferences file.
 import PyQt6.QtCore  # To allow preferences to be reached from QML.
 import typing
 
+import storage  # To know where to store the preferences file.
+
 class Preferences(PyQt6.QtCore.QObject):
 	"""
 	Stores application preferences and makes sure they get reloaded.
@@ -43,6 +45,7 @@ class Preferences(PyQt6.QtCore.QObject):
 		:param parent:
 		"""
 		super().__init__(None)
+		storage.ensure_exists()
 		self.ensure_exists()
 
 		self.defaults = {}
@@ -68,11 +71,6 @@ class Preferences(PyQt6.QtCore.QObject):
 		Ensure that the preference file storage exists.
 		"""
 		filepath = self.storage_location()
-		directory = os.path.dirname(filepath)
-
-		if not os.path.exists(directory):
-			logging.info(f"Preference directory didn't exist yet. Creating it in: {directory}")
-			os.makedirs(directory)
 		if not os.path.exists(filepath):  # No preferences file. First time this got launched.
 			logging.info(f"Preference file didn't exist yet. Creating it in: {filepath}")
 			with open(filepath, "w") as f:
@@ -129,12 +127,7 @@ class Preferences(PyQt6.QtCore.QObject):
 		Get the path to the preferences file on this computer.
 		:return: A file path to a JSON file where the preferences are stored.
 		"""
-		try:
-			os_path = os.environ["XDG_CONFIG_HOME"]  # XDG standard storage location.
-		except KeyError:
-			os_path = os.path.expanduser("~/.config")  # Most Linux machines.
-
-		return os.path.join(os_path, "lyndj", "preferences.json")  # Our own addition to the path.
+		return os.path.join(storage.config(), "preferences.json")
 
 	"""
 	Triggered when any preference value changed.
