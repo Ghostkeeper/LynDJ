@@ -20,11 +20,11 @@ def connect():
 		# Create the database anew.
 		logging.info("Creating metadata database.")
 		connection = sqlite3.connect(db_file)
-		connection.execute("""CREATE TABLE metadata (
-			path text PRIMARY KEY
-			title text
-			author text
-			duration real
+		connection.execute("""CREATE TABLE metadata(
+			path text PRIMARY KEY,
+			title text,
+			author text,
+			duration real,
 			bpm real
 		)""")
 	else:
