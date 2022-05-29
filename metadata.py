@@ -42,7 +42,7 @@ def get_cached(path, field):
 	:return: The value cached for that field. Will be ``None`` if there is no cached information about that field.
 	"""
 	cursor = database.execute("SELECT ? FROM metadata WHERE path = ?", (field, path))
-	if cursor.rowcount == 0:
+	if cursor.rowcount <= 0:
 		return None  # No metadata at all about the specified file.
 	row = cursor.fetchone()  # There should only be one row with that same path, since the primary key must be unique.
 	return row[0]

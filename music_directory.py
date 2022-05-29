@@ -4,9 +4,12 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
-import os
-import PyQt6.QtCore
+import os  # To list files in the music directory.
+import os.path  # To list file paths in the music directory.
+import PyQt6.QtCore  # To expose this list to QML.
 import typing
+
+import metadata  # To get information about the files in the music directory.
 
 class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 	"""
@@ -78,6 +81,7 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 			self.endRemoveRows()
 
 		for new_file in new_files:
+			path = os.path.join(self._directory, new_file)
 			insert_pos = len(self._data)
 			for i in range(len(self._data)):
 				if self._data[i][file_role] < new_file:
@@ -86,9 +90,9 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 			self.beginInsertRows(PyQt6.QtCore.QModelIndex(), insert_pos, insert_pos)
 			self._data.insert(insert_pos, {
 				self.roles[b"filepath"]: new_file,
-				self.roles[b"title"]: "Test title",
-				self.roles[b"author"]: "Test author",
-				self.roles[b"duration"]: 180.0,
-				self.roles[b"bpm"]: 140.0
+				self.roles[b"title"]: metadata.get_cached(path, "title"),
+				self.roles[b"author"]: metadata.get_cached(path, "author"),
+				self.roles[b"duration"]: metadata.get_cached(path, "duration"),
+				self.roles[b"bpm"]: metadata.get_cached(path, "bpm")
 			})
 			self.endInsertRows()

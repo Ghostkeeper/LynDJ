@@ -21,7 +21,7 @@ ListView {
 		directory: Lyn.Preferences.preferences["browse_path"]
 	}
 	delegate: Text {
-		text: title
+		text: title ? title : ""
 		width: 200
 		height: 20
 	}
