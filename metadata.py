@@ -10,45 +10,39 @@ import sqlite3  # To cache metadata on disk.
 
 import storage  # To know where to store the database.
 
-class Metadata:
+def connect():
 	"""
-	Tracks metadata for all known music files.
+	Connect to the metadata database and return the connection.
+	:return: A handle for the database containing metadata.
 	"""
+	db_file = os.path.join(storage.cache(), "metadata.db")
+	if not os.path.exists(db_file):
+		# Create the database anew.
+		logging.info("Creating metadata database.")
+		connection = sqlite3.connect(db_file)
+		connection.execute("""CREATE TABLE metadata (
+			path text PRIMARY KEY
+			title text
+			author text
+			duration real
+			bpm real
+		)""")
+	else:
+		connection = sqlite3.connect(db_file)
 
-	def __init__(self):
-		self.database = self.connect()
+	return connection
 
-	def connect(self):
-		"""
-		Connect to the metadata database and return the connection.
-		:return: A handle for the database containing metadata.
-		"""
-		db_file = os.path.join(storage.cache(), "metadata.db")
-		if not os.path.exists(db_file):
-			# Create the database anew.
-			logging.info("Creating metadata database.")
-			connection = sqlite3.connect(db_file)
-			connection.execute("""CREATE TABLE metadata (
-				path text PRIMARY KEY
-				title text
-				author text
-				duration real
-				bpm real
-			)""")
-		else:
-			connection = sqlite3.connect(db_file)
+database = connect()
 
-		return connection
-
-	def get_cached(self, path, field):
-		"""
-		Get a metadata field from the cache about a certain file.
-		:param path: The file to get the metadata field from.
-		:param field: The name of the metadata field to get. Must be a column of the metadata table!
-		:return: The value cached for that field. Will be ``None`` if there is no cached information about that field.
-		"""
-		cursor = self.database.execute("SELECT ? FROM metadata WHERE path = ?", (field, path))
-		if cursor.rowcount == 0:
-			return None  # No metadata at all about the specified file.
-		row = cursor.fetchone()  # There should only be one row with that same path, since the primary key must be unique.
-		return row[0]
+def get_cached(path, field):
+	"""
+	Get a metadata field from the cache about a certain file.
+	:param path: The file to get the metadata field from.
+	:param field: The name of the metadata field to get. Must be a column of the metadata table!
+	:return: The value cached for that field. Will be ``None`` if there is no cached information about that field.
+	"""
+	cursor = database.execute("SELECT ? FROM metadata WHERE path = ?", (field, path))
+	if cursor.rowcount == 0:
+		return None  # No metadata at all about the specified file.
+	row = cursor.fetchone()  # There should only be one row with that same path, since the primary key must be unique.
+	return row[0]
