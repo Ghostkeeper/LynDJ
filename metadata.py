@@ -1,0 +1,54 @@
+# Music player software aimed at Lindy Hop DJs.
+# Copyright (C) 2022 Ghostkeeper
+# This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+# This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
+# You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
+
+import logging
+import os.path  # To know where to store the database.
+import sqlite3  # To cache metadata on disk.
+
+import storage  # To know where to store the database.
+
+class Metadata:
+	"""
+	Tracks metadata for all known music files.
+	"""
+
+	def __init__(self):
+		self.database = self.connect()
+
+	def connect(self):
+		"""
+		Connect to the metadata database and return the connection.
+		:return: A handle for the database containing metadata.
+		"""
+		db_file = os.path.join(storage.cache(), "metadata.db")
+		if not os.path.exists(db_file):
+			# Create the database anew.
+			logging.info("Creating metadata database.")
+			connection = sqlite3.connect(db_file)
+			connection.execute("""CREATE TABLE metadata (
+				path text PRIMARY KEY
+				title text
+				author text
+				duration real
+				bpm real
+			)""")
+		else:
+			connection = sqlite3.connect(db_file)
+
+		return connection
+
+	def get_cached(self, path, field):
+		"""
+		Get a metadata field from the cache about a certain file.
+		:param path: The file to get the metadata field from.
+		:param field: The name of the metadata field to get. Must be a column of the metadata table!
+		:return: The value cached for that field. Will be ``None`` if there is no cached information about that field.
+		"""
+		cursor = self.database.execute("SELECT ? FROM metadata WHERE path = ?", (field, path))
+		if cursor.rowcount == 0:
+			return None  # No metadata at all about the specified file.
+		row = cursor.fetchone()  # There should only be one row with that same path, since the primary key must be unique.
+		return row[0]
