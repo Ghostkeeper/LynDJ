@@ -28,7 +28,7 @@ ApplicationWindow {
 			topMargin: Lyn.Theme.size["margin"].height
 		}
 
-		currentDirectory: Lyn.Preferences.preferences["browse_path"]
+		Component.onCompleted: currentDirectory = Lyn.Preferences.preferences["browse_path"]
 		onCurrentDirectoryChanged: Lyn.Preferences.set("browse_path", currentDirectory)
 	}
 	Gui.AllMusic {
