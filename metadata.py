@@ -25,7 +25,8 @@ def connect():
 			title text,
 			author text,
 			duration real,
-			bpm real
+			bpm real,
+			cachetime datetime 
 		)""")
 	else:
 		connection = sqlite3.connect(db_file)
@@ -46,3 +47,38 @@ def get_cached(path, field):
 		return None  # No metadata at all about the specified file.
 	row = cursor.fetchone()  # There should only be one row with that same path, since the primary key must be unique.
 	return row[0]
+
+def get_entry(path, field) -> str:
+	"""
+	Get a metadata entry from a certain file.
+
+	If there is an entry in the cache and it is up-to-date, it will be obtained from that cache. Otherwise it will be
+	read from the file itself.
+	:param path: The file to get the metadata entry from.
+	:param field: The name of the metadata field to get. Must be a column of the metadata table!
+	:return: The value of that field. Returns an empty string if the metadata could not be read.
+	"""
+	cursor = database.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
+	if cursor.rowcount <= 0:
+		update_metadata(path)
+		cursor = database.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
+		if cursor.rowcount <= 0:
+			logging.warning(f"Unable to get metadata from file: {path}")
+			return ""
+	row = cursor.fetchone()
+	last_modified = os.path.getmtime(path)
+	if last_modified > row[0]:
+		update_metadata(path)
+		cursor = database.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
+		if cursor.rowcount <= 0:
+			logging.warning(f"Unable to update metadata from file: {path}")
+		else:
+			row = cursor.fetchone()
+	return row[1]  # Return the requested field.
+
+def update_metadata(path):
+	"""
+	Update all metadata fields of a certain file and store it in the cache.
+	:param path: The file to read the metadata from.
+	"""
+	pass  # TODO.
