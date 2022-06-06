@@ -5,6 +5,12 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import logging
+import mutagen  # To read metadata from music files.
+import mutagen.easyid3
+import mutagen.flac
+import mutagen.mp3
+import mutagen.ogg
+import mutagen.wave
 import os.path  # To know where to store the database.
 import sqlite3  # To cache metadata on disk.
 
@@ -81,4 +87,29 @@ def update_metadata(path):
 	Update all metadata fields of a certain file and store it in the cache.
 	:param path: The file to read the metadata from.
 	"""
-	pass  # TODO.
+	try:
+		f = mutagen.File(path)
+		if type(f) in {mutagen.mp3.MP3, mutagen.wave.WAVE}:  # Uses ID3 tags.
+			id3 = mutagen.easyid3.EasyID3(path)
+			title = id3.get("title", os.path.splitext(os.path.basename(path)))[0]
+			artist = id3.get("artist", "")[0]
+			bpm = id3.get("bpm", "-1")[0]
+		elif isinstance(f, mutagen.ogg.OggFileType) or type(f) == mutagen.flac.FLAC:  # These types use Vorbis Comments.
+			title = f.get("title", [os.path.splitext(os.path.basename(path))])[0]
+			artist = f.get("artist", [""])[0]
+			bpm = f.get("bpm", ["-1"])[0]
+		else:  # Unknown file type.
+			title = os.path.splitext(os.path.basename(path))
+			artist = ""
+			bpm = -1
+		duration = f.info.length
+	except mutagen.MutagenError as e:
+		title = os.path.splitext(os.path.basename(path))[0]  # Take the file name without extension.
+		artist = ""
+		bpm = -1
+		duration = -1
+
+	try:
+		bpm = float(bpm)
+	except ValueError:
+		bpm = -1
