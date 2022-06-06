@@ -7,6 +7,7 @@
 import os  # To list files in the music directory.
 import os.path  # To list file paths in the music directory.
 import PyQt6.QtCore  # To expose this list to QML.
+import threading  # To update the metadata in downtime.
 import typing
 
 import metadata  # To get information about the files in the music directory.
@@ -33,14 +34,21 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 		}
 		self._directory = ""
 		self._data = []
+		self.update_thread = None
 
 	def directory_set(self, new_directory) -> None:
 		"""
 		Change the current directory that this model is looking at.
 		:param new_directory: A path to a directory to look at.
 		"""
+		if self.update_thread is not None:  # A thread is already running to update metadata.
+			thread = self.update_thread
+			self.update_thread = None  # Signal to the thread that it should abort.
+			thread.join()
 		self._directory = new_directory
 		self.update()
+		self.update_thread = threading.Thread(target=self.update_metadata_task)
+		self.update_thread.start()
 
 	@PyQt6.QtCore.pyqtProperty(str, fset=directory_set)
 	def directory(self) -> str:
@@ -59,12 +67,24 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 	def data(self, index, role) -> typing.Any:
 		return self._data[index.row()][role]
 
+	def is_music_file(self, path) -> bool:
+		"""
+		Returns whether the given file is a music file that we can read.
+		:param path: The file to check.
+		:return: ``True`` if it is a music track, or ``False`` if it isn't.
+		"""
+		path = os.path.join(self._directory, path)
+		if not os.path.isfile(path):
+			return False  # Only read files.
+		ext = os.path.splitext(path)[1]
+		return ext in [".mp3", ".flac", ".opus", ".ogg", ".wav"]  # Supported file formats.
+
 	def update(self) -> None:
 		"""
 		Update the track list from the current contents of the watched directory.
 		"""
 		file_role = self.roles[b"filepath"]
-		files = set(os.listdir(self._directory))
+		files = set(filter(self.is_music_file, os.listdir(self._directory)))
 		old_files = set()
 		for item in self._data:
 			old_files.add(item[file_role])
@@ -96,3 +116,13 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 				self.roles[b"bpm"]: metadata.get_cached(path, "bpm")
 			})
 			self.endInsertRows()
+
+	def update_metadata_task(self) -> None:
+		"""
+		A background task that gradually updates all of the metadata in the current folder.
+		"""
+		for entry in self._data:
+			if self.update_thread is None:  # We have to abort.
+				break
+			path = os.path.join(self._directory, entry[self.roles[b"filepath"]])
+			metadata.update_metadata(path)
