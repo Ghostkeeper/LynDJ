@@ -73,27 +73,25 @@ def get_entry(path, field) -> str:
 	with database_lock:
 		connection = database.get(threading.current_thread().ident, connect())
 		cursor = connection.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
-
-	if cursor.rowcount <= 0:
-		update_metadata(path)
-
-	with database_lock:
-		cursor = connection.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
-	if cursor.rowcount <= 0:
-		logging.warning(f"Unable to get metadata from file: {path}")
-		return ""
-	with database_lock:
 		row = cursor.fetchone()
+
+	if row is None:
+		update_metadata(path)
+		with database_lock:
+			cursor = connection.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
+			row = cursor.fetchone()
+		if row is None:
+			logging.warning(f"Unable to get metadata from file: {path}")
+			return ""
 	last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(path))
 	if last_modified > row[0]:
 		update_metadata(path)
 		with database_lock:
 			cursor = connection.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
-		if cursor.rowcount <= 0:
+			row = cursor.fetchone()
+		if row is None:
 			logging.warning(f"Unable to update metadata from file: {path}")
-		else:
-			with database_lock:
-				row = cursor.fetchone()
+			return ""
 	return row[1]  # Return the requested field.
 
 def update_metadata(path):
