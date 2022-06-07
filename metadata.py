@@ -98,6 +98,7 @@ def update_metadata(path):
 	Update all metadata fields of a certain file and store it in the cache.
 	:param path: The file to read the metadata from.
 	"""
+	logging.debug(f"Updating metadata for {path}")
 	try:
 		f = mutagen.File(path)
 		if type(f) in {mutagen.mp3.MP3, mutagen.wave.WAVE}:  # Uses ID3 tags.
@@ -115,6 +116,7 @@ def update_metadata(path):
 			bpm = -1
 		duration = f.info.length
 	except mutagen.MutagenError as e:
+		logging.warning(f"Unable to get metadata from {path}: {e}")
 		title = os.path.splitext(os.path.basename(path))[0]  # Take the file name without extension.
 		author = ""
 		bpm = -1
