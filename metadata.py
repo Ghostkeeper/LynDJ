@@ -4,6 +4,7 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import datetime  # To interpret the last-modified time.
 import logging
 import mutagen  # To read metadata from music files.
 import mutagen.easyid3
@@ -13,6 +14,7 @@ import mutagen.ogg
 import mutagen.wave
 import os.path  # To know where to store the database.
 import sqlite3  # To cache metadata on disk.
+import threading  # To restrict access to the database by one thread at a time.
 
 import storage  # To know where to store the database.
 
@@ -39,7 +41,8 @@ def connect():
 
 	return connection
 
-database = connect()
+database = {}  # Database connection created for each thread.
+database_lock = threading.Lock()
 
 def get_cached(path, field):
 	"""
@@ -48,10 +51,13 @@ def get_cached(path, field):
 	:param field: The name of the metadata field to get. Must be a column of the metadata table!
 	:return: The value cached for that field. Will be ``None`` if there is no cached information about that field.
 	"""
-	cursor = database.execute("SELECT ? FROM metadata WHERE path = ?", (field, path))
+	with database_lock:
+		connection = database.get(threading.current_thread().ident, connect())
+		cursor = connection.execute("SELECT ? FROM metadata WHERE path = ?", (field, path))
 	if cursor.rowcount <= 0:
 		return None  # No metadata at all about the specified file.
-	row = cursor.fetchone()  # There should only be one row with that same path, since the primary key must be unique.
+	with database_lock:
+		row = cursor.fetchone()  # There should only be one row with that same path, since the primary key must be unique.
 	return row[0]
 
 def get_entry(path, field) -> str:
@@ -64,22 +70,30 @@ def get_entry(path, field) -> str:
 	:param field: The name of the metadata field to get. Must be a column of the metadata table!
 	:return: The value of that field. Returns an empty string if the metadata could not be read.
 	"""
-	cursor = database.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
+	with database_lock:
+		connection = database.get(threading.current_thread().ident, connect())
+		cursor = connection.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
+
 	if cursor.rowcount <= 0:
 		update_metadata(path)
-		cursor = database.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
-		if cursor.rowcount <= 0:
-			logging.warning(f"Unable to get metadata from file: {path}")
-			return ""
-	row = cursor.fetchone()
-	last_modified = os.path.getmtime(path)
+
+	with database_lock:
+		cursor = connection.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
+	if cursor.rowcount <= 0:
+		logging.warning(f"Unable to get metadata from file: {path}")
+		return ""
+	with database_lock:
+		row = cursor.fetchone()
+	last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(path))
 	if last_modified > row[0]:
 		update_metadata(path)
-		cursor = database.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
+		with database_lock:
+			cursor = connection.execute("SELECT cachetime, ? FROM metadata WHERE path = ?", (field, path))
 		if cursor.rowcount <= 0:
 			logging.warning(f"Unable to update metadata from file: {path}")
 		else:
-			row = cursor.fetchone()
+			with database_lock:
+				row = cursor.fetchone()
 	return row[1]  # Return the requested field.
 
 def update_metadata(path):
@@ -91,21 +105,21 @@ def update_metadata(path):
 		f = mutagen.File(path)
 		if type(f) in {mutagen.mp3.MP3, mutagen.wave.WAVE}:  # Uses ID3 tags.
 			id3 = mutagen.easyid3.EasyID3(path)
-			title = id3.get("title", os.path.splitext(os.path.basename(path)))[0]
-			artist = id3.get("artist", "")[0]
+			title = id3.get("title", [os.path.splitext(os.path.basename(path))[0]])[0]
+			author = id3.get("artist", "")[0]
 			bpm = id3.get("bpm", "-1")[0]
 		elif isinstance(f, mutagen.ogg.OggFileType) or type(f) == mutagen.flac.FLAC:  # These types use Vorbis Comments.
-			title = f.get("title", [os.path.splitext(os.path.basename(path))])[0]
-			artist = f.get("artist", [""])[0]
+			title = f.get("title", [os.path.splitext(os.path.basename(path))[0]])[0]
+			author = f.get("artist", [""])[0]
 			bpm = f.get("bpm", ["-1"])[0]
 		else:  # Unknown file type.
-			title = os.path.splitext(os.path.basename(path))
-			artist = ""
+			title = os.path.splitext(os.path.basename(path))[0]
+			author = ""
 			bpm = -1
 		duration = f.info.length
 	except mutagen.MutagenError as e:
 		title = os.path.splitext(os.path.basename(path))[0]  # Take the file name without extension.
-		artist = ""
+		author = ""
 		bpm = -1
 		duration = -1
 
@@ -113,3 +127,10 @@ def update_metadata(path):
 		bpm = float(bpm)
 	except ValueError:
 		bpm = -1
+
+	last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(path))
+
+	with database_lock:
+		connection = database.get(threading.current_thread().ident, connect())
+		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, duration, bpm, cachetime) VALUES (?, ?, ?, ?, ?, ?)",
+			(path, title, author, duration, bpm, last_modified))
