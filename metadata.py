@@ -4,7 +4,6 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
-import datetime  # To interpret the last-modified time.
 import logging
 import mutagen  # To read metadata from music files.
 import mutagen.easyid3
@@ -34,7 +33,7 @@ def connect():
 			author text,
 			duration real,
 			bpm real,
-			cachetime datetime 
+			cachetime real
 		)""")
 	else:
 		connection = sqlite3.connect(db_file)
@@ -83,7 +82,7 @@ def get_entry(path, field) -> str:
 		if row is None:
 			logging.warning(f"Unable to get metadata from file: {path}")
 			return ""
-	last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(path))
+	last_modified = os.path.getmtime(path)
 	if last_modified > row[0]:
 		update_metadata(path)
 		with database_lock:
@@ -126,9 +125,10 @@ def update_metadata(path):
 	except ValueError:
 		bpm = -1
 
-	last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(path))
+	last_modified = os.path.getmtime(path)
 
 	with database_lock:
 		connection = database.get(threading.current_thread().ident, connect())
 		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, duration, bpm, cachetime) VALUES (?, ?, ?, ?, ?, ?)",
 			(path, title, author, duration, bpm, last_modified))
+		connection.commit()
