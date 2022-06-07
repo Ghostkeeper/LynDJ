@@ -125,6 +125,9 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 			if self.update_thread is None:  # We have to abort.
 				break
 			path = os.path.join(self._directory, entry[self.roles[b"filepath"]])
+			self.beginRemoveRows(PyQt6.QtCore.QModelIndex(), index, index)
+			self.endRemoveRows()
+			self.beginInsertRows(PyQt6.QtCore.QModelIndex(), index, index)
 			self._data[index] = {
 				self.roles[b"filepath"]: path,
 				self.roles[b"title"]: metadata.get_entry(path, "title"),
@@ -133,3 +136,4 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 				self.roles[b"bpm"]: metadata.get_entry(path, "bpm")
 			}
 			self.setItemData(self.index(index), self._data[index])
+			self.endInsertRows()
