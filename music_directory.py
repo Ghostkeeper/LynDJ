@@ -121,8 +121,15 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 		"""
 		A background task that gradually updates all of the metadata in the current folder.
 		"""
-		for entry in self._data:
+		for index, entry in enumerate(self._data):
 			if self.update_thread is None:  # We have to abort.
 				break
 			path = os.path.join(self._directory, entry[self.roles[b"filepath"]])
-			metadata.update_metadata(path)
+			self._data[index] = {
+				self.roles[b"filepath"]: path,
+				self.roles[b"title"]: metadata.get_entry(path, "title"),
+				self.roles[b"author"]: metadata.get_entry(path, "author"),
+				self.roles[b"duration"]: metadata.get_entry(path, "duration"),
+				self.roles[b"bpm"]: metadata.get_entry(path, "bpm")
+			}
+			self.setItemData(self.index(index), self._data[index])
