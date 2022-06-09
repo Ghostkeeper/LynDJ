@@ -29,8 +29,9 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 			b"filepath": user_role + 1,
 			b"title": user_role + 2,
 			b"author": user_role + 3,
-			b"duration": user_role + 4,
-			b"bpm": user_role + 5
+			b"comment": user_role + 4,
+			b"duration": user_role + 5,
+			b"bpm": user_role + 6
 		}
 		self._directory = ""
 		self._data = []
@@ -112,6 +113,7 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 				self.roles[b"filepath"]: new_file,
 				self.roles[b"title"]: metadata.get_cached(path, "title"),
 				self.roles[b"author"]: metadata.get_cached(path, "author"),
+				self.roles[b"comment"]: metadata.get_cached(path, "comment"),
 				self.roles[b"duration"]: metadata.get_cached(path, "duration"),
 				self.roles[b"bpm"]: metadata.get_cached(path, "bpm")
 			})
@@ -132,6 +134,7 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 				self.roles[b"filepath"]: path,
 				self.roles[b"title"]: metadata.get_entry(path, "title"),
 				self.roles[b"author"]: metadata.get_entry(path, "author"),
+				self.roles[b"comment"]: metadata.get_entry(path, "comment"),
 				self.roles[b"duration"]: metadata.get_entry(path, "duration"),
 				self.roles[b"bpm"]: metadata.get_entry(path, "bpm")
 			}
