@@ -6,30 +6,5 @@
 
 import QtQuick 2.15
 
-import Lyn 1.0 as Lyn
-
-ListView {
-	id: all_music
-	width: 200
-	height: 400
-
-	property alias directory: music_directory.directory
-
-	model: Lyn.MusicDirectory{
-		id: music_directory
-
-		directory: Lyn.Preferences.preferences["browse_path"]
-	}
-	delegate: Row {
-		Text {
-			text: title ? title : ""
-			width: 200
-			height: 20
-		}
-		Text {
-			text: author ? author : ""
-			width: 200
-			height: 20
-		}
-	}
+Rectangle {
 }

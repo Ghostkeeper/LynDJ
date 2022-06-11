@@ -19,6 +19,43 @@ ApplicationWindow {
 
 	color: Lyn.Theme.colour["background"]
 
+	Gui.TopBar {
+		id: topbar
+		anchors {
+			top: parent.top
+			left: parent.left
+			right: parent.right
+		}
+	}
+
+	Gui.FileBrowser {
+		id: filebrowser
+		anchors {
+			top: topbar.bottom
+			bottom: player.top
+			left: parent.left
+		}
+		//Width to be determined by slider.
+	}
+
+	Gui.Playlist {
+		anchors {
+			top: topbar.bottom
+			bottom: player.top
+			left: filebrowser.right
+			right: parent.right
+		}
+	}
+
+	Gui.Player {
+		id: player
+		anchors {
+			bottom: parent.bottom
+			left: parent.left
+			right: parent.right
+		}
+	}
+
 	Widgets.DirectoryField {
 		id: directory_field
 		anchors {
