@@ -3,6 +3,7 @@
 		"margin": [10, 10],
 		"control": [100, 32],
 		"lining": [1, 1],
+		"border_offset": [12, 12],
 
 		"topbar": [0, 52],
 		"player": [0, 252]

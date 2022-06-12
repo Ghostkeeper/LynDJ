@@ -19,29 +19,41 @@ Rectangle {
 			left: parent.left
 			right: parent.right
 			top: parent.bottom
+			topMargin: -Lyn.Theme.size["border_offset"].height
 		}
-		height: Lyn.Theme.size["margin"].height
+		height: childrenRect.height
 
 		Image {
 			id: border_left
-			height: parent.height
 
 			source: Lyn.Theme.icon["border_top_left"]
 		}
 		Image {
-			id: border_middle
+			id: border_fill_left
 			anchors {
 				left: border_left.right
+				right: border_middle.left
+			}
+
+			source: Lyn.Theme.icon["border_top"]
+		}
+		Image {
+			id: border_middle
+			anchors.horizontalCenter: parent.horizontalCenter
+
+			source: Lyn.Theme.icon["border_top_middle"]
+		}
+		Image {
+			anchors {
+				left: border_middle.right
 				right: border_right.left
 			}
-			height: parent.height
 
 			source: Lyn.Theme.icon["border_top"]
 		}
 		Image {
 			id: border_right
 			anchors.right: parent.right
-			height: parent.height
 
 			source: Lyn.Theme.icon["border_top_right"]
 		}

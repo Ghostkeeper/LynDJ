@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
-<svg width="20" height="10" xmlns="http://www.w3.org/2000/svg">
-<path fill="none" stroke="black" stroke-width="1" d="
-	M19.5,10 v-9.5 h-19.5
-	M17.5,9.5 v-7 h-7 v7 z
-	M15.5,8 v-3.5 h-3.5
-	M10.5,2.5 h-10.5
-	M12.5,0.5 l-4,4 h-8.5
-	M8.5,0.5 l-6,6 h8
-	M4.5,0.6 l-4,4
-" />
+<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+<g fill="none" stroke="black">
+	<path stroke-width="4" d="
+		M40,12 h-4 l-16,16 h-20
+		M28,20 h-28" />
+	<path stroke-width="2" d="
+		M36,13 h-36
+		M18,20 l-8,8
+		M40,19 h-12" />
+</g>
 </svg>
