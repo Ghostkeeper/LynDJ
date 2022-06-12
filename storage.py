@@ -42,3 +42,10 @@ def ensure_exists() -> None:
 	if not os.path.exists(cache_path):
 		logging.info(f"Creating cache directory in {cache_path}")
 		os.makedirs(cache_path)
+
+def source() -> str:
+	"""
+	Get the location of the source code or installation folder.
+	:return: A path to the directory where the application is installed.
+	"""
+	return os.path.dirname(__file__)
