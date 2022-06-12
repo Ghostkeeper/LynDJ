@@ -70,6 +70,14 @@ class Theme(PyQt6.QtCore.QObject):
 		"""
 		return self.fonts
 
+	@PyQt6.QtCore.pyqtProperty("QVariantMap", notify=themeChanged)
+	def icon(self) -> typing.Dict[str, str]:
+		"""
+		Get the dictionary of icon names to icon paths.
+		:return: A dictionary mapping item names to their paths.
+		"""
+		return self.icons
+
 	def load(self, update_gui=True) -> None:
 		"""
 		Load the theme from the theme file.
