@@ -19,15 +19,6 @@ ApplicationWindow {
 
 	color: Lyn.Theme.colour["background"]
 
-	Gui.TopBar {
-		id: topbar
-		anchors {
-			top: parent.top
-			left: parent.left
-			right: parent.right
-		}
-	}
-
 	Gui.FileBrowser {
 		id: filebrowser
 		anchors {
@@ -43,6 +34,15 @@ ApplicationWindow {
 			top: topbar.bottom
 			bottom: player.top
 			left: filebrowser.right
+			right: parent.right
+		}
+	}
+
+	Gui.TopBar {
+		id: topbar
+		anchors {
+			top: parent.top
+			left: parent.left
 			right: parent.right
 		}
 	}
