@@ -12,4 +12,38 @@ Rectangle {
 	height: Lyn.Theme.size["topbar"].height
 
 	color: Lyn.Theme.colour["primary_background"]
+
+	//Border extends below the actual size of the top bar!
+	Item {
+		anchors {
+			left: parent.left
+			right: parent.right
+			top: parent.bottom
+		}
+		height: Lyn.Theme.size["margin"].height
+
+		Image {
+			id: border_left
+			height: parent.height
+
+			source: Lyn.Theme.icon["border_top_left"]
+		}
+		Image {
+			id: border_middle
+			anchors {
+				left: border_left.right
+				right: border_right.left
+			}
+			height: parent.height
+
+			source: Lyn.Theme.icon["border_top"]
+		}
+		Image {
+			id: border_right
+			anchors.right: parent.right
+			height: parent.height
+
+			source: Lyn.Theme.icon["border_top_right"]
+		}
+	}
 }

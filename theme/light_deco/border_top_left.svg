@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<svg width="20" height="10" xmlns="http://www.w3.org/2000/svg">
+<path fill="none" stroke="black" stroke-width="1" d="
+	M0.5,10 v-9.5 h19.5
+	M2.5,9.5 v-7 h7 v7 z
+	M4.5,8 v-3.5 h3.5
+	M9.5,2.5 h10.5
+	M7.5,0.5 l4,4 h8.5
+	M11.5,0.5 l6,6 h-8
+	M15.5,0.6 l4,4
+" />
+</svg>

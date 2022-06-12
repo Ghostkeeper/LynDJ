@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<svg width="10" height="10" xmlns="http://www.w3.org/2000/svg">
+<path fill="none" stroke="black" stroke-width="1" d="
+	M0,0.5 h10
+	M0,2.5 h10
+	M0,4.5 h10
+" />
+</svg>
