@@ -40,11 +40,12 @@ class Theme(PyQt6.QtCore.QObject):
 	def __init__(self):
 		super().__init__(None)
 
-		preferences.Preferences.getInstance().add("theme", "light")
+		preferences.Preferences.getInstance().add("theme", "light_deco")
 
 		self.sizes = {}
 		self.colours = {}
 		self.fonts = {}
+		self.icons = {}
 
 		self.load(update_gui=False)
 
@@ -78,29 +79,39 @@ class Theme(PyQt6.QtCore.QObject):
 		load of the theme, to prevent essentially loading the GUI twice.
 		"""
 		theme_name = preferences.Preferences.getInstance().get("theme")
-		theme_file = os.path.join("theme", theme_name + ".json")
-		logging.info(f"Loading theme from: {theme_file}")
+		theme_directory = os.path.join("theme", theme_name)
+		logging.info(f"Loading theme from: {theme_directory}")
+
+		theme_file = os.path.join(theme_directory, "theme.json")
 		with open(theme_file) as f:
 			theme_dict = json.load(f)
-			for key, dimensions in theme_dict["sizes"].items():
-				while type(dimensions) is str:  # Refers to a different theme entry.
-					dimensions = theme_dict["sizes"][dimensions]
-				self.sizes[key] = PyQt6.QtCore.QSizeF(dimensions[0], dimensions[1])
-			for key, channels in theme_dict["colours"].items():
-				while type(channels) is str:  # Refers to a different theme entry.
-					channels = theme_dict["colours"][channels]
-				self.colours[key] = PyQt6.QtGui.QColor(channels[0], channels[1], channels[2], channels[3])  # RGBA.
-			for key, parameters in theme_dict["fonts"].items():
-				while type(parameters) is str:
-					parameters = theme_dict["fonts"][parameters]
-				font = PyQt6.QtGui.QFont()
-				font.setFamily(parameters["family"])
-				font.setPointSize(parameters["size"])
-				font.setWeight(parameters["weight"])
-				font.setItalic(parameters.get("italic", False))
-				self.fonts[key] = font
-			if update_gui:
-				self.themeChanged.emit()
+
+		for key, dimensions in theme_dict["sizes"].items():
+			while type(dimensions) is str:  # Refers to a different theme entry.
+				dimensions = theme_dict["sizes"][dimensions]
+			self.sizes[key] = PyQt6.QtCore.QSizeF(dimensions[0], dimensions[1])
+		for key, channels in theme_dict["colours"].items():
+			while type(channels) is str:  # Refers to a different theme entry.
+				channels = theme_dict["colours"][channels]
+			self.colours[key] = PyQt6.QtGui.QColor(channels[0], channels[1], channels[2], channels[3])  # RGBA.
+		for key, parameters in theme_dict["fonts"].items():
+			while type(parameters) is str:
+				parameters = theme_dict["fonts"][parameters]
+			font = PyQt6.QtGui.QFont()
+			font.setFamily(parameters["family"])
+			font.setPointSize(parameters["size"])
+			font.setWeight(parameters["weight"])
+			font.setItalic(parameters.get("italic", False))
+			self.fonts[key] = font
+		if update_gui:
+			self.themeChanged.emit()
+
+		for icon_file in os.listdir(theme_directory):
+			icon_name, ext = os.path.splitext(icon_file)
+			if ext != ".svg":
+				continue  # Only load SVGs as icons.
+			icon_path = os.path.join(theme_directory, icon_file)
+			self.icons[icon_name] = icon_path
 
 	@PyQt6.QtCore.pyqtProperty("QVariantMap", notify=themeChanged)
 	def size(self) -> typing.Dict[str, PyQt6.QtCore.QSizeF]:
