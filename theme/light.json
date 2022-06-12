@@ -2,7 +2,10 @@
 	"sizes": {
 		"margin": [10, 10],
 		"control": [100, 32],
-		"lining": [1, 1]
+		"lining": [1, 1],
+
+		"topbar": [0, 52],
+		"player": [0, 252]
 	},
 	"colours": {
 		"background": [255, 255, 255, 255],
@@ -10,6 +13,7 @@
 		"primary": [205, 178, 114, 255],
 		"secondary": [115, 173, 206, 255],
 
+		"primary_background": [237, 228, 205, 255],
 		"disabled_background": [227, 224, 216, 255],
 		"disabled_foreground": [68, 55, 24, 255],
 

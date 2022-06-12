@@ -6,5 +6,10 @@
 
 import QtQuick 2.15
 
+import Lyn 1.0 as Lyn
+
 Rectangle {
+	height: Lyn.Theme.size["player"].height
+
+	color: Lyn.Theme.colour["primary_background"]
 }
