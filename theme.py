@@ -12,6 +12,7 @@ import PyQt6.QtGui  # To export colours.
 import typing
 
 import preferences  # To get which theme to load.
+import storage  # To find the theme directory.
 
 class Theme(PyQt6.QtCore.QObject):
 	"""
@@ -87,7 +88,7 @@ class Theme(PyQt6.QtCore.QObject):
 		load of the theme, to prevent essentially loading the GUI twice.
 		"""
 		theme_name = preferences.Preferences.getInstance().get("theme")
-		theme_directory = os.path.join("theme", theme_name)
+		theme_directory = os.path.join(storage.source(), "theme", theme_name)
 		logging.info(f"Loading theme from: {theme_directory}")
 
 		theme_file = os.path.join(theme_directory, "theme.json")
