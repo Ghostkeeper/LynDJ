@@ -6,16 +6,15 @@
 
 import logging
 import os
-import PyQt6.QtCore
-import PyQt6.QtGui  # This is a GUI application.
-import PyQt6.QtQml  # To register types with the QML engine.
+import PySide6.QtCore
+import PySide6.QtGui  # This is a GUI application.
+import PySide6.QtQml  # To register types with the QML engine.
 
 import music_directory
 import preferences
-import storage
 import theme
 
-class Application(PyQt6.QtGui.QGuiApplication):
+class Application(PySide6.QtGui.QGuiApplication):
 	"""
 	The Qt application that runs the whole thing.
 
@@ -32,7 +31,7 @@ class Application(PyQt6.QtGui.QGuiApplication):
 
 		# TODO: Move creation of browse path preference to path browser class.
 		prefs = preferences.Preferences.getInstance()
-		music_locations = PyQt6.QtCore.QStandardPaths.standardLocations(PyQt6.QtCore.QStandardPaths.StandardLocation.MusicLocation)
+		music_locations = PySide6.QtCore.QStandardPaths.standardLocations(PySide6.QtCore.QStandardPaths.StandardLocation.MusicLocation)
 		if music_locations:
 			browse_path = music_locations[0]
 		else:
@@ -40,12 +39,12 @@ class Application(PyQt6.QtGui.QGuiApplication):
 		prefs.add("browse_path", browse_path)
 
 		logging.debug("Registering QML types.")
-		PyQt6.QtQml.qmlRegisterSingletonType(preferences.Preferences, "Lyn", 1, 0, preferences.Preferences.getInstance, "Preferences")
-		PyQt6.QtQml.qmlRegisterSingletonType(theme.Theme, "Lyn", 1, 0, theme.Theme.getInstance, "Theme")
-		PyQt6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
+		PySide6.QtQml.qmlRegisterSingletonInstance(preferences.Preferences, "Lyn", 1, 0, "Preferences", preferences.Preferences.getInstance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(theme.Theme, "Lyn", 1, 0, "Theme", theme.Theme.getInstance())
+		PySide6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
 
 		logging.debug("Loading QML engine.")
-		self.engine = PyQt6.QtQml.QQmlApplicationEngine()
+		self.engine = PySide6.QtQml.QQmlApplicationEngine()
 		self.engine.quit.connect(self.quit)
 		self.engine.load("gui/MainWindow.qml")
 

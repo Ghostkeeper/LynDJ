@@ -7,14 +7,14 @@
 import json  # Theme files are JSON formatted.
 import logging
 import os.path  # To find the theme file.
-import PyQt6.QtCore  # To allow QML to get the theme data, and to export sizes.
-import PyQt6.QtGui  # To export colours.
+import PySide6.QtCore  # To allow QML to get the theme data, and to export sizes.
+import PySide6.QtGui  # To export colours.
 import typing
 
 import preferences  # To get which theme to load.
 import storage  # To find the theme directory.
 
-class Theme(PyQt6.QtCore.QObject):
+class Theme(PySide6.QtCore.QObject):
 	"""
 	Represents a theme, which contains a list of sizes and colours that are consistent throughout the application.
 	"""
@@ -53,25 +53,25 @@ class Theme(PyQt6.QtCore.QObject):
 	"""
 	Triggered when the theme changes.
 	"""
-	themeChanged = PyQt6.QtCore.pyqtSignal()
+	themeChanged = PySide6.QtCore.Signal()
 
-	@PyQt6.QtCore.pyqtProperty("QVariantMap", notify=themeChanged)
-	def colour(self) -> typing.Dict[str, PyQt6.QtGui.QColor]:
+	@PySide6.QtCore.Property("QVariantMap", notify=themeChanged)
+	def colour(self) -> typing.Dict[str, PySide6.QtGui.QColor]:
 		"""
 		Get the dictionary of colours.
 		:return: A dictionary of all colours.
 		"""
 		return self.colours
 
-	@PyQt6.QtCore.pyqtProperty("QVariantMap", notify=themeChanged)
-	def font(self) -> typing.Dict[str, PyQt6.QtGui.QFont]:
+	@PySide6.QtCore.Property("QVariantMap", notify=themeChanged)
+	def font(self) -> typing.Dict[str, PySide6.QtGui.QFont]:
 		"""
 		Get the dictionary of fonts.
 		:return: A dictionary of all fonts.
 		"""
 		return self.fonts
 
-	@PyQt6.QtCore.pyqtProperty("QVariantMap", notify=themeChanged)
+	@PySide6.QtCore.Property("QVariantMap", notify=themeChanged)
 	def icon(self) -> typing.Dict[str, str]:
 		"""
 		Get the dictionary of icon names to icon paths.
@@ -98,18 +98,18 @@ class Theme(PyQt6.QtCore.QObject):
 		for key, dimensions in theme_dict["sizes"].items():
 			while type(dimensions) is str:  # Refers to a different theme entry.
 				dimensions = theme_dict["sizes"][dimensions]
-			self.sizes[key] = PyQt6.QtCore.QSizeF(dimensions[0], dimensions[1])
+			self.sizes[key] = PySide6.QtCore.QSizeF(dimensions[0], dimensions[1])
 		for key, channels in theme_dict["colours"].items():
 			while type(channels) is str:  # Refers to a different theme entry.
 				channels = theme_dict["colours"][channels]
-			self.colours[key] = PyQt6.QtGui.QColor(channels[0], channels[1], channels[2], channels[3])  # RGBA.
+			self.colours[key] = PySide6.QtGui.QColor(channels[0], channels[1], channels[2], channels[3])  # RGBA.
 		for key, parameters in theme_dict["fonts"].items():
 			while type(parameters) is str:
 				parameters = theme_dict["fonts"][parameters]
-			font = PyQt6.QtGui.QFont()
+			font = PySide6.QtGui.QFont()
 			font.setFamily(parameters["family"])
 			font.setPointSize(parameters["size"])
-			font.setWeight(parameters["weight"])
+			font.setWeight(PySide6.QtGui.QFont.Weight(parameters["weight"]))
 			font.setItalic(parameters.get("italic", False))
 			self.fonts[key] = font
 		if update_gui:
@@ -122,8 +122,8 @@ class Theme(PyQt6.QtCore.QObject):
 			icon_path = os.path.join(theme_directory, icon_file)
 			self.icons[icon_name] = icon_path
 
-	@PyQt6.QtCore.pyqtProperty("QVariantMap", notify=themeChanged)
-	def size(self) -> typing.Dict[str, PyQt6.QtCore.QSizeF]:
+	@PySide6.QtCore.Property("QVariantMap", notify=themeChanged)
+	def size(self) -> typing.Dict[str, PySide6.QtCore.QSizeF]:
 		"""
 		Get the dictionary of sizes.
 		:return: A dictionary of all theme sizes.

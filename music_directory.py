@@ -6,13 +6,13 @@
 
 import os  # To list files in the music directory.
 import os.path  # To list file paths in the music directory.
-import PyQt6.QtCore  # To expose this list to QML.
+import PySide6.QtCore  # To expose this list to QML.
 import threading  # To update the metadata in downtime.
 import typing
 
 import metadata  # To get information about the files in the music directory.
 
-class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
+class MusicDirectory(PySide6.QtCore.QAbstractListModel):
 	"""
 	A list of the tracks contained within a certain directory, and their metadata.
 	"""
@@ -24,7 +24,7 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 		"""
 		super().__init__(parent)
 
-		user_role = PyQt6.QtCore.Qt.ItemDataRole.UserRole
+		user_role = PySide6.QtCore.Qt.ItemDataRole.UserRole
 		self.roles = {
 			b"filepath": user_role + 1,
 			b"title": user_role + 2,
@@ -51,7 +51,7 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 		self.update_thread = threading.Thread(target=self.update_metadata_task)
 		self.update_thread.start()
 
-	@PyQt6.QtCore.pyqtProperty(str, fset=directory_set)
+	@PySide6.QtCore.Property(str, fset=directory_set)
 	def directory(self) -> str:
 		"""
 		The current directory that this model is looking at.
@@ -97,7 +97,7 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 			for i in range(len(self._data)):
 				if self._data[i][file_role] == removed_file:
 					remove_pos = i
-			self.beginRemoveRows(PyQt6.QtCore.QModelIndex(), remove_pos, remove_pos)
+			self.beginRemoveRows(PySide6.QtCore.QModelIndex(), remove_pos, remove_pos)
 			del self._data[remove_pos]
 			self.endRemoveRows()
 
@@ -108,7 +108,7 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 				if self._data[i][file_role] < new_file:
 					insert_pos = i
 					break
-			self.beginInsertRows(PyQt6.QtCore.QModelIndex(), insert_pos, insert_pos)
+			self.beginInsertRows(PySide6.QtCore.QModelIndex(), insert_pos, insert_pos)
 			self._data.insert(insert_pos, {
 				self.roles[b"filepath"]: new_file,
 				self.roles[b"title"]: metadata.get_cached(path, "title"),
@@ -127,9 +127,9 @@ class MusicDirectory(PyQt6.QtCore.QAbstractListModel):
 			if self.update_thread is None:  # We have to abort.
 				break
 			path = os.path.join(self._directory, entry[self.roles[b"filepath"]])
-			self.beginRemoveRows(PyQt6.QtCore.QModelIndex(), index, index)
+			self.beginRemoveRows(PySide6.QtCore.QModelIndex(), index, index)
 			self.endRemoveRows()
-			self.beginInsertRows(PyQt6.QtCore.QModelIndex(), index, index)
+			self.beginInsertRows(PySide6.QtCore.QModelIndex(), index, index)
 			self._data[index] = {
 				self.roles[b"filepath"]: path,
 				self.roles[b"title"]: metadata.get_entry(path, "title"),

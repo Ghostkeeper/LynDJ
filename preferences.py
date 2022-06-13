@@ -9,12 +9,19 @@ import json  # Preferences are stored in JSON format, which interfaces nicely wi
 import logging
 import os  # To know where to store the preferences file.
 import os.path  # To construct the path to the preferences file.
-import PyQt6.QtCore  # To allow preferences to be reached from QML.
+import PySide6.QtCore  # To allow preferences to be reached from QML.
+import PySide6.QtQml  # To register the type as singleton in QML.
 import typing
 
 import storage  # To know where to store the preferences file.
 
-class Preferences(PyQt6.QtCore.QObject):
+QML_IMPORT_NAME = "Lyn"
+QML_IMPORT_MAJOR_VERSION = 1
+QML_IMPORT_MINOR_VERSION = 0
+
+@PySide6.QtQml.QmlElement
+@PySide6.QtQml.QmlSingleton
+class Preferences(PySide6.QtCore.QObject):
 	"""
 	Stores application preferences and makes sure they get reloaded.
 	"""
@@ -25,7 +32,7 @@ class Preferences(PyQt6.QtCore.QObject):
 	_instance = None
 
 	@classmethod
-	def getInstance(cls, _engine=None, _script=None) -> "Preferences":
+	def getInstance(cls, _engine=None, _script=None, _bla=None) -> "Preferences":
 		"""
 		Gets an instance of the preferences class.
 
@@ -52,7 +59,7 @@ class Preferences(PyQt6.QtCore.QObject):
 		self.values = {}
 		self.load()
 
-	@PyQt6.QtCore.pyqtSlot(str, "QVariant")
+	@PySide6.QtCore.Slot(str, "QVariant")
 	def add(self, key, default) -> None:
 		"""
 		Add a new preference entry.
@@ -110,7 +117,7 @@ class Preferences(PyQt6.QtCore.QObject):
 		with open(filepath, "w") as f:
 			json.dump(changed, f)
 
-	@PyQt6.QtCore.pyqtSlot(str, "QVariant")
+	@PySide6.QtCore.Slot(str, "QVariant")
 	def set(self, key, value) -> None:
 		"""
 		Change the current value of a preference.
@@ -132,9 +139,9 @@ class Preferences(PyQt6.QtCore.QObject):
 	"""
 	Triggered when any preference value changed.
 	"""
-	valuesChanged = PyQt6.QtCore.pyqtSignal()
+	valuesChanged = PySide6.QtCore.Signal()
 
-	@PyQt6.QtCore.pyqtProperty("QVariantMap", notify=valuesChanged)
+	@PySide6.QtCore.Property("QVariantMap", notify=valuesChanged)
 	def preferences(self) -> typing.Dict[str, typing.Union[str, int, float, list, dict]]:
 		"""
 		Get a dictionary of all the current preferences.
