@@ -9,6 +9,8 @@ import QtQuick 2.15
 import Lyn 1.0 as Lyn
 
 Rectangle {
+	property real dividerPosition: width / 2
+
 	height: Lyn.Theme.size["topbar"].height
 
 	color: Lyn.Theme.colour["primary_background"]
@@ -39,7 +41,7 @@ Rectangle {
 		}
 		Image {
 			id: border_middle
-			anchors.horizontalCenter: parent.horizontalCenter
+			x: dividerPosition - width / 2
 
 			source: Lyn.Theme.icon["border_top_middle"]
 		}

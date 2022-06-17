@@ -61,6 +61,8 @@ ApplicationWindow {
 			left: parent.left
 			right: parent.right
 		}
+
+		dividerPosition: vertical_divider.x + vertical_divider.width / 2
 	}
 
 	Gui.Player {
