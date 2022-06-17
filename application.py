@@ -38,6 +38,9 @@ class Application(PySide6.QtGui.QGuiApplication):
 			browse_path = os.path.expanduser("~/")
 		prefs.add("browse_path", browse_path)
 
+		# GUI layout preferences.
+		prefs.add("divider_pos", 0.5)  # As a fraction of the width of the window.
+
 		logging.debug("Registering QML types.")
 		PySide6.QtQml.qmlRegisterSingletonInstance(preferences.Preferences, "Lyn", 1, 0, "Preferences", preferences.Preferences.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(theme.Theme, "Lyn", 1, 0, "Theme", theme.Theme.getInstance())

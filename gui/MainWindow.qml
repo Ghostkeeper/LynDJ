@@ -19,22 +19,38 @@ ApplicationWindow {
 
 	color: Lyn.Theme.colour["background"]
 
-	Gui.FileBrowser {
-		id: filebrowser
+	Item {
 		anchors {
 			top: topbar.bottom
+			topMargin: Lyn.Theme.size["border_offset"].height
 			bottom: player.top
+			bottomMargin: Lyn.Theme.size["border_offset"].height
 			left: parent.left
-		}
-		//Width to be determined by slider.
-	}
-
-	Gui.Playlist {
-		anchors {
-			top: topbar.bottom
-			bottom: player.top
-			left: filebrowser.right
 			right: parent.right
+		}
+
+		Gui.FileBrowser {
+			id: filebrowser
+			anchors {
+				top: parent.top
+				bottom: parent.bottom
+				left: parent.left
+				right: vertical_divider.left
+			}
+			//Width to be determined by slider.
+		}
+
+		Gui.Playlist {
+			anchors {
+				top: parent.top
+				bottom: parent.bottom
+				left: vertical_divider.right
+				right: parent.right
+			}
+		}
+
+		Gui.VerticalDivider {
+			id: vertical_divider
 		}
 	}
 
