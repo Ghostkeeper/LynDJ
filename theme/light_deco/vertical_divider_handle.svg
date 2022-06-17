@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<svg width="30" height="80" xmlns="http://www.w3.org/2000/svg">
+<g stroke="black">
+	<rect x="1" y="21" width="28" height="38" stroke-width="2" fill="none" />
+	<!-- Continuation of the divider. -->
+	<line stroke-width="4" x1="8" y1="0" x2="8" y2="20" />
+	<line stroke-width="2" x1="15" y1="0" x2="15" y2="20" />
+	<line stroke-width="4" x1="22" y1="0" x2="22" y2="20" />
+	<line stroke-width="4" x1="8" y1="60" x2="8" y2="80" />
+	<line stroke-width="2" x1="15" y1="60" x2="15" y2="80" />
+	<line stroke-width="4" x1="22" y1="60" x2="22" y2="80" />
+
+	<!-- Deco. -->
+	<g stroke-width="2" fill="none">
+		<path d="M8,0 l-7,7 v14" />
+		<path d="M9,20 l6,-14 l6,14" />
+		<path d="M22,0 l7,7 v14" />
+		<path d="M8,80 l-7,-7 v-14" />
+		<path d="M9,60 l6,14 l6,-14" />
+		<path d="M22,80 l7,-7 v-14" />
+	</g>
+
+	<!-- Grippy handle. -->
+	<g stroke-width="4">
+		<line x1="8" y1="26" x2="8" y2="54" />
+		<line stroke-width="2" x1="15" y1="26" x2="15" y2="54" />
+		<line x1="22" y1="26" x2="22" y2="54" />
+	</g>
+</g>
+</svg>
