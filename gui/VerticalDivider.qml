@@ -9,6 +9,7 @@ import QtQuick 2.15
 import Lyn 1.0 as Lyn
 
 Item {
+	id: verticalDivider
 	height: parent.height
 	width: Lyn.Theme.size["vertical_divider"].width
 	x: Lyn.Preferences.preferences["divider_pos"] * parent.width - width / 2
@@ -27,6 +28,21 @@ Item {
 		anchors.centerIn: parent
 
 		source: Lyn.Theme.icon["vertical_divider_handle"]
+
+		MouseArea { //Allow dragging.
+			anchors.fill: parent
+
+			cursorShape: Qt.SizeHorCursor
+
+			drag.target: verticalDivider
+			drag.axis: Drag.XAxis
+			drag.minimumX: 0
+			drag.maximumX: verticalDivider.parent.width - verticalDivider.width
+
+			onReleased: {
+				Lyn.Preferences.set("divider_pos", (verticalDivider.x + verticalDivider.width / 2) / verticalDivider.parent.width);
+			}
+		}
 	}
 	Image {
 		anchors {
