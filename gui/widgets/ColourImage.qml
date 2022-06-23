@@ -9,14 +9,14 @@ import QtQuick 2.15
 import Lyn 1.0 as Lyn
 
 Image {
-	//property alias colour: effect.colour
+	property alias colour: effect.colour
 
 	ShaderEffect {
 		id: effect
 		anchors.fill: parent
 
 		property var image: parent
-		property var colour: Lyn.Theme.colour["error"]
+		property color colour: "black"
 		fragmentShader: "ColourImage.frag.qsb"
 	}
 }
