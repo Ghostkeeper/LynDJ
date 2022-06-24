@@ -42,6 +42,9 @@ class MusicDirectory(PySide6.QtCore.QAbstractListModel):
 		Change the current directory that this model is looking at.
 		:param new_directory: A path to a directory to look at.
 		"""
+		if new_directory == self._directory:  # Didn't actually change.
+			return
+
 		if self.update_thread is not None:  # A thread is already running to update metadata.
 			thread = self.update_thread
 			self.update_thread = None  # Signal to the thread that it should abort.
