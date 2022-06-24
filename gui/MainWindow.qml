@@ -12,12 +12,27 @@ import "." as Gui
 import Lyn 1.0 as Lyn
 
 ApplicationWindow {
+	//Position and size will be overridden with the preferences on completing the load.
+	x: 100
+	y: 100
 	width: 1280
 	height: 720
+
 	visible: true
 	title: "LynDJ"
 
 	color: Lyn.Theme.colour["background"]
+
+	Component.onCompleted: {
+		x = Lyn.Preferences.preferences["window/x"];
+		y = Lyn.Preferences.preferences["window/y"];
+		width = Lyn.Preferences.preferences["window/width"];
+		height = Lyn.Preferences.preferences["window/height"];
+	}
+	onXChanged: Lyn.Preferences.set("window/x", x)
+	onYChanged: Lyn.Preferences.set("window/y", y)
+	onWidthChanged: Lyn.Preferences.set("window/width", width)
+	onHeightChanged: Lyn.Preferences.set("window/height", height)
 
 	Item {
 		anchors {

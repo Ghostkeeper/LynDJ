@@ -38,8 +38,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 			browse_path = os.path.expanduser("~/")
 		prefs.add("browse_path", browse_path)
 
-		# GUI layout preferences.
-		prefs.add("divider_pos", 0.5)  # As a fraction of the width of the window.
+		self.create_gui_preferences()
 
 		logging.debug("Registering QML types.")
 		PySide6.QtQml.qmlRegisterSingletonInstance(preferences.Preferences, "Lyn", 1, 0, "Preferences", preferences.Preferences.getInstance())
@@ -52,3 +51,17 @@ class Application(PySide6.QtGui.QGuiApplication):
 		self.engine.load("gui/MainWindow.qml")
 
 		logging.info("Start-up complete.")
+
+	def create_gui_preferences(self):
+		"""
+		Creates preferences that are used in the GUI.
+
+		The QML can't create new preferences. While the scope of the GUI would claim these preferences for themselves,
+		it can't be defined there. We should define them here instead.
+		"""
+		prefs = preferences.Preferences.getInstance()
+		prefs.add("window/width", 1280)
+		prefs.add("window/height", 720)
+		prefs.add("window/x", 100)
+		prefs.add("window/y", 100)
+		prefs.add("divider_pos", 0.5)  # As a fraction of the width of the window.
