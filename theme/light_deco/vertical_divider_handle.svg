@@ -13,10 +13,8 @@
 	<!-- Deco. -->
 	<g stroke-width="2" fill="none">
 		<path d="M8,0 l-7,7 v14" />
-		<path d="M9,20 l6,-14 l6,14" />
 		<path d="M22,0 l7,7 v14" />
 		<path d="M8,80 l-7,-7 v-14" />
-		<path d="M9,60 l6,14 l6,-14" />
 		<path d="M22,80 l7,-7 v-14" />
 	</g>
 
