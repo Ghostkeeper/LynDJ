@@ -8,14 +8,23 @@ import QtQuick 2.15
 
 import Lyn 1.0 as Lyn
 
-Image {
+Item {
+	width: originalImage.width
+	height: originalImage.height
+
 	property alias colour: effect.colour
+	property alias source: originalImage.source
+
+	Image {
+		id: originalImage
+		visible: false //The actual image is hidden, so that the shader effect can still use it as source but it's not shown behind the effect.
+	}
 
 	ShaderEffect {
 		id: effect
 		anchors.fill: parent
 
-		property var image: parent
+		property var image: originalImage
 		property color colour: "black"
 		fragmentShader: "ColourImage.frag.qsb"
 	}

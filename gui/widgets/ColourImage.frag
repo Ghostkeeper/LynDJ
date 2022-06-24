@@ -11,5 +11,6 @@ layout(binding=1) uniform sampler2D image;
 
 void main() {
 	vec4 image_colour = texture(image, qt_TexCoord0);
-	result_colour = vec4(ubuf.colour.rgb, image_colour.a) * ubuf.qt_Opacity; //Take the alpha from the image, but the colour from the input parameter.
+	result_colour = vec4(ubuf.colour.rgb   * image_colour.a //Blend the (changed) image colour on top of the original colour.
+	                   + result_colour.rgb * (1 - image_colour.a), image_colour.a);
 }
