@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+<g fill="none" stroke="black">
+	<path stroke-width="4" d="
+		M40,28 h-4 l-16,-16 h-20
+		M28,20 h-28" />
+	<path stroke-width="2" d="
+		M36,27 h-36
+		M18,20 l-8,-8
+		M40,21 h-12" />
+</g>
+</svg>

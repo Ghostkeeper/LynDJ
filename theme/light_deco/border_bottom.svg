@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<svg width="10" height="40" xmlns="http://www.w3.org/2000/svg">
+<g stroke="black">
+	<line stroke-width="2" x1="0" y1="27" x2="10" y2="27" />
+	<line stroke-width="4" x1="0" y1="20" x2="10" y2="20" />
+	<line stroke-width="4" x1="0" y1="12" x2="10" y2="12" />
+</g>
+</svg>

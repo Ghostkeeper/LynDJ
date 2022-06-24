@@ -6,10 +6,67 @@
 
 import QtQuick 2.15
 
+import "./widgets" as Widgets
 import Lyn 1.0 as Lyn
 
 Rectangle {
+	property real dividerPosition: width / 2
+
 	height: Lyn.Theme.size["player"].height
 
 	color: Lyn.Theme.colour["primary_background"]
+
+	//Border extends above the player!
+	Item {
+		anchors {
+			left: parent.left
+			right: parent.right
+			bottom: parent.top
+			bottomMargin: -Lyn.Theme.size["border_offset"].height
+		}
+		height: childrenRect.height
+
+		Widgets.ColourImage {
+			id: border_left
+
+			source: Lyn.Theme.icon["border_bottom_left"]
+			colour: Lyn.Theme.colour["lining"]
+		}
+
+		Widgets.ColourImage {
+			anchors {
+				left: border_left.right
+				right: border_middle.left
+			}
+
+			source: Lyn.Theme.icon["border_bottom"]
+			colour: Lyn.Theme.colour["lining"]
+		}
+
+		Widgets.ColourImage {
+			id: border_middle
+			x: dividerPosition - width / 2
+
+			source: Lyn.Theme.icon["border_bottom_middle"]
+			colour: Lyn.Theme.colour["lining"]
+		}
+
+		Widgets.ColourImage {
+			anchors {
+				left: border_middle.right
+				right: border_right.left
+			}
+
+			source: Lyn.Theme.icon["border_bottom"]
+			colour: Lyn.Theme.colour["lining"]
+		}
+
+		Widgets.ColourImage {
+			id: border_right
+			anchors.right: parent.right
+
+			source: Lyn.Theme.icon["border_bottom_right"]
+			colour: Lyn.Theme.colour["lining"]
+		}
+	}
 }

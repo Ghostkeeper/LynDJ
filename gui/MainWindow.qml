@@ -72,6 +72,8 @@ ApplicationWindow {
 			left: parent.left
 			right: parent.right
 		}
+
+		dividerPosition: topbar.dividerPosition
 	}
 
 	Widgets.DirectoryField {
