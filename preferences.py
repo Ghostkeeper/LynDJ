@@ -52,6 +52,12 @@ class Preferences(PySide6.QtCore.QObject):
 		:param parent:
 		"""
 		super().__init__(None)
+
+		self.save_timer = PySide6.QtCore.QTimer()
+		self.save_timer.setSingleShot(True)
+		self.save_timer.setInterval(250)  # After a preference changed, after 250ms, it'll auto-save.
+		self.save_timer.timeout.connect(self.save)
+
 		storage.ensure_exists()
 		self.ensure_exists()
 
@@ -126,7 +132,7 @@ class Preferences(PySide6.QtCore.QObject):
 		"""
 		logging.debug(f"Changing preference {key} to {value}.")
 		self.values[key] = value
-		self.save()  # Immediately save this to disk.
+		self.save_timer.start()
 		self.valuesChanged.emit()
 
 	def storage_location(self) -> str:
