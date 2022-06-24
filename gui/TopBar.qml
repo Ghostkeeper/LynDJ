@@ -33,7 +33,6 @@ Rectangle {
 			colour: Lyn.Theme.colour["lining"]
 		}
 		Widgets.ColourImage {
-			id: border_fill_left
 			anchors {
 				left: border_left.right
 				right: border_middle.left
