@@ -6,6 +6,7 @@
 
 import QtQuick 2.15
 
+import "./widgets" as Widgets
 import Lyn 1.0 as Lyn
 
 Item {
@@ -14,7 +15,7 @@ Item {
 	width: Lyn.Theme.size["vertical_divider"].width
 	x: Lyn.Preferences.preferences["divider_pos"] * parent.width - width / 2
 
-	Image {
+	Widgets.ColourImage {
 		anchors {
 			horizontalCenter: parent.horizontalCenter
 			top: parent.top
@@ -22,12 +23,14 @@ Item {
 		}
 
 		source: Lyn.Theme.icon["vertical_divider"]
+		colour: Lyn.Theme.colour["lining"]
 	}
-	Image {
+	Widgets.ColourImage {
 		id: handle
 		anchors.centerIn: parent
 
 		source: Lyn.Theme.icon["vertical_divider_handle"]
+		colour: Lyn.Theme.colour["lining"]
 
 		MouseArea { //Allow dragging.
 			anchors.fill: parent
@@ -44,7 +47,7 @@ Item {
 			}
 		}
 	}
-	Image {
+	Widgets.ColourImage {
 		anchors {
 			horizontalCenter: parent.horizontalCenter
 			top: handle.bottom
@@ -52,5 +55,6 @@ Item {
 		}
 
 		source: Lyn.Theme.icon["vertical_divider"]
+		colour: Lyn.Theme.colour["lining"]
 	}
 }

@@ -6,6 +6,7 @@
 
 import QtQuick 2.15
 
+import "./widgets" as Widgets
 import Lyn 1.0 as Lyn
 
 Rectangle {
@@ -25,12 +26,13 @@ Rectangle {
 		}
 		height: childrenRect.height
 
-		Image {
+		Widgets.ColourImage {
 			id: border_left
 
 			source: Lyn.Theme.icon["border_top_left"]
+			colour: Lyn.Theme.colour["lining"]
 		}
-		Image {
+		Widgets.ColourImage {
 			id: border_fill_left
 			anchors {
 				left: border_left.right
@@ -38,26 +40,30 @@ Rectangle {
 			}
 
 			source: Lyn.Theme.icon["border_top"]
+			colour: Lyn.Theme.colour["lining"]
 		}
-		Image {
+		Widgets.ColourImage {
 			id: border_middle
 			x: dividerPosition - width / 2
 
 			source: Lyn.Theme.icon["border_top_middle"]
+			colour: Lyn.Theme.colour["lining"]
 		}
-		Image {
+		Widgets.ColourImage {
 			anchors {
 				left: border_middle.right
 				right: border_right.left
 			}
 
 			source: Lyn.Theme.icon["border_top"]
+			colour: Lyn.Theme.colour["lining"]
 		}
-		Image {
+		Widgets.ColourImage {
 			id: border_right
 			anchors.right: parent.right
 
 			source: Lyn.Theme.icon["border_top_right"]
+			colour: Lyn.Theme.colour["lining"]
 		}
 	}
 }
