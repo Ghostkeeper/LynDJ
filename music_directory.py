@@ -44,6 +44,8 @@ class MusicDirectory(PySide6.QtCore.QAbstractListModel):
 		"""
 		if new_directory == self._directory:  # Didn't actually change.
 			return
+		if not os.path.exists(new_directory):  # User is probably still typing.
+			return
 
 		if self.update_thread is not None:  # A thread is already running to update metadata.
 			thread = self.update_thread
