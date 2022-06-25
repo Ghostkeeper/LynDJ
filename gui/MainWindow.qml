@@ -18,7 +18,6 @@ ApplicationWindow {
 	width: 1280
 	height: 720
 
-	visible: true
 	title: "LynDJ"
 
 	color: Lyn.Theme.colour["background"]
@@ -28,11 +27,50 @@ ApplicationWindow {
 		y = Lyn.Preferences.preferences["window/y"];
 		width = Lyn.Preferences.preferences["window/width"];
 		height = Lyn.Preferences.preferences["window/height"];
+		switch(Lyn.Preferences.preferences["window/visibility"]) {
+			default:
+			case "windowed": showNormal(); break;
+			case "maximised": showMaximized(); break;
+			case "fullscreen": showFullScreen(); break;
+		}
 	}
-	onXChanged: Lyn.Preferences.set("window/x", x)
-	onYChanged: Lyn.Preferences.set("window/y", y)
-	onWidthChanged: Lyn.Preferences.set("window/width", width)
-	onHeightChanged: Lyn.Preferences.set("window/height", height)
+	onXChanged: function(x) {
+		if(visibility == Window.Windowed) {
+			Lyn.Preferences.set("window/x", x);
+		}
+	}
+	onYChanged: function(y) {
+		if(visibility == Window.Windowed) {
+			Lyn.Preferences.set("window/y", y);
+		}
+	}
+	onWidthChanged: function(width) {
+		if(visibility == Window.Windowed) {
+			Lyn.Preferences.set("window/width", width);
+		}
+	}
+	onHeightChanged: function(height) {
+		if(visibility == Window.Windowed) {
+			Lyn.Preferences.set("window/height", height);
+		}
+	}
+	onVisibilityChanged: function(visibility) {
+		switch(visibility) {
+			default:
+			case Window.Minimized:
+			case Window.Hidden:
+				break;
+			case Window.Windowed: //Only store position/size in windowed mode.
+				Lyn.Preferences.set("window/visibility", "windowed");
+				x = Lyn.Preferences.preferences["window/x"];
+				y = Lyn.Preferences.preferences["window/y"];
+				width = Lyn.Preferences.preferences["window/width"];
+				height = Lyn.Preferences.preferences["window/height"];
+				break;
+			case Window.FullScreen: Lyn.Preferences.set("window/visibility", "fullscreen"); break;
+			case Window.Maximized: Lyn.Preferences.set("window/visibility", "maximised"); break;
+		}
+	}
 
 	Item {
 		anchors {

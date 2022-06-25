@@ -64,4 +64,5 @@ class Application(PySide6.QtGui.QGuiApplication):
 		prefs.add("window/height", 720)
 		prefs.add("window/x", 100)
 		prefs.add("window/y", 100)
+		prefs.add("window/visibility", "normal")
 		prefs.add("divider_pos", 0.5)  # As a fraction of the width of the window.
