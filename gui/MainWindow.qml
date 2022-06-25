@@ -128,25 +128,4 @@ ApplicationWindow {
 
 		dividerPosition: topbar.dividerPosition
 	}
-
-	Widgets.DirectoryField {
-		id: directory_field
-		anchors {
-			left: parent.left
-			leftMargin: Lyn.Theme.size["margin"].width
-			top: parent.top
-			topMargin: Lyn.Theme.size["margin"].height
-		}
-
-		Component.onCompleted: currentDirectory = Lyn.Preferences.preferences["browse_path"]
-		onCurrentDirectoryChanged: Lyn.Preferences.set("browse_path", currentDirectory)
-	}
-	Gui.AllMusic {
-		anchors {
-			left: parent.left
-			leftMargin: Lyn.Theme.size["margin"].width
-			top: directory_field.bottom
-			topMargin: Lyn.Theme.size["margin"].height
-		}
-	}
 }

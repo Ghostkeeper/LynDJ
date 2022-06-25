@@ -6,5 +6,34 @@
 
 import QtQuick 2.15
 
+import "." as Gui
+import "./widgets" as Widgets
+import Lyn 1.0 as Lyn
+
 Item {
+	Widgets.DirectoryField {
+		id: directory_field
+		anchors {
+			left: parent.left
+			leftMargin: Lyn.Theme.size["margin"].width
+			right: parent.right
+			rightMargin: Lyn.Theme.size["margin"].width
+			top: parent.top
+			topMargin: Lyn.Theme.size["margin"].height
+		}
+
+		Component.onCompleted: currentDirectory = Lyn.Preferences.preferences["browse_path"]
+		onCurrentDirectoryChanged: Lyn.Preferences.set("browse_path", currentDirectory)
+	}
+	Gui.AllMusic {
+		anchors {
+			left: parent.left
+			leftMargin: Lyn.Theme.size["margin"].width
+			right: parent.right
+			rightMargin: Lyn.Theme.size["margin"].width
+			top: directory_field.bottom
+			topMargin: Lyn.Theme.size["margin"].height
+			bottom: parent.bottom
+		}
+	}
 }
