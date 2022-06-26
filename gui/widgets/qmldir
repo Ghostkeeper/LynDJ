@@ -3,4 +3,5 @@ module Widgets
 Button         1.0 Button.qml
 ColourImage    1.0 ColourImage.qml
 DirectoryField 1.0 DirectoryField.qml
+TableHeader    1.0 TableHeader.qml
 TextField      1.0 TextField.qml
