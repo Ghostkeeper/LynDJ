@@ -36,6 +36,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractListModel):
 		self._directory = ""
 		self._data = []
 		self.update_thread = None
+		self.sorted_role = self.roles[b"author"]
 
 	def directory_set(self, new_directory) -> None:
 		"""
@@ -108,40 +109,64 @@ class MusicDirectory(PySide6.QtCore.QAbstractListModel):
 
 		for new_file in new_files:
 			path = os.path.join(self._directory, new_file)
-			insert_pos = len(self._data)
-			for i in range(len(self._data)):
-				if self._data[i][file_role] < new_file:
-					insert_pos = i
-					break
-			self.beginInsertRows(PySide6.QtCore.QModelIndex(), insert_pos, insert_pos)
-			self._data.insert(insert_pos, {
+			metadata_dict = {
 				self.roles[b"filepath"]: new_file,
 				self.roles[b"title"]: metadata.get_cached(path, "title"),
 				self.roles[b"author"]: metadata.get_cached(path, "author"),
 				self.roles[b"comment"]: metadata.get_cached(path, "comment"),
 				self.roles[b"duration"]: metadata.get_cached(path, "duration"),
 				self.roles[b"bpm"]: metadata.get_cached(path, "bpm")
-			})
+			}
+			insert_pos = len(self._data)
+			sorted_field = metadata_dict[self.sorted_role]
+			if sorted_field is not None:
+				for i in range(len(self._data)):
+					if self._data[i][self.sorted_role] > sorted_field:
+						insert_pos = i
+						break
+			self.beginInsertRows(PySide6.QtCore.QModelIndex(), insert_pos, insert_pos)
+			self._data.insert(insert_pos, metadata_dict)
 			self.endInsertRows()
 
 	def update_metadata_task(self) -> None:
 		"""
 		A background task that gradually updates all of the metadata in the current folder.
 		"""
-		for index, entry in enumerate(self._data):
+		# We'll be modifying the data while iterating over it.
+		# During this iteration, we have to keep the data sorted. To do this we'll re-insert the tracks into the list.
+		# This may end up before the place where we're processing.
+		# So to do this, we'll track an index manually, that we can increment if we're inserting above the cursor, or not if we're inserting below.
+		cursor = 0
+		while cursor < len(self._data):
 			if self.update_thread is None:  # We have to abort.
 				break
-			path = os.path.join(self._directory, entry[self.roles[b"filepath"]])
-			self.beginRemoveRows(PySide6.QtCore.QModelIndex(), index, index)
+			entry = self._data[cursor]
+			if entry[self.roles[b"title"]] is not None:  # Already processed.
+				cursor += 1
+				continue
+			self.beginRemoveRows(PySide6.QtCore.QModelIndex(), cursor, cursor)
+			self._data.pop(cursor)
 			self.endRemoveRows()
-			self.beginInsertRows(PySide6.QtCore.QModelIndex(), index, index)
-			self._data[index] = {
-				self.roles[b"filepath"]: path,
-				self.roles[b"title"]: metadata.get_entry(path, "title"),
-				self.roles[b"author"]: metadata.get_entry(path, "author"),
-				self.roles[b"comment"]: metadata.get_entry(path, "comment"),
-				self.roles[b"duration"]: metadata.get_entry(path, "duration"),
-				self.roles[b"bpm"]: metadata.get_entry(path, "bpm")
-			}
-			self.setItemData(self.index(index), self._data[index])
+
+			# Get the actual data from the file.
+			path = os.path.join(self._directory, entry[self.roles[b"filepath"]])
+			entry[self.roles[b"title"]] = metadata.get_entry(path, "title")
+			entry[self.roles[b"author"]] = metadata.get_entry(path, "author")
+			entry[self.roles[b"comment"]] = metadata.get_entry(path, "comment")
+			entry[self.roles[b"duration"]] = metadata.get_entry(path, "duration")
+			entry[self.roles[b"bpm"]] = metadata.get_entry(path, "bpm")
+
+			# Find where to re-insert it, given the new information.
+			insert_pos = len(self._data)
+			sorted_field = entry[self.sorted_role]
+			if sorted_field is not None:
+				for i in range(len(self._data)):
+					other_field = self._data[i][self.sorted_role]
+					if other_field is not None and other_field > sorted_field:
+						insert_pos = i
+						break
+			if insert_pos <= cursor:  # If after the cursor, don't increment the cursor.
+				cursor += 1
+			self.beginInsertRows(PySide6.QtCore.QModelIndex(), insert_pos, insert_pos)
+			self._data.insert(insert_pos, entry)
 			self.endInsertRows()
