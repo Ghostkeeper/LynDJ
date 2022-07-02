@@ -21,7 +21,7 @@ Button {
 		elide: Text.ElideRight
 	}
 	background: Rectangle {
-		color: Lyn.Theme.colour["primary_background"]
+		color: Lyn.Theme.colour["accent_background"]
 		border.color: Lyn.Theme.colour["lining"]
 		border.width: Lyn.Theme.size["lining"].height
 	}
