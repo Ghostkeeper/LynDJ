@@ -7,29 +7,65 @@
 import QtQuick 2.15
 
 import Lyn 1.0 as Lyn
+import "./widgets" as Widgets
 
-ListView {
-	id: all_music
-	width: 200
-	height: 400
-
-	property alias directory: music_directory.directory
-
-	model: Lyn.MusicDirectory{
-		id: music_directory
-
-		directory: Lyn.Preferences.preferences["browse_path"]
-	}
-	delegate: Row {
-		Text {
-			text: title ? title : ""
-			width: 200
-			height: 20
+Item {
+	ListView {
+		anchors {
+			left: parent.left
+			right: parent.right
+			top: header.bottom
+			bottom: parent.bottom
 		}
-		Text {
-			text: author ? author : ""
-			width: 200
-			height: 20
+
+		property alias directory: music_directory.directory
+
+		model: Lyn.MusicDirectory{
+			id: music_directory
+
+			directory: Lyn.Preferences.preferences["browse_path"]
+		}
+		delegate: Row {
+			Text {
+				text: title ? title : ""
+				width: 200
+				height: 20
+			}
+			Text {
+				text: author ? author : ""
+				width: 200
+				height: 20
+			}
+		}
+	}
+
+	//Table header is rendered above the actual table, to prevent the need for clipping.
+	Row {
+		id: header
+		Widgets.TableHeader {
+			id: titleHeader
+
+			text: "Title"
+		}
+		Widgets.TableHeader {
+			id: authorHeader
+
+			text: "Author"
+		}
+		Widgets.TableHeader {
+			id: durationHeader
+
+			text: "Duration"
+		}
+		Widgets.TableHeader {
+			id: bpmHeader
+
+			text: "BPM"
+		}
+		Widgets.TableHeader {
+			id: commentHeader
+
+			text: "Comment"
 		}
 	}
 }
