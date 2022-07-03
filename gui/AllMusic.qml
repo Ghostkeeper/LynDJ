@@ -27,7 +27,7 @@ Item {
 		}
 		delegate: Row {
 			Text {
-				text: title ? title : ""
+				text: title ? title : (filepath ? ("<i>" + filepath + "</i>") : "<i>(no title)</i>")
 				width: 200
 				height: 20
 			}
