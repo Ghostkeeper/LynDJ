@@ -36,7 +36,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractListModel):
 		self._directory = ""
 		self._data = []
 		self.update_thread = None
-		self.sorted_role = self.roles[b"author"]
+		self.sorted_role = self.roles[b"title"]
 
 	def directory_set(self, new_directory) -> None:
 		"""
@@ -121,9 +121,15 @@ class MusicDirectory(PySide6.QtCore.QAbstractListModel):
 			sorted_field = metadata_dict[self.sorted_role]
 			if sorted_field is not None:
 				for i in range(len(self._data)):
-					if self._data[i][self.sorted_role] > sorted_field:
-						insert_pos = i
-						break
+					other_field = self._data[i][self.sorted_role]
+					if type(other_field) == str:
+						if other_field.lower() > sorted_field.lower():  # Case-insensitive compare in case of strings.
+							insert_pos = i
+							break
+					else:
+						if other_field > sorted_field:
+							insert_pos = i
+							break
 			self.beginInsertRows(PySide6.QtCore.QModelIndex(), insert_pos, insert_pos)
 			self._data.insert(insert_pos, metadata_dict)
 			self.endInsertRows()
@@ -162,9 +168,16 @@ class MusicDirectory(PySide6.QtCore.QAbstractListModel):
 			if sorted_field is not None:
 				for i in range(len(self._data)):
 					other_field = self._data[i][self.sorted_role]
-					if other_field is not None and other_field > sorted_field:
-						insert_pos = i
-						break
+					if other_field is None:
+						continue
+					if type(other_field) == str:
+						if other_field.lower() > sorted_field.lower():  # Case-insensitive compare in case of strings.
+							insert_pos = i
+							break
+					else:
+						if other_field > sorted_field:
+							insert_pos = i
+							break
 			if insert_pos <= cursor:  # If after the cursor, don't increment the cursor.
 				cursor += 1
 			self.beginInsertRows(PySide6.QtCore.QModelIndex(), insert_pos, insert_pos)
