@@ -39,6 +39,8 @@ def connect():
 	else:
 		connection = sqlite3.connect(db_file)
 
+	global database
+	database[threading.current_thread().ident] = connection
 	return connection
 
 database = {}  # Database connection created for each thread.
@@ -52,8 +54,12 @@ def get_cached(path, field):
 	:return: The value cached for that field. Will be ``None`` if there is no cached information about that field.
 	"""
 	with database_lock:
-		connection = database.get(threading.current_thread().ident, connect())
-		cursor = connection.execute("SELECT ? FROM metadata WHERE path = ?", (field, path))
+		thread_ident = threading.current_thread().ident
+		if thread_ident in database:
+			connection = database[thread_ident]
+		else:
+			connection = connect()
+		cursor = connection.execute(f"SELECT {field} FROM metadata WHERE path = ?", (path, ))
 	if cursor.rowcount <= 0:
 		return None  # No metadata at all about the specified file.
 	with database_lock:
@@ -71,7 +77,11 @@ def get_entry(path, field) -> str:
 	:return: The value of that field. Returns an empty string if the metadata could not be read.
 	"""
 	with database_lock:
-		connection = database.get(threading.current_thread().ident, connect())
+		thread_ident = threading.current_thread().ident
+		if thread_ident in database:
+			connection = database[thread_ident]
+		else:
+			connection = connect()
 		cursor = connection.execute(f"SELECT cachetime, {field} FROM metadata WHERE path = ?", (path, ))
 		row = cursor.fetchone()
 
@@ -135,7 +145,11 @@ def update_metadata(path):
 	last_modified = os.path.getmtime(path)
 
 	with database_lock:
-		connection = database.get(threading.current_thread().ident, connect())
+		thread_ident = threading.current_thread().ident
+		if thread_ident in database:
+			connection = database[thread_ident]
+		else:
+			connection = connect()
 		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?)",
 			(path, title, author, comment, duration, bpm, last_modified))
 		connection.commit()
