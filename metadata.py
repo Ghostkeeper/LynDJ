@@ -4,6 +4,7 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import collections  # For named tuples.
 import logging
 import mutagen  # To read metadata from music files.
 import mutagen.easyid3
@@ -16,6 +17,16 @@ import sqlite3  # To cache metadata on disk.
 import threading  # To restrict access to the database by one thread at a time.
 
 import storage  # To know where to store the database.
+
+Metadata = collections.namedtuple("Metadata", ["title", "author", "comment", "duration", "bpm", "cachetime"])
+
+metadata = {}
+"""
+The single source of truth for the currently known metadata.
+
+To quickly access metadata for certain files, look into this dictionary. The keys of the dictionary are absolute paths
+to music files. The values are named tuples of type Metadata.
+"""
 
 def connect():
 	"""
