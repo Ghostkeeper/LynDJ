@@ -142,6 +142,29 @@ def add_file(path):
 
 	add(path, Metadata(title=title, author=author, comment=comment, duration=duration, bpm=bpm, cachetime=last_modified))
 
+def is_music_file(self, path) -> bool:
+	"""
+	Returns whether the given file is a music file that we can read.
+	:param path: The file to check.
+	:return: ``True`` if it is a music track, or ``False`` if it isn't.
+	"""
+	path = os.path.join(self._directory, path)
+	if not os.path.isfile(path):
+		return False  # Only read files.
+	ext = os.path.splitext(path)[1]
+	return ext in [".mp3", ".flac", ".opus", ".ogg", ".wav"]  # Supported file formats.
+
+def add_directory(path):
+	"""
+	Read the metadata from all music files in a directory (not its subdirectories) and store them in our database.
+
+	This will update all metadata in the database about the files in this directory so that it's all up to date again.
+	:param path: The path to the directory to read the files from.
+	"""
+	files = set(filter(is_music_file, [os.path.join(path, filename) for filename in os.listdir(path)]))
+	for filepath in files:
+		add_file(filepath)
+
 def connect():
 	"""
 	Connect to the metadata database and return the connection.
