@@ -38,12 +38,41 @@ def load():
 	if not os.path.exists(db_file):
 		return  # No metadata to read.
 	connection = sqlite3.connect(db_file)
+	logging.debug("Reading metadata from database.")
 
 	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
 	for path, title, author, comment, duration, bpm, cachetime in connection.execute("SELECT * FROM metadata"):
 		new_metadata[path] = Metadata(title, author, comment, duration, bpm, cachetime)
 	global metadata
 	metadata.update(new_metadata)
+
+def store():
+	"""
+	Serialises the metadata on disk in a database file.
+	"""
+	db_file = os.path.join(storage.cache(), "metadata.db")
+	if not os.path.exists(db_file):
+		# Create the database anew.
+		logging.info("Creating metadata database.")
+		connection = sqlite3.connect(db_file)
+		connection.execute("""CREATE TABLE metadata(
+			path text PRIMARY KEY,
+			title text,
+			author text,
+			comment text,
+			duration real,
+			bpm real,
+			cachetime real
+		)""")
+	else:
+		connection = sqlite3.connect(db_file)
+
+	global metadata
+	local_metadata = metadata  # Cache locally for performance.
+	for path, entry in local_metadata.items():
+		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?)",
+			(path, entry.title, entry.author, entry.comment, entry.duration, entry.bpm, entry.cachetime))
+	connection.commit()
 
 
 def connect():
