@@ -92,6 +92,56 @@ def add(path, entry):
 	metadata[path] = entry
 	# TODO: Start a timer to write the metadata.
 
+def add_file(path):
+	"""
+	Read the metadata from a given file and store it in our database.
+
+	This will check if the file has been modified since it was last stored in the database. If the database is still up
+	to date, nothing is changed. If the entry is not present in the database or outdated, it will add or update the
+	entry respectively.
+	:param path: The path to the file to read the metadata from.
+	"""
+	local_metadata = metadata  # Cache locally for performance.
+	last_modified = os.path.getmtime(path)
+	if path in local_metadata:
+		if local_metadata[path].cachetime >= last_modified:
+			return  # Already up to date.
+	logging.debug(f"Updating metadata for {path}")
+
+	try:
+		f = mutagen.File(path)
+		if type(f) in {mutagen.mp3.MP3, mutagen.wave.WAVE}:  # Uses ID3 tags.
+			id3 = mutagen.easyid3.EasyID3(path)
+			title = id3.get("title", [os.path.splitext(os.path.basename(path))[0]])[0]
+			author = id3.get("artist", [""])[0]
+			comment = f.get("COMM:ID3v1 Comment:eng", [""])[0]  # There is no EasyID3 for comments.
+			bpm = id3.get("bpm", "-1")[0]
+		elif isinstance(f, mutagen.ogg.OggFileType) or type(f) == mutagen.flac.FLAC:  # These types use Vorbis Comments.
+			title = f.get("title", [os.path.splitext(os.path.basename(path))[0]])[0]
+			author = f.get("artist", [""])[0]
+			comment = f.get("comment", [""])[0]
+			bpm = f.get("bpm", ["-1"])[0]
+		else:  # Unknown file type.
+			title = os.path.splitext(os.path.basename(path))[0]
+			author = ""
+			comment = ""
+			bpm = -1
+		duration = f.info.length
+	except mutagen.MutagenError as e:
+		logging.warning(f"Unable to get metadata from {path}: {e}")
+		title = os.path.splitext(os.path.basename(path))[0]  # Take the file name without extension.
+		author = ""
+		comment = ""
+		bpm = -1
+		duration = -1
+
+	try:
+		bpm = float(bpm)
+	except ValueError:
+		bpm = -1
+
+	add(path, Metadata(title=title, author=author, comment=comment, duration=duration, bpm=bpm, cachetime=last_modified))
+
 def connect():
 	"""
 	Connect to the metadata database and return the connection.
