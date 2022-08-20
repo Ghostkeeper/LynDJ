@@ -67,13 +67,30 @@ def store():
 	else:
 		connection = sqlite3.connect(db_file)
 
-	global metadata
 	local_metadata = metadata  # Cache locally for performance.
 	for path, entry in local_metadata.items():
 		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?)",
 			(path, entry.title, entry.author, entry.comment, entry.duration, entry.bpm, entry.cachetime))
 	connection.commit()
 
+def get(path, field):
+	"""
+	Get a metadata field from the cache about a certain file.
+	:param path: The file to get the metadata field from.
+	:param field: The name of the metadata field to get. Must be a property of the Metadata enum!
+	:return: The value of the metadata entry for that field. Will be ``None`` if there is no cached information about
+	that field.
+	"""
+	return getattr(metadata[path], field)
+
+def add(path, entry):
+	"""
+	Add or override a metadata entry for a certain file.
+	:param path: The path to the file that the metadata is for.
+	:param entry: A ``Metadata`` instance (or one that quacks like it) that contains the given metadata.
+	"""
+	metadata[path] = entry
+	# TODO: Start a timer to write the metadata.
 
 def connect():
 	"""
