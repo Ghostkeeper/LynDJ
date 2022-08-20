@@ -28,6 +28,24 @@ To quickly access metadata for certain files, look into this dictionary. The key
 to music files. The values are named tuples of type Metadata.
 """
 
+def load():
+	"""
+	Reads the metadata from the database file into memory.
+
+	All of the metadata in the database file will get stored in the ``metadata`` dict.
+	"""
+	db_file = os.path.join(storage.cache(), "metadata.db")
+	if not os.path.exists(db_file):
+		return  # No metadata to read.
+	connection = sqlite3.connect(db_file)
+
+	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
+	for path, title, author, comment, duration, bpm, cachetime in connection.execute("SELECT * FROM metadata"):
+		new_metadata[path] = Metadata(title, author, comment, duration, bpm, cachetime)
+	global metadata
+	metadata.update(new_metadata)
+
+
 def connect():
 	"""
 	Connect to the metadata database and return the connection.
