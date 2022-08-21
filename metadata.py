@@ -13,6 +13,7 @@ import mutagen.mp3
 import mutagen.ogg
 import mutagen.wave
 import os.path  # To know where to store the database.
+import PySide6.QtCore  # For a timer to write the database.
 import sqlite3  # To cache metadata on disk.
 import threading  # To restrict access to the database by one thread at a time.
 
@@ -73,6 +74,13 @@ def store():
 			(path, entry.title, entry.author, entry.comment, entry.duration, entry.bpm, entry.cachetime))
 	connection.commit()
 
+# When we change the database, save the database to disk after a short delay.
+# If there's multiple changes in short succession, those will be combined into a single write.
+store_timer = PySide6.QtCore.QTimer()
+store_timer.setSingleShot(True)
+store_timer.setInterval(250)
+store_timer.timeout.connect(store)
+
 def get(path, field):
 	"""
 	Get a metadata field from the cache about a certain file.
@@ -90,7 +98,7 @@ def add(path, entry):
 	:param entry: A ``Metadata`` instance (or one that quacks like it) that contains the given metadata.
 	"""
 	metadata[path] = entry
-	# TODO: Start a timer to write the metadata.
+	store_timer.start()
 
 def add_file(path):
 	"""
