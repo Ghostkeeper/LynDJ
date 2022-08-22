@@ -121,7 +121,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			return
 
 		metadata.add_directory(new_directory)  # Make sure we have the metadata cached of all files in this new directory.
-		files = set(filter(metadata.is_music_file, [os.path.join(self._directory, filename) for filename in os.listdir(self._directory)]))
+		files = set(filter(metadata.is_music_file, [os.path.join(new_directory, filename) for filename in os.listdir(new_directory)]))
 		new_music = [metadata.metadata[path] for path in files]  # Prepare the music itself, so that the switch to the user appears as quickly as possible.
 
 		# Remove all old data from the table. We're assuming that since the directory changed, all files will be different.
