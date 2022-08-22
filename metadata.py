@@ -41,6 +41,7 @@ def load():
 	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
 	for path, title, author, comment, duration, bpm, cachetime in connection.execute("SELECT * FROM metadata"):
 		new_metadata[path] = {
+			"path": path,
 			"title": title,
 			"author": author,
 			"comment": comment,
@@ -115,7 +116,7 @@ def add_file(path):
 	local_metadata = metadata  # Cache locally for performance.
 	last_modified = os.path.getmtime(path)
 	if path in local_metadata:
-		if local_metadata[path].cachetime >= last_modified:
+		if local_metadata[path]["cachetime"] >= last_modified:
 			return  # Already up to date.
 	logging.debug(f"Updating metadata for {path}")
 
@@ -152,6 +153,7 @@ def add_file(path):
 		bpm = -1
 
 	add(path, {
+		"path": path,
 		"title": title,
 		"author": author,
 		"comment": comment,
@@ -160,13 +162,12 @@ def add_file(path):
 		"cachetime": last_modified
 	})
 
-def is_music_file(self, path) -> bool:
+def is_music_file(path) -> bool:
 	"""
 	Returns whether the given file is a music file that we can read.
 	:param path: The file to check.
 	:return: ``True`` if it is a music track, or ``False`` if it isn't.
 	"""
-	path = os.path.join(self._directory, path)
 	if not os.path.isfile(path):
 		return False  # Only read files.
 	ext = os.path.splitext(path)[1]

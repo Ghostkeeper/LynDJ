@@ -4,6 +4,7 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import logging
 import os  # To list files in the music directory.
 import os.path  # To list file paths in the music directory.
 import PySide6.QtCore  # To expose this list to QML.
@@ -12,31 +13,102 @@ import typing
 
 import metadata  # To get information about the files in the music directory.
 
-class MusicDirectory(PySide6.QtCore.QAbstractListModel):
+class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 	"""
 	A list of the tracks contained within a certain directory, and their metadata.
 	"""
 
 	def __init__(self, parent=None):
 		"""
-		Construct a new directory model.
-		:param parent: The QML element to shove this under. If the parent is destroyed, this model is also freed.
+		Construct a new music directory table.
+		:param parent: The parent element to this QML element, if any.
 		"""
 		super().__init__(parent)
 
-		user_role = PySide6.QtCore.Qt.ItemDataRole.UserRole
-		self.roles = {
-			b"filepath": user_role + 1,
-			b"title": user_role + 2,
-			b"author": user_role + 3,
-			b"comment": user_role + 4,
-			b"duration": user_role + 5,
-			b"bpm": user_role + 6
-		}
+		self.column_fields = ["title", "author", "comment", "duration", "bpm"]
+
 		self._directory = ""
-		self._data = []
-		self.update_thread = None
-		self.sorted_role = self.roles[b"title"]
+		self.sort_field = []  # You can sort multiple fields at the same time. These two lists are in order of priority. The last entry has the greatest sorting priority.
+		self.sort_direction = []
+		self.music = []  # The actual data contained in this table.
+
+	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
+		"""
+		Returns the number of music files in this table.
+		:param parent: The parent to display the child entries under. This is a plain table, so no parent should be
+		provided.
+		:return: The number of music files in this table.
+		"""
+		if parent.isValid():
+			return 0
+		return len(self.music)
+
+	def columnCount(self, parent=PySide6.QtCore.QModelIndex()):
+		"""
+		Returns the number of metadata entries we're displaying in the table.
+		:param parent: The parent to display the child entries under. This is a plain table, so no parent should be
+		provided.
+		:return: The number of metadata entries we're displaying in the table.
+		"""
+		if parent.isValid():
+			return 0
+		return len(self.column_fields)
+
+	def data(self, index, role=PySide6.QtCore.Qt.DisplayRole):
+		"""
+		Returns one cell of the table.
+		:param index: The row index of the cell to give the data from.
+		:param role: Which data to return for this cell. Defaults to the data displayed, which is the only data we
+		store for a cell.
+		:return: The data contained in that cell, as a string.
+		"""
+		if not index.isValid():
+			return None  # Only valid indices return data.
+		if role != PySide6.QtCore.Qt.DisplayRole:
+			return None  # Only return for the display role.
+		return str(self.music[index.row()][self.column_fields[index.column()]])
+
+	def headerData(self, section, orientation, role):
+		"""
+		Returns the row or column labels for the table.
+
+		This table doesn't really use any row labels. We'll return the row index, but it shouldn't get displayed.
+		:param section: The row or column index.
+		:param orientation: Whether to get the row labels or the column labels.
+		:param role: Which data to return for the headers. Defaults to the data displayed, which is the only data we can
+		return.
+		:return: The header for the row or column, as a string.
+		"""
+		if role != PySide6.QtCore.Qt.DisplayRole:
+			return None
+		if orientation == PySide6.QtCore.Qt.Orientation.Horizontal:
+			return ["Title", "Author", "Comment", "Duration", "BPM"][section]
+		elif orientation == PySide6.QtCore.Qt.Orientation.Vertical:
+			return str(section)
+		else:
+			return None
+
+	def sort(self, column, descending_order):
+		"""
+		Sort the table by a certain column number.
+		:param column: The index of the column to sort by.
+		:param descending_order: Whether to sort in ascending order (False) or descending order (True).
+		"""
+		def sort_key(entry):
+			"""
+			Get the appropriate column from a metadata entry to trigger the sort by.
+			:param entry: A metadata entry.
+			:return: The value to sort this entry by.
+			"""
+			value = entry[self.column_fields[column]]
+			if type(value) == str:
+				return value.lower()  # Case-insensitive for strings.
+			else:
+				return value
+
+		self.layoutAboutToBeChanged.emit(PySide6.QtCore.QModelIndex(), self.VerticalSortHint)
+		self.music = list(sorted(self.music, sort_key, descending_order))
+		self.layoutChanged.emit(PySide6.QtCore.QModelIndex(), self.VerticalSortHint)
 
 	def directory_set(self, new_directory) -> None:
 		"""
@@ -48,14 +120,21 @@ class MusicDirectory(PySide6.QtCore.QAbstractListModel):
 		if not os.path.exists(new_directory):  # User is probably still typing.
 			return
 
-		if self.update_thread is not None:  # A thread is already running to update metadata.
-			thread = self.update_thread
-			self.update_thread = None  # Signal to the thread that it should abort.
-			thread.join()
+		metadata.add_directory(new_directory)  # Make sure we have the metadata cached of all files in this new directory.
+		files = set(filter(metadata.is_music_file, [os.path.join(self._directory, filename) for filename in os.listdir(self._directory)]))
+		new_music = [metadata.metadata[path] for path in files]  # Prepare the music itself, so that the switch to the user appears as quickly as possible.
+
+		# Remove all old data from the table. We're assuming that since the directory changed, all files will be different.
+		self.beginRemoveRows(PySide6.QtCore.QModelIndex(), 0, len(self.music) - 1)
+		self.music.clear()
+		self.endRemoveRows()
+
+		# Add the new data.
+		self.beginInsertRows(PySide6.QtCore.QModelIndex(), 0, len(new_music))
+		self.music.extend(new_music)
+		self.endInsertRows()
+
 		self._directory = new_directory
-		self.update()
-		self.update_thread = threading.Thread(target=self.update_metadata_task)
-		self.update_thread.start()
 
 	@PySide6.QtCore.Property(str, fset=directory_set)
 	def directory(self) -> str:
@@ -64,122 +143,3 @@ class MusicDirectory(PySide6.QtCore.QAbstractListModel):
 		:return: The current directory that this model is looking at.
 		"""
 		return self._directory
-
-	def roleNames(self) -> typing.Dict[int, bytes]:
-		return {role: name for name, role in self.roles.items()}  # Inverse of role dict.
-
-	def rowCount(self, parent=None) -> int:
-		return len(self._data)
-
-	def data(self, index, role) -> typing.Any:
-		return self._data[index.row()][role]
-
-	def is_music_file(self, path) -> bool:
-		"""
-		Returns whether the given file is a music file that we can read.
-		:param path: The file to check.
-		:return: ``True`` if it is a music track, or ``False`` if it isn't.
-		"""
-		path = os.path.join(self._directory, path)
-		if not os.path.isfile(path):
-			return False  # Only read files.
-		ext = os.path.splitext(path)[1]
-		return ext in [".mp3", ".flac", ".opus", ".ogg", ".wav"]  # Supported file formats.
-
-	def update(self) -> None:
-		"""
-		Update the track list from the current contents of the watched directory.
-		"""
-		file_role = self.roles[b"filepath"]
-		files = set(filter(self.is_music_file, os.listdir(self._directory)))
-		old_files = set()
-		for item in self._data:
-			old_files.add(item[file_role])
-		new_files = files - old_files
-		removed_files = old_files - files
-
-		for removed_file in removed_files:
-			remove_pos = 0
-			for i in range(len(self._data)):
-				if self._data[i][file_role] == removed_file:
-					remove_pos = i
-			self.beginRemoveRows(PySide6.QtCore.QModelIndex(), remove_pos, remove_pos)
-			del self._data[remove_pos]
-			self.endRemoveRows()
-
-		for new_file in new_files:
-			path = os.path.join(self._directory, new_file)
-			metadata_dict = {
-				self.roles[b"filepath"]: new_file,
-				self.roles[b"title"]: metadata.get_cached(path, "title"),
-				self.roles[b"author"]: metadata.get_cached(path, "author"),
-				self.roles[b"comment"]: metadata.get_cached(path, "comment"),
-				self.roles[b"duration"]: metadata.get_cached(path, "duration"),
-				self.roles[b"bpm"]: metadata.get_cached(path, "bpm")
-			}
-			insert_pos = len(self._data)
-			sorted_field = metadata_dict[self.sorted_role]
-			if sorted_field is not None:
-				for i in range(len(self._data)):
-					other_field = self._data[i][self.sorted_role]
-					if type(other_field) == str:
-						if other_field.lower() > sorted_field.lower():  # Case-insensitive compare in case of strings.
-							insert_pos = i
-							break
-					else:
-						if other_field > sorted_field:
-							insert_pos = i
-							break
-			self.beginInsertRows(PySide6.QtCore.QModelIndex(), insert_pos, insert_pos)
-			self._data.insert(insert_pos, metadata_dict)
-			self.endInsertRows()
-
-	def update_metadata_task(self) -> None:
-		"""
-		A background task that gradually updates all of the metadata in the current folder.
-		"""
-		# We'll be modifying the data while iterating over it.
-		# During this iteration, we have to keep the data sorted. To do this we'll re-insert the tracks into the list.
-		# This may end up before the place where we're processing.
-		# So to do this, we'll track an index manually, that we can increment if we're inserting above the cursor, or not if we're inserting below.
-		cursor = 0
-		while cursor < len(self._data):
-			if self.update_thread is None:  # We have to abort.
-				break
-			entry = self._data[cursor]
-			if entry[self.roles[b"title"]] is not None:  # Already processed.
-				cursor += 1
-				continue
-			self.beginRemoveRows(PySide6.QtCore.QModelIndex(), cursor, cursor)
-			self._data.pop(cursor)
-			self.endRemoveRows()
-
-			# Get the actual data from the file.
-			path = os.path.join(self._directory, entry[self.roles[b"filepath"]])
-			entry[self.roles[b"title"]] = metadata.get_entry(path, "title")
-			entry[self.roles[b"author"]] = metadata.get_entry(path, "author")
-			entry[self.roles[b"comment"]] = metadata.get_entry(path, "comment")
-			entry[self.roles[b"duration"]] = metadata.get_entry(path, "duration")
-			entry[self.roles[b"bpm"]] = metadata.get_entry(path, "bpm")
-
-			# Find where to re-insert it, given the new information.
-			insert_pos = len(self._data)
-			sorted_field = entry[self.sorted_role]
-			if sorted_field is not None:
-				for i in range(len(self._data)):
-					other_field = self._data[i][self.sorted_role]
-					if other_field is None:
-						continue
-					if type(other_field) == str:
-						if other_field.lower() > sorted_field.lower():  # Case-insensitive compare in case of strings.
-							insert_pos = i
-							break
-					else:
-						if other_field > sorted_field:
-							insert_pos = i
-							break
-			if insert_pos <= cursor:  # If after the cursor, don't increment the cursor.
-				cursor += 1
-			self.beginInsertRows(PySide6.QtCore.QModelIndex(), insert_pos, insert_pos)
-			self._data.insert(insert_pos, entry)
-			self.endInsertRows()

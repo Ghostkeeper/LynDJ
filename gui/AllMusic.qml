@@ -10,7 +10,7 @@ import Lyn 1.0 as Lyn
 import "./widgets" as Widgets
 
 Item {
-	ListView {
+	TableView {
 		anchors {
 			left: parent.left
 			right: parent.right
@@ -20,21 +20,16 @@ Item {
 
 		property alias directory: music_directory.directory
 
-		model: Lyn.MusicDirectory{
+		model: Lyn.MusicDirectory {
 			id: music_directory
 
 			directory: Lyn.Preferences.preferences["browse_path"]
 		}
-		delegate: Row {
+		delegate: Rectangle {
+			implicitWidth: 100
+			implicitHeight: 50
 			Text {
-				text: title ? title : (filepath ? ("<i>" + filepath + "</i>") : "<i>(no title)</i>")
-				width: 200
-				height: 20
-			}
-			Text {
-				text: author ? author : ""
-				width: 200
-				height: 20
+				text: display
 			}
 		}
 	}
