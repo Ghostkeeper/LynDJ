@@ -18,6 +18,7 @@
 		"primary_background": [237, 228, 205, 255],
 		"accent_background": [224, 224, 224, 255],
 		"disabled_background": [227, 224, 216, 255],
+		"row_alternation_background": [240, 240, 240, 255],
 
 		"disabled_foreground": [68, 55, 24, 255],
 

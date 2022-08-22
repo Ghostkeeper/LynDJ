@@ -26,10 +26,16 @@ Item {
 			directory: Lyn.Preferences.preferences["browse_path"]
 		}
 		delegate: Rectangle {
-			implicitWidth: 100
-			implicitHeight: 50
+			implicitWidth: 200  //TODO: Make this resizeable.
+			implicitHeight: childrenRect.height
+
+			color: Lyn.Theme.colour[(row % 2 == 0) ? "background" : "row_alternation_background"]
+
 			Text {
+				width: parent.width
+
 				text: display
+				elide: Text.ElideRight
 			}
 		}
 	}
