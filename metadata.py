@@ -4,7 +4,6 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
-import collections  # For named tuples.
 import logging
 import mutagen  # To read metadata from music files.
 import mutagen.easyid3
@@ -19,14 +18,12 @@ import threading  # To restrict access to the database by one thread at a time.
 
 import storage  # To know where to store the database.
 
-Metadata = collections.namedtuple("Metadata", ["title", "author", "comment", "duration", "bpm", "cachetime"])
-
 metadata = {}
 """
 The single source of truth for the currently known metadata.
 
 To quickly access metadata for certain files, look into this dictionary. The keys of the dictionary are absolute paths
-to music files. The values are named tuples of type Metadata.
+to music files. The values are dictionaries of metadata key-values.
 """
 
 def load():
@@ -43,8 +40,14 @@ def load():
 
 	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
 	for path, title, author, comment, duration, bpm, cachetime in connection.execute("SELECT * FROM metadata"):
-		new_metadata[path] = Metadata(title, author, comment, duration, bpm, cachetime)
-	global metadata
+		new_metadata[path] = {
+			"title": title,
+			"author": author,
+			"comment": comment,
+			"duration": duration,
+			"bpm": bpm,
+			"cachetime": cachetime
+		}
 	metadata.update(new_metadata)
 
 def store():
@@ -71,7 +74,7 @@ def store():
 	local_metadata = metadata  # Cache locally for performance.
 	for path, entry in local_metadata.items():
 		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?)",
-			(path, entry.title, entry.author, entry.comment, entry.duration, entry.bpm, entry.cachetime))
+			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["cachetime"]))
 	connection.commit()
 
 # When we change the database, save the database to disk after a short delay.
@@ -85,17 +88,17 @@ def get(path, field):
 	"""
 	Get a metadata field from the cache about a certain file.
 	:param path: The file to get the metadata field from.
-	:param field: The name of the metadata field to get. Must be a property of the Metadata enum!
+	:param field: The name of the metadata field to get. Must be one of the known metadata fields in the database!
 	:return: The value of the metadata entry for that field. Will be ``None`` if there is no cached information about
 	that field.
 	"""
-	return getattr(metadata[path], field)
+	return metadata[path][field]
 
 def add(path, entry):
 	"""
 	Add or override a metadata entry for a certain file.
 	:param path: The path to the file that the metadata is for.
-	:param entry: A ``Metadata`` instance (or one that quacks like it) that contains the given metadata.
+	:param entry: A dictionary containing metadata.
 	"""
 	metadata[path] = entry
 	store_timer.start()
@@ -148,7 +151,14 @@ def add_file(path):
 	except ValueError:
 		bpm = -1
 
-	add(path, Metadata(title=title, author=author, comment=comment, duration=duration, bpm=bpm, cachetime=last_modified))
+	add(path, {
+		"title": title,
+		"author": author,
+		"comment": comment,
+		"duration": duration,
+		"bpm": bpm,
+		"cachetime": last_modified
+	})
 
 def is_music_file(self, path) -> bool:
 	"""
