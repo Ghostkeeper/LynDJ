@@ -4,6 +4,7 @@
 		"control": [100, 32],
 		"lining": [1, 1],
 		"border_offset": [12, 12],
+		"scrollbar": [12, 0],
 
 		"topbar": [0, 52],
 		"player": [0, 252],

@@ -5,6 +5,7 @@
 //You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import QtQuick 2.15
+import QtQuick.Controls 2.15
 
 import Lyn 1.0 as Lyn
 import "./widgets" as Widgets
@@ -20,6 +21,8 @@ Item {
 
 		property alias directory: music_directory.directory
 
+		flickableDirection: Flickable.VerticalFlick
+		clip: true
 		model: Lyn.MusicDirectory {
 			id: music_directory
 
@@ -38,9 +41,9 @@ Item {
 				elide: Text.ElideRight
 			}
 		}
+		ScrollBar.vertical: Widgets.ScrollBar {}
 	}
 
-	//Table header is rendered above the actual table, to prevent the need for clipping.
 	Row {
 		id: header
 		Widgets.TableHeader {
