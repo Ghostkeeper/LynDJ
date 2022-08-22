@@ -22,7 +22,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		"""
 		super().__init__(parent)
 
-		self.column_fields = ["title", "author", "comment", "duration", "bpm"]
+		self.column_fields = ["title", "author", "duration", "bpm", "comment"]
 
 		self._directory = ""
 		self.sort_field = []  # You can sort multiple fields at the same time. These two lists are in order of priority. The last entry has the greatest sorting priority.
@@ -79,7 +79,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		if role != PySide6.QtCore.Qt.DisplayRole:
 			return None
 		if orientation == PySide6.QtCore.Qt.Orientation.Horizontal:
-			return ["Title", "Author", "Comment", "Duration", "BPM"][section]
+			return ["Title", "Author", "Duration", "BPM", "Comment"][section]
 		elif orientation == PySide6.QtCore.Qt.Orientation.Vertical:
 			return str(section)
 		else:
