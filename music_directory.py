@@ -149,6 +149,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		self.beginInsertRows(PySide6.QtCore.QModelIndex(), 0, len(new_music))
 		self.music.extend(new_music)
 		self.endInsertRows()
+		self.resort()  # In the same sorting order as what the table is currently configured at.
 
 		self._directory = new_directory
 
