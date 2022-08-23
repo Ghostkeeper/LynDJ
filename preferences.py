@@ -97,6 +97,14 @@ class Preferences(PySide6.QtCore.QObject):
 		"""
 		return self.values[key]
 
+	def has(self, key) -> bool:
+		"""
+		Tests whether a preference with a given key exists.
+		:param key: The preference to test for.
+		:return: ``True`` if it exists, or ``False`` if it doesn't.
+		"""
+		return key in self.defaults
+
 	def load(self) -> None:
 		"""
 		Load up the preferences from disk.
