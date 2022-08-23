@@ -29,10 +29,10 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 
 		self._directory = ""
 		prefs = preferences.Preferences.getInstance()
-		if not prefs.has("sort_order"):
-			prefs.add("sort_order", ["bpm", "title", "duration", "author", "comment"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
-		if not prefs.has("sort_direction"):
-			prefs.add("sort_direction", [False, False, False, False, False])  # For each sort order, whether it is descending (True) or ascending (False).
+		if not prefs.has("directory/sort_order"):
+			prefs.add("directory/sort_order", ["bpm", "title", "duration", "author", "comment"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
+		if not prefs.has("directory/sort_direction"):
+			prefs.add("directory/sort_direction", [False, False, False, False, False])  # For each sort order, whether it is descending (True) or ascending (False).
 		self.music = []  # The actual data contained in this table.
 
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
@@ -110,15 +110,15 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		"""
 		field = self.column_fields[column]
 		prefs = preferences.Preferences.getInstance()
-		sort_field = prefs.get("sort_order")
-		sort_direction = prefs.get("sort_direction")
+		sort_field = prefs.get("directory/sort_order")
+		sort_direction = prefs.get("directory/sort_direction")
 		current_index = sort_field.index(field)  # Remove the old place in the sorting priority.
 		del sort_field[current_index]
 		del sort_direction[current_index]
 		sort_field.insert(0, field)  # And then re-insert it in front, with the highest priority.
 		sort_direction.insert(0, descending_order)
-		prefs.set("sort_order", sort_field)
-		prefs.set("sort_direction", sort_direction)
+		prefs.set("directory/sort_order", sort_field)
+		prefs.set("directory/sort_direction", sort_direction)
 
 		# Now sort it according to that priority.
 		self.resort()
@@ -128,8 +128,8 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		Re-sort the table according to the current sorting priority list.
 		"""
 		prefs = preferences.Preferences.getInstance()
-		sort_field = prefs.get("sort_order")
-		sort_direction = prefs.get("sort_direction")
+		sort_field = prefs.get("directory/sort_order")
+		sort_direction = prefs.get("directory/sort_direction")
 		def sort_key(entry):
 			"""
 			Create a key for each element to be sorted by.
