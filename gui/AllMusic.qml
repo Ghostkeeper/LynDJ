@@ -21,8 +21,6 @@ Item {
 		}
 		onWidthChanged: forceLayout() //Re-calculate column widths.
 
-		property alias directory: music_directory.directory
-
 		flickableDirection: Flickable.VerticalFlick
 		clip: true
 		model: Lyn.MusicDirectory {
