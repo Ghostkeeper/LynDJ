@@ -26,7 +26,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		self.column_fields = ["title", "author", "duration", "bpm", "comment"]
 
 		self._directory = ""
-		self.sort_field = ["comment", "author", "duration", "title", "bpm"]  # You can sort multiple fields at the same time. These two lists are in order of priority. The last entry has the greatest sorting priority.
+		self.sort_field = ["comment", "author", "duration", "title", "bpm"]  # You can sort multiple fields at the same time. These two lists are in order of priority.
 		self.sort_direction = [False, False, False, False, False]  # For each sort order, whether it is descending (True) or ascending (False).
 		self.music = []  # The actual data contained in this table.
 
@@ -96,8 +96,8 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		current_index = self.sort_field.index(field)  # Remove the old place in the sorting priority.
 		del self.sort_field[current_index]
 		del self.sort_direction[current_index]
-		self.sort_field.append(field)  # And then re-append it at the end.
-		self.sort_direction.append(descending_order)
+		self.sort_field.insert(0, field)  # And then re-insert it in front, with the highest priority.
+		self.sort_direction.insert(0, descending_order)
 
 		# Now sort it according to that priority.
 		self.resort()
