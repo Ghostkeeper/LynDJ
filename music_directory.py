@@ -26,7 +26,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		self.column_fields = ["title", "author", "duration", "bpm", "comment"]
 
 		self._directory = ""
-		self.sort_field = ["comment", "author", "duration", "title", "bpm"]  # You can sort multiple fields at the same time. These two lists are in order of priority.
+		self.sort_field = ["bpm", "title", "duration", "author", "comment"]  # You can sort multiple fields at the same time. These two lists are in order of priority.
 		self.sort_direction = [False, False, False, False, False]  # For each sort order, whether it is descending (True) or ascending (False).
 		self.music = []  # The actual data contained in this table.
 
