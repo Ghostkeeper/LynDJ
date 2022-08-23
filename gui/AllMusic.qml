@@ -11,6 +11,35 @@ import Lyn 1.0 as Lyn
 import "./widgets" as Widgets
 
 Item {
+	Row {
+		id: header
+		Widgets.TableHeader {
+			width: music_table.columnWidthProvider(0)
+
+			text: "Title"
+		}
+		Widgets.TableHeader {
+			width: music_table.columnWidthProvider(1)
+
+			text: "Author"
+		}
+		Widgets.TableHeader {
+			width: music_table.columnWidthProvider(2)
+
+			text: "Duration"
+		}
+		Widgets.TableHeader {
+			width: music_table.columnWidthProvider(3)
+
+			text: "BPM"
+		}
+		Widgets.TableHeader {
+			width: music_table.columnWidthProvider(4)
+
+			text: "Comment"
+		}
+	}
+
 	TableView {
 		id: music_table
 		anchors {
@@ -44,35 +73,6 @@ Item {
 		ScrollBar.vertical: Widgets.ScrollBar {}
 		columnWidthProvider: function(column) {
 			return music_table.width * Lyn.Preferences.preferences["directory/column_width"][column];
-		}
-	}
-
-	Row {
-		id: header
-		Widgets.TableHeader {
-			width: music_table.columnWidthProvider(0)
-
-			text: "Title"
-		}
-		Widgets.TableHeader {
-			width: music_table.columnWidthProvider(1)
-
-			text: "Author"
-		}
-		Widgets.TableHeader {
-			width: music_table.columnWidthProvider(2)
-
-			text: "Duration"
-		}
-		Widgets.TableHeader {
-			width: music_table.columnWidthProvider(3)
-
-			text: "BPM"
-		}
-		Widgets.TableHeader {
-			width: music_table.columnWidthProvider(4)
-
-			text: "Comment"
 		}
 	}
 }
