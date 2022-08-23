@@ -50,27 +50,27 @@ Item {
 	Row {
 		id: header
 		Widgets.TableHeader {
-			id: titleHeader
+			width: music_table.columnWidthProvider(0)
 
 			text: "Title"
 		}
 		Widgets.TableHeader {
-			id: authorHeader
+			width: music_table.columnWidthProvider(1)
 
 			text: "Author"
 		}
 		Widgets.TableHeader {
-			id: durationHeader
+			width: music_table.columnWidthProvider(2)
 
 			text: "Duration"
 		}
 		Widgets.TableHeader {
-			id: bpmHeader
+			width: music_table.columnWidthProvider(3)
 
 			text: "BPM"
 		}
 		Widgets.TableHeader {
-			id: commentHeader
+			width: music_table.columnWidthProvider(4)
 
 			text: "Comment"
 		}
