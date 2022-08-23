@@ -58,8 +58,8 @@ Item {
 			directory: Lyn.Preferences.preferences["browse_path"]
 		}
 		delegate: Rectangle {
-			implicitWidth: music_table.columnWidthProvider()
-			implicitHeight: childrenRect.height
+			implicitWidth: 200 //Will be overridden by the column width provider.
+			implicitHeight: Math.max(childrenRect.height, 1)
 
 			color: Lyn.Theme.colour[(row % 2 == 0) ? "background" : "row_alternation_background"]
 
