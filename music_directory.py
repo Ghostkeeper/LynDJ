@@ -35,6 +35,10 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			prefs.add("directory/sort_direction", [False, False, False, False, False])  # For each sort order, whether it is descending (True) or ascending (False).
 		self.music = []  # The actual data contained in this table.
 
+		if not prefs.has("directory/column_width"):
+			fraction = 1.0 / len(self.column_fields)  # Equal fraction for each column.
+			prefs.add("directory/column_width", [fraction, fraction, fraction, fraction, fraction])
+
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
 		"""
 		Returns the number of music files in this table.

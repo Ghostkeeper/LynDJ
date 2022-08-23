@@ -12,12 +12,14 @@ import "./widgets" as Widgets
 
 Item {
 	TableView {
+		id: music_table
 		anchors {
 			left: parent.left
 			right: parent.right
 			top: header.bottom
 			bottom: parent.bottom
 		}
+		onWidthChanged: forceLayout() //Re-calculate column widths.
 
 		property alias directory: music_directory.directory
 
@@ -29,7 +31,7 @@ Item {
 			directory: Lyn.Preferences.preferences["browse_path"]
 		}
 		delegate: Rectangle {
-			implicitWidth: 200  //TODO: Make this resizeable.
+			implicitWidth: music_table.columnWidthProvider()
 			implicitHeight: childrenRect.height
 
 			color: Lyn.Theme.colour[(row % 2 == 0) ? "background" : "row_alternation_background"]
@@ -42,6 +44,9 @@ Item {
 			}
 		}
 		ScrollBar.vertical: Widgets.ScrollBar {}
+		columnWidthProvider: function(column) {
+			return music_table.width * Lyn.Preferences.preferences["directory/column_width"][column];
+		}
 	}
 
 	Row {
