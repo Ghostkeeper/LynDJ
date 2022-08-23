@@ -122,9 +122,9 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 				key.append(value)
 			return key
 
-		self.layoutAboutToBeChanged.emit(PySide6.QtCore.QModelIndex(), self.VerticalSortHint)
-		self.music = list(sorted(self.music, sort_key))
-		self.layoutChanged.emit(PySide6.QtCore.QModelIndex(), self.VerticalSortHint)
+		self.layoutAboutToBeChanged.emit()
+		self.music = list(sorted(self.music, key=sort_key))
+		self.layoutChanged.emit()
 
 	def directory_set(self, new_directory) -> None:
 		"""
