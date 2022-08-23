@@ -22,6 +22,27 @@ Item {
 			width: music_table.columnWidthProvider(1)
 
 			text: "Author"
+
+			MouseArea {
+				id: mouse_area
+				width: Lyn.Theme.size["drag_handle"].width
+				height: parent.height
+				x: -width / 2
+
+				hoverEnabled: true
+				cursorShape: Qt.SizeHorCursor
+				drag.target: mouse_area
+				drag.axis: Drag.XAxis
+				drag.minimumX: -100
+				drag.maximumX: 100
+				drag.threshold: 0
+
+				Rectangle {
+					id: handle
+					anchors.fill: parent
+					color: "pink"
+				}
+			}
 		}
 		Widgets.TableHeader {
 			width: music_table.columnWidthProvider(2)
