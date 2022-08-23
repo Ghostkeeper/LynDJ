@@ -4,6 +4,7 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import math  # To format track duration.
 import os  # To list files in the music directory.
 import os.path  # To list file paths in the music directory.
 import PySide6.QtCore  # To expose this list to QML.
@@ -64,7 +65,18 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			return None  # Only valid indices return data.
 		if role != PySide6.QtCore.Qt.DisplayRole:
 			return None  # Only return for the display role.
-		return str(self.music[index.row()][self.column_fields[index.column()]])
+		field = self.column_fields[index.column()]
+		value = self.music[index.row()][field]
+		if field == "duration":
+			# Display duration as minutes:seconds.
+			seconds = round(value)
+			return str(math.floor(seconds / 60)) + ":" + ("0" if (seconds % 60 < 10) else "") + str(seconds % 60)
+		if field == "bpm":
+			# Don't display negatives (= no information)
+			if value <= 0:
+				return ""
+			return str(round(value))
+		return str(value)  # Default, just convert to string.
 
 	def headerData(self, section, orientation, role):
 		"""
