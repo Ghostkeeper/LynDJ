@@ -9,6 +9,7 @@ import os.path  # To list file paths in the music directory.
 import PySide6.QtCore  # To expose this list to QML.
 
 import metadata  # To get information about the files in the music directory.
+import sorting  # To invert a sorting order.
 
 class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 	"""
@@ -25,8 +26,8 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		self.column_fields = ["title", "author", "duration", "bpm", "comment"]
 
 		self._directory = ""
-		self.sort_field = []  # You can sort multiple fields at the same time. These two lists are in order of priority. The last entry has the greatest sorting priority.
-		self.sort_direction = []
+		self.sort_field = ["comment", "author", "duration", "title", "bpm"]  # You can sort multiple fields at the same time. These two lists are in order of priority. The last entry has the greatest sorting priority.
+		self.sort_direction = [False, False, False, False, False]  # For each sort order, whether it is descending (True) or ascending (False).
 		self.music = []  # The actual data contained in this table.
 
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
@@ -91,20 +92,38 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		:param column: The index of the column to sort by.
 		:param descending_order: Whether to sort in ascending order (False) or descending order (True).
 		"""
+		field = self.column_fields[column]
+		current_index = self.sort_field.index(field)  # Remove the old place in the sorting priority.
+		del self.sort_field[current_index]
+		del self.sort_direction[current_index]
+		self.sort_field.append(field)  # And then re-append it at the end.
+		self.sort_direction.append(descending_order)
+
+		# Now sort it according to that priority.
+		self.resort()
+
+	def resort(self):
+		"""
+		Re-sort the table according to the current sorting priority list.
+		"""
 		def sort_key(entry):
 			"""
-			Get the appropriate column from a metadata entry to trigger the sort by.
+			Create a key for each element to be sorted by.
 			:param entry: A metadata entry.
 			:return: The value to sort this entry by.
 			"""
-			value = entry[self.column_fields[column]]
-			if type(value) == str:
-				return value.lower()  # Case-insensitive for strings.
-			else:
-				return value
+			key = []
+			for i in range(len(self.sort_field)):
+				value = entry[self.sort_field[i]]
+				if type(value) == str:
+					value = value.lower()
+				if self.sort_direction[i]:
+					value = sorting.ReverseOrder(value)
+				key.append(value)
+			return key
 
 		self.layoutAboutToBeChanged.emit(PySide6.QtCore.QModelIndex(), self.VerticalSortHint)
-		self.music = list(sorted(self.music, sort_key, descending_order))
+		self.music = list(sorted(self.music, sort_key))
 		self.layoutChanged.emit(PySide6.QtCore.QModelIndex(), self.VerticalSortHint)
 
 	def directory_set(self, new_directory) -> None:
