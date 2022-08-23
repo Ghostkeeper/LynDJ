@@ -10,6 +10,7 @@ import PySide6.QtCore
 import PySide6.QtGui  # This is a GUI application.
 import PySide6.QtQml  # To register types with the QML engine.
 
+import metadata
 import music_directory
 import preferences
 import theme
@@ -37,6 +38,9 @@ class Application(PySide6.QtGui.QGuiApplication):
 		else:
 			browse_path = os.path.expanduser("~/")
 		prefs.add("browse_path", browse_path)
+
+		logging.debug("Loading metadata database.")
+		metadata.load()
 
 		self.create_gui_preferences()
 
