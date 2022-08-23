@@ -129,7 +129,7 @@ class Preferences(PySide6.QtCore.QObject):
 			if self.defaults[key] != value:  # Not equal to default.
 				changed[key] = value
 		with open(filepath, "w") as f:
-			json.dump(changed, f)
+			json.dump(changed, f, indent="\t")
 
 	@PySide6.QtCore.Slot(str, "QVariant")
 	def set(self, key, value) -> None:
