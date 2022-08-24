@@ -30,6 +30,17 @@ def cache() -> str:
 		path = os.path.expanduser("~/.cache")  # Most Linux machines.
 	return os.path.join(path, "lyndj")
 
+def data() -> str:
+	"""
+	Get the location where data files should be stored.
+	:return: A path to a directory where data for the application is stored.
+	"""
+	try:
+		path = os.environ["XDG_DATA_HOME"]  # XDG standard storage location.
+	except KeyError:
+		path =os.path.expanduser("~/.local")  # Most Linux machines.
+	return os.path.join(path, "lyndj")
+
 def ensure_exists() -> None:
 	"""
 	Ensure that the storage locations all exist.
