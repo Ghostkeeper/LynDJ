@@ -18,52 +18,54 @@ Item {
 			width: music_table.columnWidthProvider(0)
 
 			text: "Title"
+			onWidthChanged: music_table.forceLayout()
 		}
 		Widgets.TableHeader {
 			id: header_author
 			width: music_table.columnWidthProvider(1)
 
 			text: "Author"
+			onWidthChanged: music_table.forceLayout()
 
-			MouseArea {
-				id: mouse_area
-				width: Lyn.Theme.size["drag_handle"].width
-				height: parent.height
-				x: -width / 2
-
-				hoverEnabled: true
-				cursorShape: Qt.SizeHorCursor
-				drag.target: mouse_area
-				drag.axis: Drag.XAxis
-				drag.minimumX: -header_title.width + Lyn.Theme.size["table_cell_minimum"].width
-				drag.maximumX: parent.width - Lyn.Theme.size["table_cell_minimum"].width - width
-				drag.threshold: 0
-
-				onXChanged: {
-					const prev_width = (header_title.width + x + width / 2) / music_table.width;
-					const next_width = (parent.width - x - width / 2) / music_table.width;
-					if(prev_width > 0 && next_width > 0) {
-						Lyn.Preferences.set_element("directory/column_width", 0, prev_width);
-						Lyn.Preferences.set_element("directory/column_width", 1, next_width);
-					}
-					music_table.forceLayout();
-				}
+			Widgets.ColumnResizer {
+				previous_column_width: header_title.width
+				previous_index: 0
 			}
 		}
 		Widgets.TableHeader {
+			id: header_duration
 			width: music_table.columnWidthProvider(2)
 
 			text: "Duration"
+			onWidthChanged: music_table.forceLayout()
+
+			Widgets.ColumnResizer {
+				previous_column_width: header_author.width
+				previous_index: 1
+			}
 		}
 		Widgets.TableHeader {
+			id: header_bpm
 			width: music_table.columnWidthProvider(3)
 
 			text: "BPM"
+			onWidthChanged: music_table.forceLayout()
+
+			Widgets.ColumnResizer {
+				previous_column_width: header_duration.width
+				previous_index: 2
+			}
 		}
 		Widgets.TableHeader {
 			width: music_table.columnWidthProvider(4)
 
 			text: "Comment"
+			onWidthChanged: music_table.forceLayout()
+
+			Widgets.ColumnResizer {
+				previous_column_width: header_bpm.width
+				previous_index: 3
+			}
 		}
 	}
 
