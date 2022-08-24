@@ -14,11 +14,13 @@ Item {
 	Row {
 		id: header
 		Widgets.TableHeader {
+			id: header_title
 			width: music_table.columnWidthProvider(0)
 
 			text: "Title"
 		}
 		Widgets.TableHeader {
+			id: header_author
 			width: music_table.columnWidthProvider(1)
 
 			text: "Author"
@@ -33,8 +35,8 @@ Item {
 				cursorShape: Qt.SizeHorCursor
 				drag.target: mouse_area
 				drag.axis: Drag.XAxis
-				drag.minimumX: -100
-				drag.maximumX: 100
+				drag.minimumX: -header_title.width + Lyn.Theme.size["table_cell_minimum"].width
+				drag.maximumX: header_author.width - Lyn.Theme.size["table_cell_minimum"].width - width
 				drag.threshold: 0
 
 				Rectangle {
