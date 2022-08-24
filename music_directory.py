@@ -4,10 +4,11 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import logging
 import math  # To format track duration.
 import os  # To list files in the music directory.
 import os.path  # To list file paths in the music directory.
-import PySide6.QtCore  # To expose this list to QML.
+import PySide6.QtCore  # To expose this table to QML.
 
 import metadata  # To get information about the files in the music directory.
 import preferences  # To store the sorting order.
@@ -106,20 +107,23 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		else:
 			return None
 
-	def sort(self, column, descending_order):
+	@PySide6.QtCore.Slot(str, bool)
+	def sort(self, column, descending_order) -> None:
 		"""
 		Sort the table by a certain column number.
-		:param column: The index of the column to sort by.
+		:param column: The index of the column to sort by, or the role to sort by.
 		:param descending_order: Whether to sort in ascending order (False) or descending order (True).
 		"""
-		field = self.column_fields[column]
+		logging.info(f"Sorting music directory by {column}, {'descending' if descending_order else 'ascending'}")
+		if type(column) is int:
+			column = self.column_fields[column]
 		prefs = preferences.Preferences.getInstance()
 		sort_field = prefs.get("directory/sort_order")
 		sort_direction = prefs.get("directory/sort_direction")
-		current_index = sort_field.index(field)  # Remove the old place in the sorting priority.
+		current_index = sort_field.index(column)  # Remove the old place in the sorting priority.
 		del sort_field[current_index]
 		del sort_direction[current_index]
-		sort_field.insert(0, field)  # And then re-insert it in front, with the highest priority.
+		sort_field.insert(0, column)  # And then re-insert it in front, with the highest priority.
 		sort_direction.insert(0, descending_order)
 		prefs.set("directory/sort_order", sort_field)
 		prefs.set("directory/sort_direction", sort_direction)
