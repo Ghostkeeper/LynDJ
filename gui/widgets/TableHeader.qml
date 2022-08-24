@@ -30,6 +30,10 @@ Button {
 	}
 
 	onClicked: {
-		table.sort(role, false);
+		if(table.is_sorted(role) == 1) { //Was sorted ascending.
+			table.sort(role, true); //Now sort descending.
+		} else { //Not recently sorted, or sorted descending.
+			table.sort(role, false); //Now sort ascending.
+		}
 	}
 }

@@ -192,3 +192,21 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		:return: The current directory that this model is looking at.
 		"""
 		return self._directory
+
+	@PySide6.QtCore.Slot(str, result="int")
+	def is_sorted(self, field) -> int:
+		"""
+		Gives the sorting status of a field in the table.
+
+		The sorting can be:
+		* 1: The field is sorted in ascending order.
+		* 0: The field is not sorted (not the highest priority anyway).
+		* -1: The field is sorted in descending order.
+		"""
+		prefs = preferences.Preferences.getInstance()
+		if prefs.get("directory/sort_order")[0] != field:  # Not the highest priority sort.
+			return 0
+		if prefs.get("directory/sort_direction")[0]:  # Descending.
+			return -1
+		else:  # Ascending.
+			return 1
