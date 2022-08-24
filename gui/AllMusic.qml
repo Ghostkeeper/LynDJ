@@ -97,6 +97,14 @@ Item {
 
 				text: display
 				elide: Text.ElideRight
+
+				MouseArea {
+					anchors.fill: parent
+
+					hoverEnabled: true
+					ToolTip.visible: parent.truncated && containsMouse && parent.text !== ""
+					ToolTip.text: parent.text
+				}
 			}
 		}
 		ScrollBar.vertical: Widgets.ScrollBar {}
