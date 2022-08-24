@@ -12,6 +12,9 @@ import Lyn 1.0 as Lyn
 Button {
 	id: tableHeader
 
+	property string role
+	property var table
+
 	contentItem: Text {
 		text: tableHeader.text
 		font: Lyn.Theme.font["default"]
@@ -24,5 +27,9 @@ Button {
 		color: Lyn.Theme.colour["accent_background"]
 		border.color: Lyn.Theme.colour["lining"]
 		border.width: Lyn.Theme.size["lining"].height
+	}
+
+	onClicked: {
+		table.sort(role, false);
 	}
 }

@@ -19,6 +19,8 @@ Item {
 
 			text: "Title"
 			onWidthChanged: music_table.forceLayout()
+			role: "title"
+			table: music_table.model
 		}
 		Widgets.TableHeader {
 			id: header_author
@@ -26,6 +28,8 @@ Item {
 
 			text: "Author"
 			onWidthChanged: music_table.forceLayout()
+			role: "author"
+			table: music_table.model
 
 			Widgets.ColumnResizer {
 				previous_column_width: header_title.width
@@ -38,6 +42,8 @@ Item {
 
 			text: "Duration"
 			onWidthChanged: music_table.forceLayout()
+			role: "duration"
+			table: music_table.model
 
 			Widgets.ColumnResizer {
 				previous_column_width: header_author.width
@@ -50,6 +56,8 @@ Item {
 
 			text: "BPM"
 			onWidthChanged: music_table.forceLayout()
+			role: "bpm"
+			table: music_table.model
 
 			Widgets.ColumnResizer {
 				previous_column_width: header_duration.width
@@ -61,6 +69,8 @@ Item {
 
 			text: "Comment"
 			onWidthChanged: music_table.forceLayout()
+			role: "comment"
+			table: music_table.model
 
 			Widgets.ColumnResizer {
 				previous_column_width: header_bpm.width
