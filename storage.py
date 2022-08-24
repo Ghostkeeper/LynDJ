@@ -53,6 +53,10 @@ def ensure_exists() -> None:
 	if not os.path.exists(cache_path):
 		logging.info(f"Creating cache directory in {cache_path}")
 		os.makedirs(cache_path)
+	data_path = data()
+	if not os.path.exists(data_path):
+		logging.info(f"Creating data directory in {data_path}")
+		os.makedirs(data_path)
 
 def source() -> str:
 	"""
