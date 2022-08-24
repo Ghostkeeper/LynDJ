@@ -4,7 +4,7 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
-import copy
+import copy  # Copying values from defaults to the actual values, so that defaults don't get changed by reference.
 import json  # Preferences are stored in JSON format, which interfaces nicely with Python.
 import logging
 import os  # To know where to store the preferences file.
@@ -77,7 +77,7 @@ class Preferences(PySide6.QtCore.QObject):
 		logging.debug(f"Adding preference {key} with default {default}.")
 		self.defaults[key] = default
 		if key not in self.values:
-			self.values[key] = default
+			self.values[key] = copy.copy(default)  # Make a copy, so that the default doesn't accidentally change if modified by reference.
 
 	def ensure_exists(self) -> None:
 		"""
