@@ -101,7 +101,7 @@ Item {
 				MouseArea {
 					anchors.fill: parent
 
-					hoverEnabled: true
+					hoverEnabled: parent.truncated && parent.text !== ""
 					ToolTip.visible: parent.truncated && containsMouse && parent.text !== ""
 					ToolTip.text: parent.text
 				}
