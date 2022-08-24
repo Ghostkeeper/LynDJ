@@ -107,6 +107,7 @@ Item {
 
 				text: display
 				elide: Text.ElideRight
+				font: Lyn.Theme.font["default"]
 
 				MouseArea {
 					anchors.fill: parent
