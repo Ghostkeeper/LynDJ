@@ -16,7 +16,18 @@ Button {
 	property var table
 
 	contentItem: Text {
-		text: tableHeader.text
+		id: text_label
+
+		text: {
+			const sort_state = table ? table.is_sorted(role) : 0;
+			if(sort_state == 0) { //Not highest priority sorted.
+				return tableHeader.text;
+			} else if(sort_state == 1) { //Sorted ascending.
+				return tableHeader.text + " ▴";
+			} else { //Sorted descending.
+				return tableHeader.text + " ▾";
+			}
+		}
 		font: Lyn.Theme.font["default"]
 		color: Lyn.Theme.colour["foreground"]
 		horizontalAlignment: Text.AlignHCenter
@@ -32,8 +43,10 @@ Button {
 	onClicked: {
 		if(table.is_sorted(role) == 1) { //Was sorted ascending.
 			table.sort(role, true); //Now sort descending.
+			text_label.text = tableHeader.text + " ▾";
 		} else { //Not recently sorted, or sorted descending.
 			table.sort(role, false); //Now sort ascending.
+			text_label.text = tableHeader.text + " ▴";
 		}
 	}
 }
