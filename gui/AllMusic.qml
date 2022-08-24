@@ -36,13 +36,17 @@ Item {
 				drag.target: mouse_area
 				drag.axis: Drag.XAxis
 				drag.minimumX: -header_title.width + Lyn.Theme.size["table_cell_minimum"].width
-				drag.maximumX: header_author.width - Lyn.Theme.size["table_cell_minimum"].width - width
+				drag.maximumX: parent.width - Lyn.Theme.size["table_cell_minimum"].width - width
 				drag.threshold: 0
 
-				Rectangle {
-					id: handle
-					anchors.fill: parent
-					color: "pink"
+				onXChanged: {
+					const prev_width = (header_title.width + x + width / 2) / music_table.width;
+					const next_width = (parent.width - x - width / 2) / music_table.width;
+					if(prev_width > 0 && next_width > 0) {
+						Lyn.Preferences.set_element("directory/column_width", 0, prev_width);
+						Lyn.Preferences.set_element("directory/column_width", 1, next_width);
+					}
+					music_table.forceLayout();
 				}
 			}
 		}
