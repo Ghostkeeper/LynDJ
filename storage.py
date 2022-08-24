@@ -38,7 +38,7 @@ def data() -> str:
 	try:
 		path = os.environ["XDG_DATA_HOME"]  # XDG standard storage location.
 	except KeyError:
-		path =os.path.expanduser("~/.local")  # Most Linux machines.
+		path =os.path.expanduser("~/.local/share")  # Most Linux machines.
 	return os.path.join(path, "lyndj")
 
 def ensure_exists() -> None:
