@@ -143,6 +143,19 @@ class Preferences(PySide6.QtCore.QObject):
 		self.save_timer.start()
 		self.valuesChanged.emit()
 
+	@PySide6.QtCore.Slot(str, int, "QVariant")
+	def set_element(self, key, index, value) -> None:
+		"""
+		Change an element in a list-type or dict-type preference.
+		:param key: The preference to change an element of.
+		:param index: The index in the list, or the key in the dict to change.
+		:param value: The new value for the element in the list or dict.
+		"""
+		logging.debug(f"Changing preference {key}, index {index} to {value}.")
+		self.values[key][index] = value
+		self.save_timer.start()
+		self.valuesChanged.emit()
+
 	def storage_location(self) -> str:
 		"""
 		Get the path to the preferences file on this computer.
