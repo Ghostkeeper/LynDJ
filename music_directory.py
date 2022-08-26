@@ -65,7 +65,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 	def data(self, index, role=PySide6.QtCore.Qt.DisplayRole):
 		"""
 		Returns one cell of the table.
-		:param index: The row index of the cell to give the data from.
+		:param index: The row and column index of the cell to give the data from.
 		:param role: Which data to return for this cell. Defaults to the data displayed, which is the only data we
 		store for a cell.
 		:return: The data contained in that cell, as a string.
