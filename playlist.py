@@ -7,6 +7,7 @@
 import math  # To format durations.
 import PySide6.QtCore  # To expose this table to QML.
 
+import metadata  # To show file metadata in the playlist table.
 import preferences  # For the column widths.
 
 class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
@@ -91,3 +92,12 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			return str(section)
 		else:
 			return None
+
+	@PySide6.QtCore.Slot(str)
+	def add(self, path) -> None:
+		"""
+		Add a certain file to the playlist.
+		:param path: The path to the file to add.
+		"""
+		file_metadata = metadata.metadata[path]
+		self.playlist.append(file_metadata)
