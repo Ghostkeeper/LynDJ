@@ -87,6 +87,14 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			return str(round(value))
 		return str(value)  # Default, just convert to string.
 
+	def flags(self, index):
+		"""
+		Returns metadata properties of a cell.
+		:param index: The cell to get metadata of.
+		:return: The metadata flags for that cell.
+		"""
+		return PySide6.QtCore.Qt.ItemFlag.ItemIsSelectable | PySide6.QtCore.Qt.ItemFlag.ItemIsEnabled
+
 	def headerData(self, section, orientation, role):
 		"""
 		Returns the row or column labels for the table.

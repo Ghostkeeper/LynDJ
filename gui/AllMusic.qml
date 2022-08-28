@@ -4,8 +4,8 @@
 //This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 //You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick 6.2
+import QtQuick.Controls 6.2
 
 import Lyn 1.0 as Lyn
 import "./widgets" as Widgets
@@ -87,8 +87,10 @@ Item {
 			top: header.bottom
 			bottom: parent.bottom
 		}
-		onWidthChanged: forceLayout() //Re-calculate column widths.
 
+		property int selectedRow: -1
+
+		onWidthChanged: forceLayout() //Re-calculate column widths.
 		flickableDirection: Flickable.VerticalFlick
 		clip: true
 		model: Lyn.MusicDirectory {
@@ -100,7 +102,9 @@ Item {
 			implicitWidth: 200 //Will be overridden by the column width provider.
 			implicitHeight: Math.max(childrenRect.height, 1)
 
-			color: Lyn.Theme.colour[(row % 2 == 0) ? "background" : "row_alternation_background"]
+			required property bool selected
+
+			color: Lyn.Theme.colour[row == music_table.selectedRow ? "selection" : ((row % 2 == 0) ? "background" : "row_alternation_background")]
 
 			Text {
 				width: parent.width
@@ -115,6 +119,7 @@ Item {
 					hoverEnabled: parent.truncated && parent.text !== ""
 					ToolTip.visible: parent.truncated && containsMouse && parent.text !== ""
 					ToolTip.text: parent.text
+					onClicked: { music_table.selectedRow = row; }
 				}
 			}
 		}
