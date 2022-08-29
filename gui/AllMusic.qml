@@ -120,7 +120,10 @@ Item {
 					hoverEnabled: parent.truncated && parent.text !== ""
 					ToolTip.visible: parent.truncated && containsMouse && parent.text !== ""
 					ToolTip.text: parent.text
-					onClicked: { music_table.selectedRow = row; }
+					onClicked: {
+						music_table.selectedRow = row;
+						music_table.focus = true;
+					}
 				}
 			}
 		}
