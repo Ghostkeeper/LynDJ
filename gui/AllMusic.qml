@@ -93,6 +93,7 @@ Item {
 		onWidthChanged: forceLayout() //Re-calculate column widths.
 		flickableDirection: Flickable.VerticalFlick
 		clip: true
+		focus: true
 		model: Lyn.MusicDirectory {
 			id: music_directory
 
@@ -127,5 +128,7 @@ Item {
 		columnWidthProvider: function(column) {
 			return music_table.width * Lyn.Preferences.preferences["directory/column_width"][column];
 		}
+		Keys.onUpPressed: if(selectedRow > 0) selectedRow--;
+		Keys.onDownPressed: if(selectedRow < rows - 1) selectedRow++;
 	}
 }
