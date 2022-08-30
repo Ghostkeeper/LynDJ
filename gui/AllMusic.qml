@@ -131,7 +131,30 @@ Item {
 		columnWidthProvider: function(column) {
 			return music_table.width * Lyn.Preferences.preferences["directory/column_width"][column];
 		}
+
+		property int _row_height: 0
 		Keys.onUpPressed: if(selectedRow > 0) selectedRow--;
 		Keys.onDownPressed: if(selectedRow < rows - 1) selectedRow++;
+		onSelectedRowChanged: {
+			//cellAtPos is deemed unreliable, probably because the table unloads cells if they are out of view and then doesn't calculate their size properly.
+			//Instead we'll have to get the row height manually and calculate which parts are in view.
+			if(_row_height == 0) { //The first time, store the row height.
+				for(let i = 0; i < rows; ++i) {
+					if(rowHeight(i) > 0) {
+						_row_height = rowHeight(i);
+						break;
+					}
+				}
+			}
+			if(selectedRow > 0) {
+				const first_visible_row = Math.floor(contentY / _row_height);
+				const last_visible_row = first_visible_row + Math.floor(height / _row_height);
+				if(selectedRow <= first_visible_row) { //Selected row is above the view.
+					positionViewAtRow(selectedRow, Qt.AlignTop);
+				} else if(selectedRow > last_visible_row) { //Selected row is below the view.
+					positionViewAtRow(selectedRow, Qt.AlignBottom);
+				}
+			}
+		}
 	}
 }
