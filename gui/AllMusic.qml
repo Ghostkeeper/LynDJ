@@ -101,7 +101,7 @@ Item {
 		}
 		delegate: Rectangle {
 			implicitWidth: 200 //Will be overridden by the column width provider.
-			implicitHeight: Math.max(childrenRect.height, 1)
+			implicitHeight: Lyn.Theme.size["table_cell_minimum"].height
 
 			required property bool selected
 
