@@ -94,6 +94,7 @@ ApplicationWindow {
 		}
 
 		Gui.Playlist {
+			id: playlist
 			anchors {
 				top: parent.top
 				bottom: parent.bottom
@@ -104,6 +105,10 @@ ApplicationWindow {
 
 		Gui.VerticalDivider {
 			id: vertical_divider
+
+			queueButtonHandler: function() {
+				playlist.add(filebrowser.selectedFilePath);
+			}
 		}
 	}
 

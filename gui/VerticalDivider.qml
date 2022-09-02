@@ -15,6 +15,8 @@ Item {
 	width: Lyn.Theme.size["vertical_divider"].width
 	x: Lyn.Preferences.preferences["divider_pos"] * parent.width - width / 2
 
+	property var queueButtonHandler
+
 	Widgets.ColourImage {
 		anchors {
 			horizontalCenter: parent.horizontalCenter
@@ -32,6 +34,10 @@ Item {
 
 		source: Lyn.Theme.icon["vertical_divider_arrow"]
 		colour: Lyn.Theme.colour["lining"]
+		MouseArea {
+			anchors.fill: parent
+			onClicked: queueButtonHandler()
+		}
 	}
 	Widgets.ColourImage {
 		anchors {

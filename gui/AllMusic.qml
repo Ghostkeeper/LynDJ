@@ -11,6 +11,14 @@ import Lyn 1.0 as Lyn
 import "./widgets" as Widgets
 
 Item {
+	property string selectedFilePath: {
+		if(music_table.selectedRow >= 0 && music_directory) {
+			return music_directory.get_path(music_table.selectedRow);
+		} else {
+			return "";
+		}
+	}
+
 	Row {
 		id: header
 		Widgets.TableHeader {

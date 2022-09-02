@@ -7,4 +7,7 @@
 import QtQuick 2.15
 
 Item {
+	function add(path) {
+		print("This is where it would add " + path + " to the playlist.");
+	}
 }

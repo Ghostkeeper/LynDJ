@@ -11,6 +11,8 @@ import "./widgets" as Widgets
 import Lyn 1.0 as Lyn
 
 Item {
+	property alias selectedFilePath: all_music.selectedFilePath
+
 	Widgets.DirectoryField {
 		id: directory_field
 		anchors {
@@ -26,6 +28,7 @@ Item {
 		onCurrentDirectoryChanged: Lyn.Preferences.set("browse_path", currentDirectory)
 	}
 	Gui.AllMusic {
+		id: all_music
 		anchors {
 			left: parent.left
 			leftMargin: Lyn.Theme.size["margin"].width
