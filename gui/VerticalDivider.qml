@@ -19,6 +19,24 @@ Item {
 		anchors {
 			horizontalCenter: parent.horizontalCenter
 			top: parent.top
+			bottom: queue_button.top
+		}
+
+		source: Lyn.Theme.icon["vertical_divider"]
+		colour: Lyn.Theme.colour["lining"]
+	}
+	Widgets.ColourImage {
+		id: queue_button
+		anchors.horizontalCenter: parent.horizontalCenter
+		y: parent.height / 4
+
+		source: Lyn.Theme.icon["vertical_divider_arrow"]
+		colour: Lyn.Theme.colour["lining"]
+	}
+	Widgets.ColourImage {
+		anchors {
+			horizontalCenter: parent.horizontalCenter
+			top: queue_button.bottom
 			bottom: handle.top
 		}
 
