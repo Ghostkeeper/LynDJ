@@ -10,7 +10,7 @@ import PySide6.QtCore  # To expose this table to QML.
 import metadata  # To show file metadata in the playlist table.
 import preferences  # For the column widths.
 
-class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
+class Playlist(PySide6.QtCore.QAbstractTableModel):
 	"""
 	A list of the tracks that are about to be played.
 	"""
