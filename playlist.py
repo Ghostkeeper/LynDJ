@@ -4,6 +4,7 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import logging
 import math  # To format durations.
 import PySide6.QtCore  # To expose this table to QML.
 
@@ -100,4 +101,5 @@ class Playlist(PySide6.QtCore.QAbstractTableModel):
 		:param path: The path to the file to add.
 		"""
 		file_metadata = metadata.metadata[path]
+		logging.info(f"Adding {path} to the playlist.")
 		self.playlist.append(file_metadata)

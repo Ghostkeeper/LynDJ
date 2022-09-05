@@ -6,8 +6,13 @@
 
 import QtQuick 2.15
 
+import Lyn 1.0 as Lyn
+
 Item {
+	Lyn.Playlist {
+		id: playlist
+	}
 	function add(path) {
-		print("This is where it would add " + path + " to the playlist.");
+		playlist.add(path);
 	}
 }

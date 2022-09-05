@@ -12,6 +12,7 @@ import PySide6.QtQml  # To register types with the QML engine.
 
 import metadata
 import music_directory
+import playlist
 import preferences
 import theme
 
@@ -48,6 +49,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		PySide6.QtQml.qmlRegisterSingletonInstance(preferences.Preferences, "Lyn", 1, 0, "Preferences", preferences.Preferences.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(theme.Theme, "Lyn", 1, 0, "Theme", theme.Theme.getInstance())
 		PySide6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
+		PySide6.QtQml.qmlRegisterType(playlist.Playlist, "Lyn", 1, 0, "Playlist")
 
 		logging.debug("Loading QML engine.")
 		self.engine = PySide6.QtQml.QQmlApplicationEngine()
