@@ -5,27 +5,55 @@
 //You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import QtQuick 2.15
+import QtQuick.Controls 2.15
 
 import Lyn 1.0 as Lyn
 
 ListView {
-	model: Lyn.Playlist {
-		id: playlist
-	}
+	verticalLayoutDirection: ListView.BottomToTop
 
 	function add(path) {
 		playlist.add(path);
 	}
 
+	model: Lyn.Playlist {
+		id: playlist
+	}
+
 	delegate: Rectangle {
 		width: parent.width
-		height: Lyn.Theme.size["table_cell_minimum"].height
+		height: Lyn.Theme.size["card"].height
+
+		MouseArea {
+			anchors.fill: parent
+
+			hoverEnabled: true
+			ToolTip.visible: containsMouse
+			ToolTip.text: model.title + "<br />" + model.comment
+			ToolTip.delay: 500
+		}
 
 		Text {
-			width: parent.width
-			anchors.verticalCenter: parent.verticalCenter
+			anchors {
+				left: parent.left
+				right: duration_indicator.left
+				verticalCenter: parent.verticalCenter
+			}
 
 			text: model.title
+			font: Lyn.Theme.font["title"]
+			elide: Text.ElideRight
+		}
+
+		Text {
+			id: duration_indicator
+			anchors {
+				right: parent.right
+				bottom: parent.bottom
+			}
+
+			text: model.duration
+			font: Lyn.Theme.font["default"]
 		}
 	}
 }

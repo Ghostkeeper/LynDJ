@@ -10,7 +10,8 @@
 
 		"topbar": [0, 52],
 		"player": [0, 252],
-		"vertical_divider": [30, 0]
+		"vertical_divider": [30, 0],
+		"card": [0, 43]
 	},
 	"colours": {
 		"background": [255, 255, 255, 255],
@@ -40,6 +41,11 @@
 			"family": "sans",
 			"size": 10,
 			"weight": 500
+		},
+		"title": {
+			"family": "sans",
+			"size": 16,
+			"weight": 800
 		}
 	}
 }
