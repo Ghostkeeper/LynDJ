@@ -113,7 +113,7 @@ Item {
 
 			required property bool selected
 
-			color: Lyn.Theme.colour[row == music_table.selectedRow ? "selection" : ((row % 2 == 0) ? "background" : "row_alternation_background")]
+			color: Lyn.Theme.colour[row == music_table.selectedRow ? "selection" : ((row % 2 == 0) ? "background" : "accent_background")]
 
 			Text {
 				width: parent.width

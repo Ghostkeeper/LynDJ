@@ -16,12 +16,11 @@
 		"background": [255, 255, 255, 255],
 		"foreground": [17, 14, 6, 255],
 		"primary": [205, 178, 114, 255],
-		"secondary": [115, 173, 206, 255],
+		"secondary": [115, 143, 206, 255],
 
 		"primary_background": [237, 228, 205, 255],
-		"accent_background": [224, 224, 224, 255],
+		"accent_background": [248, 244, 235, 255],
 		"disabled_background": [227, 224, 216, 255],
-		"row_alternation_background": [240, 240, 240, 255],
 
 		"disabled_foreground": [68, 55, 24, 255],
 
