@@ -4,6 +4,7 @@
 		"control": [100, 32],
 		"lining": [1, 1],
 		"border_offset": [12, 12],
+		"border_width": [40, 40],
 		"scrollbar": [12, 0],
 		"drag_handle": [6, 0],
 		"table_cell_minimum": [10, 16],

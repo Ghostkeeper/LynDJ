@@ -24,7 +24,6 @@ Rectangle {
 			top: parent.bottom
 			topMargin: -Lyn.Theme.size["border_offset"].height
 		}
-		height: childrenRect.height
 
 		Widgets.ColourImage {
 			id: border_left

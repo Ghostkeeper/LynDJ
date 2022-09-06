@@ -17,11 +17,8 @@ Item {
 		id: directory_field
 		anchors {
 			left: parent.left
-			leftMargin: Lyn.Theme.size["margin"].width
 			right: parent.right
-			rightMargin: Lyn.Theme.size["margin"].width
 			top: parent.top
-			topMargin: Lyn.Theme.size["margin"].height
 		}
 
 		Component.onCompleted: currentDirectory = Lyn.Preferences.preferences["browse_path"]
@@ -31,9 +28,7 @@ Item {
 		id: all_music
 		anchors {
 			left: parent.left
-			leftMargin: Lyn.Theme.size["margin"].width
 			right: parent.right
-			rightMargin: Lyn.Theme.size["margin"].width
 			top: directory_field.bottom
 			topMargin: Lyn.Theme.size["margin"].height
 			bottom: parent.bottom

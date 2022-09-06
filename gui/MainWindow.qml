@@ -75,9 +75,9 @@ ApplicationWindow {
 	Item {
 		anchors {
 			top: topbar.bottom
-			topMargin: Lyn.Theme.size["border_offset"].height
+			topMargin: Lyn.Theme.size["border_width"].height - Lyn.Theme.size["border_offset"].height
 			bottom: player.top
-			bottomMargin: Lyn.Theme.size["border_offset"].height
+			bottomMargin: Lyn.Theme.size["border_width"].height - Lyn.Theme.size["border_offset"].height
 			left: parent.left
 			right: parent.right
 		}
@@ -88,6 +88,7 @@ ApplicationWindow {
 				top: parent.top
 				bottom: parent.bottom
 				left: parent.left
+				leftMargin: Lyn.Theme.size["margin"].width
 				right: vertical_divider.left
 			}
 			//Width to be determined by slider.
@@ -100,6 +101,7 @@ ApplicationWindow {
 				bottom: parent.bottom
 				left: vertical_divider.right
 				right: parent.right
+				rightMargin: Lyn.Theme.size["margin"].width
 			}
 		}
 

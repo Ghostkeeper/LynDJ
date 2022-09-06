@@ -38,6 +38,7 @@ ListView {
 		Text { //Title.
 			anchors {
 				left: parent.left
+				leftMargin: Lyn.Theme.size["margin"].width
 				right: duration_indicator.left
 				verticalCenter: parent.verticalCenter
 			}
@@ -51,7 +52,9 @@ ListView {
 			id: duration_indicator
 			anchors {
 				right: parent.right
+				rightMargin: Lyn.Theme.size["margin"].width
 				bottom: parent.bottom
+				bottomMargin: Lyn.Theme.size["margin"].height
 			}
 
 			text: model.duration
@@ -61,6 +64,7 @@ ListView {
 		Text { //Cumulative duration.
 			anchors {
 				right: parent.right
+				rightMargin: Lyn.Theme.size["margin"].width
 				top: parent.top
 			}
 
