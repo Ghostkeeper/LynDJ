@@ -8,11 +8,24 @@ import QtQuick 2.15
 
 import Lyn 1.0 as Lyn
 
-Item {
-	Lyn.Playlist {
+ListView {
+	model: Lyn.Playlist {
 		id: playlist
 	}
+
 	function add(path) {
 		playlist.add(path);
+	}
+
+	delegate: Rectangle {
+		width: parent.width
+		height: Lyn.Theme.size["table_cell_minimum"].height
+
+		Text {
+			width: parent.width
+			anchors.verticalCenter: parent.verticalCenter
+
+			text: model.title
+		}
 	}
 }
