@@ -20,6 +20,8 @@
 		"secondary": [115, 143, 206, 255],
 
 		"primary_background": [237, 228, 205, 255],
+		"secondary_background": [185, 199, 230, 255],
+		"tertiary_background": [206, 118, 115, 255],
 		"accent_background": [248, 244, 235, 255],
 		"disabled_background": [227, 224, 216, 255],
 
@@ -31,6 +33,9 @@
 
 		"error": [206, 118, 115, 255],
 		"success": [173, 206, 115, 255],
+		"tempo_slow": "secondary_background",
+		"tempo_medium": "background",
+		"tempo_fast": "tertiary_background",
 
 		"selection":  "secondary",
 		"lining": "foreground",

@@ -7,9 +7,11 @@
 import copy
 import logging
 import math  # To format durations.
-import PySide6.QtCore  # To expose this table to QML.
+import PySide6.QtCore  # To expose this list to QML.
+import PySide6.QtGui  # To calculate display colours for song tempo.
 
 import metadata  # To show file metadata in the playlist table.
+import theme  # To get the colours for the BPM indication.
 
 class Playlist(PySide6.QtCore.QAbstractListModel):
 	"""
@@ -79,10 +81,30 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			seconds = round(value)
 			return str(math.floor(seconds / 60)) + ":" + ("0" if (seconds % 60 < 10) else "") + str(seconds % 60)
 		if field == "bpm":
-			# Don't display negatives (= no information)
-			if value <= 0:
-				return ""
-			return str(round(value))
+			# Display tempo as a colour!
+			theme_inst = theme.Theme.getInstance()
+			slow = theme_inst.colours["tempo_slow"]
+			slow_rgba = [slow.red(), slow.green(), slow.blue(), slow.alpha()]
+			medium = theme_inst.colours["tempo_medium"]
+			medium_rgba = [medium.red(), medium.green(), medium.blue(), medium.alpha()]
+			fast = theme_inst.colours["tempo_fast"]
+			fast_rgba = [fast.red(), fast.green(), fast.blue(), fast.alpha()]
+			slow_bpm = 100
+			medium_bpm = 150
+			fast_bpm = 220
+
+			if value <= 0:  # No BPM information. Return neutral tempo.
+				return medium
+			if value < slow_bpm:  # The minimum tempo we'll consider. Completely slow.
+				return slow
+			if value < medium_bpm:  # The medium tempo. So between slow and medium we'll interpolate.
+				interpolation = (value - slow_bpm) / (medium_bpm - slow_bpm)
+				return PySide6.QtGui.QColor(*[interpolation * medium_rgba[i] + (1 - interpolation) * slow_rgba[i] for i in range(4)])
+			if value < fast_bpm:  # The fast tempo. Between medium and fast we'll interpolate.
+				interpolation = (value - medium_bpm) / (fast_bpm - medium_bpm)
+				return PySide6.QtGui.QColor(*[interpolation * fast_rgba[i] + (1 - interpolation) * medium_rgba[i] for i in range(4)])
+			# Above the fast tempo. Completely fast.
+			return fast
 		return str(value)  # Default, just convert to string.
 
 	@PySide6.QtCore.Slot(str)

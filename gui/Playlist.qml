@@ -24,6 +24,8 @@ ListView {
 		width: parent.width
 		height: Lyn.Theme.size["card"].height
 
+		color: model.bpm
+
 		MouseArea {
 			anchors.fill: parent
 
