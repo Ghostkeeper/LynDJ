@@ -9,7 +9,6 @@ import math  # To format durations.
 import PySide6.QtCore  # To expose this table to QML.
 
 import metadata  # To show file metadata in the playlist table.
-import preferences  # For the column widths.
 
 class Playlist(PySide6.QtCore.QAbstractListModel):
 	"""
@@ -84,4 +83,6 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		"""
 		file_metadata = metadata.metadata[path]
 		logging.info(f"Adding {path} to the playlist.")
+		self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(self.playlist), len(self.playlist))
 		self.playlist.append(file_metadata)
+		self.endInsertRows()
