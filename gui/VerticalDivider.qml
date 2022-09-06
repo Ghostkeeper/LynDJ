@@ -37,6 +37,7 @@ Item {
 		MouseArea {
 			anchors.fill: parent
 			onClicked: queueButtonHandler()
+			cursorShape: Qt.PointingHandCursor
 		}
 	}
 	Widgets.ColourImage {
