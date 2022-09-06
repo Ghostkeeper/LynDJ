@@ -30,11 +30,6 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			user_role + 4: "comment"
 		}
 
-		prefs = preferences.Preferences.getInstance()
-		if not prefs.has("playlist/column_width"):
-			fraction = 1.0 / len(self.column_fields)  # Equal fraction for each column.
-			prefs.add("playlist/column_width", [fraction, fraction, fraction, fraction, fraction])
-
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
 		"""
 		Returns the number of music files in the playlist.
