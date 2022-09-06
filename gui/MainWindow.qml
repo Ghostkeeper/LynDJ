@@ -107,7 +107,9 @@ ApplicationWindow {
 			id: vertical_divider
 
 			queueButtonHandler: function() {
-				playlist.add(filebrowser.selectedFilePath);
+				if(filebrowser.selectedFilePath !== "") {
+					playlist.add(filebrowser.selectedFilePath);
+				}
 			}
 		}
 	}
