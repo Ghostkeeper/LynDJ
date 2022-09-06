@@ -51,6 +51,15 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			return 0
 		return 1
 
+	def roleNames(self):
+		"""
+		Gets the names of the roles as exposed to QML.
+
+		This function is called internally by Qt to match a model field in the QML code with the roles in this model.
+		:return: A mapping of roles to field names. The field names are bytes.
+		"""
+		return {role: field.encode("utf-8") for role, field in self.role_to_field.items()}
+
 	def data(self, index, role=PySide6.QtCore.Qt.DisplayRole):
 		"""
 		Returns one field of the data in the list.
