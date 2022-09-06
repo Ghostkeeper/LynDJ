@@ -11,7 +11,7 @@ import PySide6.QtCore  # To expose this table to QML.
 import metadata  # To show file metadata in the playlist table.
 import preferences  # For the column widths.
 
-class Playlist(PySide6.QtCore.QAbstractTableModel):
+class Playlist(PySide6.QtCore.QAbstractListModel):
 	"""
 	A list of the tracks that are about to be played.
 	"""
@@ -19,8 +19,16 @@ class Playlist(PySide6.QtCore.QAbstractTableModel):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 
-		self.column_fields = ["title", "duration", "bpm", "comment"]
 		self.playlist = []  # The actual data contained in this table.
+
+		self.column_fields = ["title", "duration", "bpm", "comment"]
+		user_role = PySide6.QtCore.Qt.UserRole
+		self.role_to_field = {
+			user_role + 1: "title",
+			user_role + 2: "duration",
+			user_role + 3: "bpm",
+			user_role + 4: "comment"
+		}
 
 		prefs = preferences.Preferences.getInstance()
 		if not prefs.has("playlist/column_width"):
@@ -30,7 +38,7 @@ class Playlist(PySide6.QtCore.QAbstractTableModel):
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
 		"""
 		Returns the number of music files in the playlist.
-		:param parent: The parent to display the child entries under. This is a plain table, so no parent should be
+		:param parent: The parent to display the child entries under. This is a plain list, so no parent should be
 		provided.
 		:return: The number of music files in this playlist.
 		"""
@@ -47,21 +55,20 @@ class Playlist(PySide6.QtCore.QAbstractTableModel):
 		"""
 		if parent.isValid():
 			return 0
-		return len(self.column_fields)
+		return 1
 
 	def data(self, index, role=PySide6.QtCore.Qt.DisplayRole):
 		"""
-		Returns one cell of the table.
-		:param index: The row and column index of the cell to give the data from.
-		:param role: Which data to return for this cell. Defaults to the data displayed, which is the only data we
-		store for a cell.
+		Returns one field of the data in the list.
+		:param index: The row of the entry to return the data from.
+		:param role: Which data to return for this cell.
 		:return: The data contained in that cell, as a string.
 		"""
 		if not index.isValid():
 			return None  # Only valid indices return data.
-		if role != PySide6.QtCore.Qt.DisplayRole:
-			return None  # Only return for the display role.
-		field = self.column_fields[index.column()]
+		if role not in self.role_to_field:
+			return None
+		field = self.role_to_field[role]
 		value = self.playlist[index.row()][field]
 		if field == "duration":
 			# Display duration as minutes:seconds.
@@ -73,26 +80,6 @@ class Playlist(PySide6.QtCore.QAbstractTableModel):
 				return ""
 			return str(round(value))
 		return str(value)  # Default, just convert to string.
-
-	def headerData(self, section, orientation, role):
-		"""
-		Returns the row or column labels for the table.
-
-		This table doesn't really use any row labels. We'll return the row index, but it shouldn't get displayed.
-		:param section: The row or column index.
-		:param orientation: Whether to get the row labels or the column labels.
-		:param role: Which data to return for the headers. Defaults to the data displayed, which is the only data we can
-		return.
-		:return: The header for the row or column, as a string.
-		"""
-		if role != PySide6.QtCore.Qt.DisplayRole:
-			return None
-		if orientation == PySide6.QtCore.Qt.Orientation.Horizontal:
-			return ["Title", "Duration", "BPM", "Comment"][section]
-		elif orientation == PySide6.QtCore.Qt.Orientation.Vertical:
-			return str(section)
-		else:
-			return None
 
 	@PySide6.QtCore.Slot(str)
 	def add(self, path) -> None:
