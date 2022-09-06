@@ -33,7 +33,7 @@ ListView {
 			ToolTip.delay: 500
 		}
 
-		Text {
+		Text { //Title.
 			anchors {
 				left: parent.left
 				right: duration_indicator.left
@@ -45,7 +45,7 @@ ListView {
 			elide: Text.ElideRight
 		}
 
-		Text {
+		Text { //Duration.
 			id: duration_indicator
 			anchors {
 				right: parent.right
@@ -54,6 +54,16 @@ ListView {
 
 			text: model.duration
 			font: Lyn.Theme.font["default"]
+		}
+
+		Text { //Cumulative duration.
+			anchors {
+				right: parent.right
+				top: parent.top
+			}
+
+			text: model.cumulative_duration
+			font: Lyn.Theme.font["detail"]
 		}
 	}
 }

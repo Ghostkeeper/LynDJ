@@ -4,6 +4,7 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import copy
 import logging
 import math  # To format durations.
 import PySide6.QtCore  # To expose this table to QML.
@@ -20,13 +21,13 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 
 		self.playlist = []  # The actual data contained in this table.
 
-		self.column_fields = ["title", "duration", "bpm", "comment"]
 		user_role = PySide6.QtCore.Qt.UserRole
 		self.role_to_field = {
 			user_role + 1: "title",
 			user_role + 2: "duration",
 			user_role + 3: "bpm",
-			user_role + 4: "comment"
+			user_role + 4: "comment",
+			user_role + 5: "cumulative_duration"
 		}
 
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
@@ -73,7 +74,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			return None
 		field = self.role_to_field[role]
 		value = self.playlist[index.row()][field]
-		if field == "duration":
+		if field == "duration" or field == "cumulative_duration":
 			# Display duration as minutes:seconds.
 			seconds = round(value)
 			return str(math.floor(seconds / 60)) + ":" + ("0" if (seconds % 60 < 10) else "") + str(seconds % 60)
@@ -90,7 +91,12 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		Add a certain file to the playlist.
 		:param path: The path to the file to add.
 		"""
-		file_metadata = metadata.metadata[path]
+		file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
+		if len(self.playlist) == 0:
+			file_metadata["cumulative_duration"] = file_metadata["duration"]
+		else:
+			file_metadata["cumulative_duration"] = self.playlist[len(self.playlist) - 1]["cumulative_duration"] + file_metadata["duration"]
+
 		logging.info(f"Adding {path} to the playlist.")
 		self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(self.playlist), len(self.playlist))
 		self.playlist.append(file_metadata)

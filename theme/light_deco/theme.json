@@ -46,6 +46,11 @@
 			"family": "sans",
 			"size": 16,
 			"weight": 800
+		},
+		"detail": {
+			"family": "sans",
+			"size": 7,
+			"weight": 500
 		}
 	}
 }
