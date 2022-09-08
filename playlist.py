@@ -113,6 +113,12 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		Add a certain file to the playlist.
 		:param path: The path to the file to add.
 		"""
+		# If the file is already in the playlist, do nothing.
+		for existing_file in self.playlist:
+			if existing_file["path"] == path:
+				logging.debug(f"Tried adding {path} to the playlist, but it's already in the playlist.")
+				return
+
 		file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
 		if len(self.playlist) == 0:
 			file_metadata["cumulative_duration"] = file_metadata["duration"]
