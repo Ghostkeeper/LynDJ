@@ -165,3 +165,13 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		self.playlist.insert(list_new_index, file_data)
 
 		self.endMoveRows()
+
+		# Update the cumulative durations in the part of the list that got changed.
+		lower = min(old_index, new_index)
+		upper = max(old_index, new_index)
+		for i in range(lower, upper):
+			if i == 0:
+				self.playlist[0]["cumulative_duration"] = self.playlist[0]["duration"]
+			else:
+				self.playlist[i]["cumulative_duration"] = self.playlist[i]["duration"] + self.playlist[i - 1]["cumulative_duration"]
+		self.dataChanged.emit(self.createIndex(lower, 0), self.createIndex(upper, 0))
