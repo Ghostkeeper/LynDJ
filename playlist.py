@@ -25,11 +25,12 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 
 		user_role = PySide6.QtCore.Qt.UserRole
 		self.role_to_field = {
-			user_role + 1: "title",
-			user_role + 2: "duration",
-			user_role + 3: "bpm",
-			user_role + 4: "comment",
-			user_role + 5: "cumulative_duration"
+			user_role + 1: "path",
+			user_role + 2: "title",
+			user_role + 3: "duration",
+			user_role + 4: "bpm",
+			user_role + 5: "comment",
+			user_role + 6: "cumulative_duration"
 		}
 
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
@@ -129,3 +130,38 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(self.playlist), len(self.playlist))
 		self.playlist.append(file_metadata)
 		self.endInsertRows()
+
+	@PySide6.QtCore.Slot(str, int)
+	def reorder(self, path, new_index) -> None:
+		"""
+		Move a certain file to a certain position in the playlist.
+
+		If the file is not currently in the playlist, nothing will happen. It only reorders existing items.
+
+		This will cause the file to be repositioned. The length of the playlist will not change.
+		:param path: The path of the file to reorder.
+		:param new_index: The new position of the file.
+		"""
+		for i, existing_file in enumerate(self.playlist):
+			if existing_file["path"] == path:
+				old_index = i
+				break
+		else:
+			return  # The file is not in the playlist.
+
+		qt_new_index = new_index
+		if old_index < new_index:
+			qt_new_index += 1
+		success = self.beginMoveRows(PySide6.QtCore.QModelIndex(), old_index, old_index, PySide6.QtCore.QModelIndex(), qt_new_index)
+		if not success:
+			logging.error(f"Attempt to move {path} out of range: {new_index}")
+			return
+
+		file_data = self.playlist[old_index]
+		self.playlist.pop(old_index)
+		list_new_index = new_index
+		if old_index < new_index:
+			list_new_index -= 1  # Since we removed the element, we're now going to shift everything behind it by one.
+		self.playlist.insert(list_new_index, file_data)
+
+		self.endMoveRows()

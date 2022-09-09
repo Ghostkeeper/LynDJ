@@ -10,6 +10,7 @@ import QtQuick.Controls 2.15
 import Lyn 1.0 as Lyn
 
 ListView {
+	id: playlist_root
 	verticalLayoutDirection: ListView.BottomToTop
 
 	function add(path) {
@@ -27,12 +28,28 @@ ListView {
 		color: model.bpm
 
 		MouseArea {
+			id: mouse_area
 			anchors.fill: parent
 
 			hoverEnabled: true
 			ToolTip.visible: containsMouse
 			ToolTip.text: model.title + "<br />" + model.comment
 			ToolTip.delay: 500
+			drag.target: parent
+			drag.axis: Drag.YAxis
+			drag.minimumY: -playlist_root.contentHeight
+			drag.maximumY: -parent.height
+			drag.threshold: parent.height / 8
+		}
+		onYChanged: {
+			//When this item is being dragged, we want to reorder it in the list.
+			if(mouse_area.drag.active) {
+				let old_index = index;
+				let new_index = Math.round(y / -height) - 1;
+				if(old_index != new_index) {
+					playlist.reorder(model.path, new_index);
+				}
+			}
 		}
 
 		Text { //Title.
