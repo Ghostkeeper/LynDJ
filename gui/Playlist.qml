@@ -50,8 +50,10 @@ ListView {
 					//Restore everything to its original position.
 					const old_index = index;
 					const new_index = Math.round(parent.y / -height) - 1;
-					for(let i = Math.min(old_index, new_index); i <= Math.max(old_index, new_index); i++) {
-						playlist_root.itemAtIndex(i).y = -parent.height * (i + 1);
+					for(let i = 0; i < playlist_root.count; i++) {
+						if(playlist_root.itemAtIndex(i)) {
+							playlist_root.itemAtIndex(i).y = -parent.height * (i + 1);
+						}
 					}
 					if(new_index != old_index) {
 						playlist.reorder(model.path, new_index);
@@ -65,6 +67,11 @@ ListView {
 				//Everything that we just crossed needs to be re-positioned to pretend that it already moved.
 				const old_index = index;
 				const new_index = Math.round(y / -height) - 1;
+				for(let i = 0; i < playlist_root.count; i++) {
+					if(i != old_index && playlist_root.itemAtIndex(i)) {
+						playlist_root.itemAtIndex(i).y = -height * (i + 1);
+					}
+				}
 				if(new_index > old_index) {
 					for(let i = old_index + 1; i <= new_index; i++) {
 						playlist_root.itemAtIndex(i).y = -height * i;
