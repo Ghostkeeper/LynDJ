@@ -32,7 +32,7 @@ ListView {
 			anchors.fill: parent
 
 			hoverEnabled: true
-			ToolTip.visible: containsMouse
+			ToolTip.visible: containsMouse && !drag.active
 			ToolTip.text: model.title + "<br />" + model.comment
 			ToolTip.delay: 500
 			drag.target: parent
