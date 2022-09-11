@@ -16,6 +16,7 @@ ListView {
 	verticalLayoutDirection: ListView.BottomToTop
 	clip: true
 	ScrollBar.vertical: Widgets.ScrollBar {}
+	currentIndex: -1 //Start off with no items selected.
 
 	function add(path) {
 		playlist.add(path);
@@ -31,6 +32,8 @@ ListView {
 
 		color: model.bpm
 		z: mouse_area.drag.active ? 2 : 1
+		border.color: Lyn.Theme.colour["selection"]
+		border.width: ListView.isCurrentItem ? Lyn.Theme.size["lining"].width : 0
 
 		MouseArea {
 			id: mouse_area
@@ -60,6 +63,9 @@ ListView {
 						playlist.reorder(model.path, new_index);
 					}
 				}
+			}
+			onClicked: {
+				playlist_root.currentIndex = index;
 			}
 		}
 		onYChanged: {
