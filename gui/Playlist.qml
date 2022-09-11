@@ -30,6 +30,7 @@ ListView {
 		height: Lyn.Theme.size["card"].height
 
 		color: model.bpm
+		z: mouse_area.drag.active ? 2 : 1
 
 		MouseArea {
 			id: mouse_area
