@@ -21,13 +21,16 @@ ListView {
 	function add(path) {
 		playlist.add(path);
 	}
+	function remove(index) {
+		playlist.remove(index);
+	}
 
 	model: Lyn.Playlist {
 		id: playlist
 	}
 
 	delegate: Rectangle {
-		width: parent.width
+		width: parent ? parent.width : 0
 		height: Lyn.Theme.size["card"].height
 
 		property string path: model.path //To allow externals to see this part of the model.

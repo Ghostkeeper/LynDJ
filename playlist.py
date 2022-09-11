@@ -131,6 +131,21 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		self.playlist.append(file_metadata)
 		self.endInsertRows()
 
+	@PySide6.QtCore.Slot(int)
+	def remove(self, index) -> None:
+		"""
+		Remove a certain file from the playlist.
+		:param index: The position of the file to remove.
+		"""
+		if index < 0 or index >= len(self.playlist):
+			logging.error(f"Trying to remove playlist entry {index}, which is out of range.")
+			return
+
+		logging.info(f"Removing {self.playlist[index]['path']} from the playlist.")
+		self.beginRemoveRows(PySide6.QtCore.QModelIndex(), index, index)
+		self.playlist.pop(index)
+		self.endRemoveRows()
+
 	@PySide6.QtCore.Slot(str, int)
 	def reorder(self, path, new_index) -> None:
 		"""

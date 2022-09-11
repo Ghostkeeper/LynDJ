@@ -104,7 +104,9 @@ ApplicationWindow {
 				rightMargin: Lyn.Theme.size["margin"].width
 			}
 			onCurrentIndexChanged: {
-				file_browser.selectByPath(currentItem.path);
+				if(currentItem) {
+					file_browser.selectByPath(currentItem.path);
+				}
 			}
 		}
 
@@ -114,6 +116,11 @@ ApplicationWindow {
 			queueButtonHandler: function() {
 				if(file_browser.selectedFilePath !== "") {
 					playlist.add(file_browser.selectedFilePath);
+				}
+			}
+			unqueueButtonHandler: function() {
+				if(playlist.currentIndex != -1) {
+					playlist.remove(playlist.currentIndex);
 				}
 			}
 			queueButtonEnabled: file_browser.selectedFilePath !== ""

@@ -16,6 +16,7 @@ Item {
 	x: Lyn.Preferences.preferences["divider_pos"] * parent.width - width / 2
 
 	property var queueButtonHandler
+	property var unqueueButtonHandler
 	property alias queueButtonEnabled: queue_area.enabled
 	property alias unqueueButtonEnabled: unqueue_area.enabled
 
@@ -40,7 +41,6 @@ Item {
 			id: queue_area
 			anchors.fill: parent
 
-			hoverEnabled: enabled
 			onClicked: queueButtonHandler()
 			cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
 		}
@@ -58,7 +58,7 @@ Item {
 			id: unqueue_area
 			anchors.fill: parent
 
-			hoverEnabled: enabled
+			onClicked: unqueueButtonHandler()
 			cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
 		}
 	}
