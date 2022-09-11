@@ -167,7 +167,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		# Update the cumulative durations in the part of the list that got changed.
 		lower = min(old_index, new_index)
 		upper = max(old_index, new_index)
-		for i in range(lower, upper):
+		for i in range(lower, upper + 1):
 			if i == 0:
 				self.playlist[0]["cumulative_duration"] = self.playlist[0]["duration"]
 			else:
