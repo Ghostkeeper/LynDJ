@@ -53,7 +53,9 @@ ListView {
 					for(let i = Math.min(old_index, new_index); i <= Math.max(old_index, new_index); i++) {
 						playlist_root.itemAtIndex(i).y = -parent.height * (i + 1);
 					}
-					playlist.reorder(model.path, new_index);
+					if(new_index != old_index) {
+						playlist.reorder(model.path, new_index);
+					}
 				}
 			}
 		}
