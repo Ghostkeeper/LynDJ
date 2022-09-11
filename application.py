@@ -10,11 +10,12 @@ import PySide6.QtCore
 import PySide6.QtGui  # This is a GUI application.
 import PySide6.QtQml  # To register types with the QML engine.
 
-import metadata
-import music_directory
-import playlist
-import preferences
-import theme
+import metadata  # Loading metadata on start-up.
+import music_directory  # To register this with QML.
+import playlist  # To register this with QML.
+import preferences  # To register this with QML and define some preferences.
+import storage  # To find the window icon.
+import theme  # To register this with QML.
 
 class Application(PySide6.QtGui.QGuiApplication):
 	"""
@@ -55,6 +56,9 @@ class Application(PySide6.QtGui.QGuiApplication):
 		self.engine = PySide6.QtQml.QQmlApplicationEngine()
 		self.engine.quit.connect(self.quit)
 		self.engine.load("gui/MainWindow.qml")
+
+		# Icon needs to be added AFTER the main window is loaded.
+		self.setWindowIcon(PySide6.QtGui.QIcon(os.path.join(storage.source(), "icon.svg")))
 
 		logging.info("Start-up complete.")
 
