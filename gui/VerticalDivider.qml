@@ -30,9 +30,9 @@ Item {
 	Widgets.ColourImage {
 		id: queue_button
 		anchors.horizontalCenter: parent.horizontalCenter
-		y: parent.height / 4
+		y: parent.height / 4 - height
 
-		source: Lyn.Theme.icon["vertical_divider_arrow"]
+		source: Lyn.Theme.icon["queue"]
 		colour: Lyn.Theme.colour["lining"]
 		MouseArea {
 			anchors.fill: parent
@@ -41,9 +41,23 @@ Item {
 		}
 	}
 	Widgets.ColourImage {
+		id: unqueue_button
 		anchors {
 			horizontalCenter: parent.horizontalCenter
 			top: queue_button.bottom
+		}
+
+		source: Lyn.Theme.icon["unqueue"]
+		colour: Lyn.Theme.colour["lining"]
+		MouseArea {
+			anchors.fill: parent
+			cursorShape: Qt.PointingHandCursor
+		}
+	}
+	Widgets.ColourImage {
+		anchors {
+			horizontalCenter: parent.horizontalCenter
+			top: unqueue_button.bottom
 			bottom: handle.top
 		}
 
