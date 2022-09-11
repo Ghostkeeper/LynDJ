@@ -149,6 +149,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		else:
 			return  # The file is not in the playlist.
 
+		logging.info(f"Move {path} to playlist index {new_index}")
 		qt_new_index = new_index
 		if old_index < new_index:
 			qt_new_index += 1
@@ -159,10 +160,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 
 		file_data = self.playlist[old_index]
 		self.playlist.pop(old_index)
-		list_new_index = new_index
-		if old_index < new_index:
-			list_new_index -= 1  # Since we removed the element, we're now going to shift everything behind it by one.
-		self.playlist.insert(list_new_index, file_data)
+		self.playlist.insert(new_index, file_data)
 
 		self.endMoveRows()
 
