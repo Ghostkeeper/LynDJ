@@ -19,6 +19,10 @@ Item {
 		}
 	}
 
+	function selectByPath(path) {
+		music_table.selectedRow = music_directory.get_row(path);
+	}
+
 	Row {
 		id: header
 		Widgets.TableHeader {

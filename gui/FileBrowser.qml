@@ -13,6 +13,10 @@ import Lyn 1.0 as Lyn
 Item {
 	property alias selectedFilePath: all_music.selectedFilePath
 
+	function selectByPath(path) {
+		all_music.selectByPath(path);
+	}
+
 	Widgets.DirectoryField {
 		id: directory_field
 		anchors {

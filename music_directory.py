@@ -227,3 +227,18 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		:return: A path to the file on local disk.
 		"""
 		return self.music[index]["path"]
+
+	@PySide6.QtCore.Slot(str, result=int)
+	def get_row(self, path) -> int:
+		"""
+		Get the row number of a certain file, by the path to the file.
+
+		If the file is not in this table, this returns -1.
+		:param path: The path to the file to search.
+		:return: The row index of that file, or -1 if the file is not in the table.
+		"""
+		for i in range(len(self.music)):
+			if self.music[i]["path"] == path:
+				return i
+		else:
+			return -1

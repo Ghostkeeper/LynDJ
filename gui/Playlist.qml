@@ -30,6 +30,8 @@ ListView {
 		width: parent.width
 		height: Lyn.Theme.size["card"].height
 
+		property string path: model.path //To allow externals to see this part of the model.
+
 		color: model.bpm
 		z: mouse_area.drag.active ? 2 : 1
 		border.color: Lyn.Theme.colour["selection"]
@@ -60,7 +62,7 @@ ListView {
 						}
 					}
 					if(new_index != old_index) {
-						playlist.reorder(model.path, new_index);
+						playlist.reorder(path, new_index);
 					}
 				}
 			}

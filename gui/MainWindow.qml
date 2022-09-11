@@ -83,7 +83,7 @@ ApplicationWindow {
 		}
 
 		Gui.FileBrowser {
-			id: filebrowser
+			id: file_browser
 			anchors {
 				top: parent.top
 				bottom: parent.bottom
@@ -103,14 +103,17 @@ ApplicationWindow {
 				right: parent.right
 				rightMargin: Lyn.Theme.size["margin"].width
 			}
+			onCurrentIndexChanged: {
+				file_browser.selectByPath(currentItem.path);
+			}
 		}
 
 		Gui.VerticalDivider {
 			id: vertical_divider
 
 			queueButtonHandler: function() {
-				if(filebrowser.selectedFilePath !== "") {
-					playlist.add(filebrowser.selectedFilePath);
+				if(file_browser.selectedFilePath !== "") {
+					playlist.add(file_browser.selectedFilePath);
 				}
 			}
 		}
