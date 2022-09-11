@@ -8,10 +8,14 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 import Lyn 1.0 as Lyn
+import "./widgets" as Widgets
 
 ListView {
 	id: playlist_root
+
 	verticalLayoutDirection: ListView.BottomToTop
+	clip: true
+	ScrollBar.vertical: Widgets.ScrollBar {}
 
 	function add(path) {
 		playlist.add(path);
