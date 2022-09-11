@@ -76,6 +76,8 @@ ListView {
 		onYChanged: {
 			//When this item is being dragged, we want to reorder it in the list.
 			if(mouse_area.drag.active) {
+				playlist_root.currentIndex = index;
+
 				//Everything that we just crossed needs to be re-positioned to pretend that it already moved.
 				const old_index = index;
 				const new_index = Math.round(y / -height) - 1;
