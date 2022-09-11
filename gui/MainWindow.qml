@@ -116,6 +116,8 @@ ApplicationWindow {
 					playlist.add(file_browser.selectedFilePath);
 				}
 			}
+			queueButtonEnabled: file_browser.selectedFilePath !== ""
+			unqueueButtonEnabled: playlist.currentIndex != -1
 		}
 	}
 
