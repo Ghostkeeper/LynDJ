@@ -1,9 +1,10 @@
 module Gui
 
-AllMusic        1.0 AllMusic.qml
-FileBrowser     1.0 FileBrowser.qml
-MainWindow      1.0 MainWindow.qml
-Player          1.0 Player.qml
-Playlist        1.0 Playlist.qml
-TopBar          1.0 TopBar.qml
-VerticalDivider 1.0 VerticalDivider.qml
+AllMusic               1.0 AllMusic.qml
+ChangeMetadataDialogue 1.0 ChangeMetadataDialogue.qml
+FileBrowser            1.0 FileBrowser.qml
+MainWindow             1.0 MainWindow.qml
+Player                 1.0 Player.qml
+Playlist               1.0 Playlist.qml
+TopBar                 1.0 TopBar.qml
+VerticalDivider        1.0 VerticalDivider.qml

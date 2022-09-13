@@ -129,12 +129,17 @@ Item {
 				MouseArea {
 					anchors.fill: parent
 
+					acceptedButtons: Qt.LeftButton | Qt.RightButton
 					hoverEnabled: parent.truncated && parent.text !== ""
 					ToolTip.visible: parent.truncated && containsMouse && parent.text !== ""
 					ToolTip.text: parent.text
-					onClicked: {
-						music_table.selectedRow = row;
-						music_table.focus = true;
+					onClicked: function(mouse) {
+						if(mouse.button === Qt.LeftButton) {
+							music_table.selectedRow = row;
+							music_table.focus = true;
+						} else { //Right button.
+							change_dialogue.open();
+						}
 					}
 				}
 			}
@@ -168,5 +173,9 @@ Item {
 				}
 			}
 		}
+	}
+
+	ChangeMetadataDialogue {
+		id: change_dialogue
 	}
 }
