@@ -9,6 +9,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Dialogs
 
 import Lyn 1.0 as Lyn
+import "./widgets" as Widgets
 
 Dialog {
 	width: Lyn.Theme.size["dialogue"].width
@@ -17,4 +18,19 @@ Dialog {
 	title: "Changing metadata" //TODO: Make this adapt to the field being edited: "Change title", "Change author", etc.
 	standardButtons: Dialog.Ok | Dialog.Cancel
 	modal: true
+
+	contentItem: Column {
+		width: parent.width
+
+		Text {
+			width: parent.width
+
+			text: "Please enter the new value for this field:"
+			wrapMode: Text.Wrap
+		}
+
+		Widgets.TextField {
+			width: parent.width
+		}
+	}
 }
