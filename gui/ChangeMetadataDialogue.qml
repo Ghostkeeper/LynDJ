@@ -15,7 +15,9 @@ Dialog {
 	width: Lyn.Theme.size["dialogue"].width
 	height: Lyn.Theme.size["dialogue"].height
 
-	title: "Changing metadata" //TODO: Make this adapt to the field being edited: "Change title", "Change author", etc.
+	property string field
+
+	title: "Change " + field
 	standardButtons: Dialog.Ok | Dialog.Cancel
 	modal: true
 
@@ -25,7 +27,7 @@ Dialog {
 		Text {
 			width: parent.width
 
-			text: "Please enter the new value for this field:"
+			text: "Please enter the new value for the " + field + ":"
 			wrapMode: Text.Wrap
 		}
 

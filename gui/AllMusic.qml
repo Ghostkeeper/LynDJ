@@ -138,6 +138,7 @@ Item {
 							music_table.selectedRow = row;
 							music_table.focus = true;
 						} else { //Right button.
+							change_dialogue.field = music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole);
 							change_dialogue.open();
 						}
 					}

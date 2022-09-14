@@ -95,7 +95,8 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		"""
 		return PySide6.QtCore.Qt.ItemFlag.ItemIsSelectable | PySide6.QtCore.Qt.ItemFlag.ItemIsEnabled
 
-	def headerData(self, section, orientation, role):
+	@PySide6.QtCore.Slot(int, int, int, result=str)
+	def headerData(self, section, orientation, role=PySide6.QtCore.Qt.DisplayRole):
 		"""
 		Returns the row or column labels for the table.
 
@@ -109,7 +110,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		if role != PySide6.QtCore.Qt.DisplayRole:
 			return None
 		if orientation == PySide6.QtCore.Qt.Orientation.Horizontal:
-			return ["Title", "Author", "Duration", "BPM", "Comment"][section]
+			return ["title", "author", "duration", "bpm", "comment"][section]
 		elif orientation == PySide6.QtCore.Qt.Orientation.Vertical:
 			return str(section)
 		else:
