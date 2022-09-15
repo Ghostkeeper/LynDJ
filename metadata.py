@@ -14,7 +14,6 @@ import mutagen.wave
 import os.path  # To know where to store the database.
 import PySide6.QtCore  # For a timer to write the database.
 import sqlite3  # To cache metadata on disk.
-import threading  # To restrict access to the database by one thread at a time.
 
 import storage  # To know where to store the database.
 
