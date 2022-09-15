@@ -103,6 +103,33 @@ def add(path, entry):
 	metadata[path] = entry
 	store_timer.start()
 
+def change(path, key, value):
+	"""
+	Change an individual metadata element of a file, and change it also inside of that file.
+
+	This changes the metadata inside of the metadata tags of the music file, if applicable.
+	:param path: The path to the file to change metadata of.
+	:param key: The metadata entry to change.
+	:param value: The new value for this metadata entry.
+	"""
+	try:
+		f = mutagen.File(path)
+		if type(f) in {mutagen.mp3.MP3, mutagen.wave.WAVE}:  # Uses ID3 tags.
+			id3 = mutagen.easyid3.EasyID3(path)
+			id3[key] = value
+			id3.save()
+		elif isinstance(f, mutagen.ogg.OggFileType) or type(f) == mutagen.flac.FLAC:  # These types use Vorbis Comments.
+			f[key] = [value]
+			f.save()
+		else:  # Unknown file type.
+			logging.warning(f"Cannot save metadata to file type of {path}!")
+	except mutagen.MutagenError as e:
+		logging.error(f"Unable to save metadata in {path}: {e}")
+		return
+
+	metadata[path][key] = value
+	store_timer.start()
+
 def add_file(path):
 	"""
 	Read the metadata from a given file and store it in our database.
