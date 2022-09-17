@@ -112,7 +112,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		if orientation == PySide6.QtCore.Qt.Orientation.Horizontal:
 			return ["title", "author", "duration", "bpm", "comment"][section]
 		elif orientation == PySide6.QtCore.Qt.Orientation.Vertical:
-			return str(section)
+			return self.music[section]["path"]
 		else:
 			return None
 
@@ -243,3 +243,15 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 				return i
 		else:
 			return -1
+
+	@PySide6.QtCore.Slot(str, str, str)
+	def change_metadata(self, path, key, value) -> None:
+		"""
+		Change an individual metadata element of a file, and change it also inside of that file.
+
+		This changes the metadata inside of the metadata tags of the music file, if applicable.
+		:param path: The path to the file to change metadata of.
+		:param key: The metadata entry to change.
+		:param value: The new value for this metadata entry.
+		"""
+		metadata.change(path, key, value)

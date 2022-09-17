@@ -139,6 +139,7 @@ Item {
 							music_table.focus = true;
 						} else { //Right button.
 							change_dialogue.field = music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole);
+							change_dialogue.path = music_directory.headerData(row, Qt.Vertical, Qt.DisplayRole);
 							change_dialogue.open();
 						}
 					}
@@ -178,5 +179,9 @@ Item {
 
 	ChangeMetadataDialogue {
 		id: change_dialogue
+
+		onAccepted: {
+			music_directory.change_metadata(path, field, value);
+		}
 	}
 }

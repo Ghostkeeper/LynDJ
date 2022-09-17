@@ -15,13 +15,15 @@ Dialog {
 	width: Lyn.Theme.size["dialogue"].width
 	height: Lyn.Theme.size["dialogue"].height
 
-	property string field
+	property string field //Which metadata key to change.
+	property alias value: textfield.text
+	property string path //Which file to change the metadata of.
 
 	title: "Change " + field
 	standardButtons: Dialog.Ok | Dialog.Cancel
 	modal: true
 
-	contentItem: Column {
+	Column {
 		width: parent.width
 
 		Text {
@@ -32,6 +34,7 @@ Dialog {
 		}
 
 		Widgets.TextField {
+			id: textfield
 			width: parent.width
 		}
 	}
