@@ -178,8 +178,15 @@ def change(path, key, value) -> None:
 			id3[key] = value
 			id3.save()
 		elif isinstance(f, mutagen.ogg.OggFileType) or type(f) == mutagen.flac.FLAC:  # These types use Vorbis Comments.
-			f[key] = [value]
-			f.save()
+			if key in {"title", "comment", "bpm"}:
+				save_key = key.upper()
+			elif key == "author":
+				save_key = "ARTIST"
+			else:
+				save_key = key  # Custom keys.
+			flac = mutagen.flac.FLAC(path)
+			flac[save_key] = [value]
+			flac.save()
 		else:  # Unknown file type.
 			logging.warning(f"Cannot save metadata to file type of {path}!")
 	except mutagen.MutagenError as e:
