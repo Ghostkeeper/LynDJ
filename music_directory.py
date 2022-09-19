@@ -255,3 +255,6 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		:param value: The new value for this metadata entry.
 		"""
 		metadata.change(path, key, value)
+		# Looking up where in the table the data changed is much more expensive than just triggering an update of the entire column.
+		column = self.column_fields.index(key)
+		self.dataChanged.emit(self.createIndex(0, column), self.createIndex(len(self.music) - 1, column))
