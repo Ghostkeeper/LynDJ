@@ -8,6 +8,7 @@ import logging
 import mutagen  # To read metadata from music files.
 import mutagen.easyid3
 import mutagen.flac
+import mutagen.id3
 import mutagen.mp3
 import mutagen.ogg
 import mutagen.wave
@@ -174,16 +175,23 @@ def change(path, key, value) -> None:
 	try:
 		f = mutagen.File(path)
 		if type(f) in {mutagen.mp3.MP3, mutagen.wave.WAVE}:  # Uses ID3 tags.
-			id3 = mutagen.easyid3.EasyID3(path)
-			id3[key] = value
-			id3.save()
-		elif isinstance(f, mutagen.ogg.OggFileType) or type(f) == mutagen.flac.FLAC:  # These types use Vorbis Comments.
-			if key in {"title", "comment", "bpm"}:
-				save_key = key.upper()
-			elif key == "author":
-				save_key = "ARTIST"
+			if key == "comment":  # There is no EasyID3 for comments.
+				id3 = mutagen.id3.ID3(path)
+				id3.setall("COMM:ID3v1 Comment:eng", [mutagen.id3.COMM(encoding=3, lang="eng", text=[value])])
+				id3.save()
 			else:
-				save_key = key  # Custom keys.
+				if key == "author":
+					save_key = "artist"
+				else:
+					save_key = key
+				id3 = mutagen.easyid3.EasyID3(path)
+				id3[save_key] = value
+				id3.save()
+		elif isinstance(f, mutagen.ogg.OggFileType) or type(f) == mutagen.flac.FLAC:  # These types use Vorbis Comments.
+			if key == "author":
+				save_key = "artist"
+			else:
+				save_key = key
 			flac = mutagen.flac.FLAC(path)
 			flac[save_key] = [value]
 			flac.save()
