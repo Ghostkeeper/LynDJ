@@ -23,6 +23,11 @@ Dialog {
 	standardButtons: Dialog.Ok | Dialog.Cancel
 	modal: true
 
+	onOpened: {
+		textfield.forceActiveFocus();
+		textfield.selectAll();
+	}
+
 	Column {
 		width: parent.width
 
