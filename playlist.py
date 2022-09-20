@@ -11,6 +11,7 @@ import PySide6.QtCore  # To expose this list to QML.
 import PySide6.QtGui  # To calculate display colours for song tempo.
 
 import metadata  # To show file metadata in the playlist table.
+import preferences  # To store the playlist between restarts.
 import theme  # To get the colours for the BPM indication.
 
 class Playlist(PySide6.QtCore.QAbstractListModel):
@@ -21,7 +22,10 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 
-		self.playlist = []  # The actual data contained in this table.
+		prefs = preferences.Preferences.getInstance()
+		if not prefs.has("playlist/playlist"):
+			prefs.add("playlist/playlist", [])
+		self.playlist = prefs.get("playlist/playlist")  # The actual data contained in this table.
 
 		user_role = PySide6.QtCore.Qt.UserRole
 		self.role_to_field = {
@@ -42,7 +46,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		"""
 		if parent.isValid():
 			return 0
-		return len(self.playlist)
+		return len(preferences.Preferences.getInstance().get("playlist/playlist"))
 
 	def columnCount(self, parent=PySide6.QtCore.QModelIndex()):
 		"""
@@ -76,7 +80,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		if role not in self.role_to_field:
 			return None
 		field = self.role_to_field[role]
-		value = self.playlist[index.row()][field]
+		value = preferences.Preferences.getInstance().get("playlist/playlist")[index.row()][field]
 		if field == "duration" or field == "cumulative_duration":
 			# Display duration as minutes:seconds.
 			seconds = round(value)
@@ -115,20 +119,23 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		:param path: The path to the file to add.
 		"""
 		# If the file is already in the playlist, do nothing.
-		for existing_file in self.playlist:
+		prefs = preferences.Preferences.getInstance()
+		playlist = prefs.get("playlist/playlist")
+		for existing_file in playlist:
 			if existing_file["path"] == path:
 				logging.debug(f"Tried adding {path} to the playlist, but it's already in the playlist.")
 				return
 
 		file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
-		if len(self.playlist) == 0:
+		if len(playlist) == 0:
 			file_metadata["cumulative_duration"] = file_metadata["duration"]
 		else:
-			file_metadata["cumulative_duration"] = self.playlist[len(self.playlist) - 1]["cumulative_duration"] + file_metadata["duration"]
+			file_metadata["cumulative_duration"] = playlist[len(playlist) - 1]["cumulative_duration"] + file_metadata["duration"]
 
 		logging.info(f"Adding {path} to the playlist.")
-		self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(self.playlist), len(self.playlist))
-		self.playlist.append(file_metadata)
+		self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(playlist), len(playlist))
+		playlist.append(file_metadata)
+		prefs.changed_internally("playlist/playlist")
 		self.endInsertRows()
 
 	@PySide6.QtCore.Slot(int)
@@ -137,13 +144,16 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		Remove a certain file from the playlist.
 		:param index: The position of the file to remove.
 		"""
-		if index < 0 or index >= len(self.playlist):
+		prefs = preferences.Preferences.getInstance()
+		playlist = prefs.get("playlist/playlist")
+		if index < 0 or index >= len(playlist):
 			logging.error(f"Trying to remove playlist entry {index}, which is out of range.")
 			return
 
-		logging.info(f"Removing {self.playlist[index]['path']} from the playlist.")
+		logging.info(f"Removing {playlist[index]['path']} from the playlist.")
 		self.beginRemoveRows(PySide6.QtCore.QModelIndex(), index, index)
-		self.playlist.pop(index)
+		playlist.pop(index)
+		prefs.changed_internally("playlist/playlist")
 		self.endRemoveRows()
 
 	@PySide6.QtCore.Slot(str, int)
@@ -157,7 +167,9 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		:param path: The path of the file to reorder.
 		:param new_index: The new position of the file.
 		"""
-		for i, existing_file in enumerate(self.playlist):
+		prefs = preferences.Preferences.getInstance()
+		playlist = prefs.get("playlist/playlist")
+		for i, existing_file in enumerate(playlist):
 			if existing_file["path"] == path:
 				old_index = i
 				break
@@ -173,9 +185,10 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			logging.error(f"Attempt to move {path} out of range: {new_index}")
 			return
 
-		file_data = self.playlist[old_index]
-		self.playlist.pop(old_index)
-		self.playlist.insert(new_index, file_data)
+		file_data = playlist[old_index]
+		playlist.pop(old_index)
+		playlist.insert(new_index, file_data)
+		prefs.changed_internally("playlist/playlist")
 
 		self.endMoveRows()
 
@@ -184,7 +197,8 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		upper = max(old_index, new_index)
 		for i in range(lower, upper + 1):
 			if i == 0:
-				self.playlist[0]["cumulative_duration"] = self.playlist[0]["duration"]
+				playlist[0]["cumulative_duration"] = playlist[0]["duration"]
 			else:
-				self.playlist[i]["cumulative_duration"] = self.playlist[i]["duration"] + self.playlist[i - 1]["cumulative_duration"]
+				playlist[i]["cumulative_duration"] = playlist[i]["duration"] + playlist[i - 1]["cumulative_duration"]
+		prefs.changed_internally("playlist/playlist")
 		self.dataChanged.emit(self.createIndex(lower, 0), self.createIndex(upper, 0))

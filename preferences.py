@@ -95,7 +95,7 @@ class Preferences(PySide6.QtCore.QObject):
 		:param key: The preference to get the value of.
 		:return: The current value of the preference.
 		"""
-		return self.values[key]
+		return self.values[key]  # Get by reference! Otherwise you can't change lists and dicts stored in the preferences.
 
 	def has(self, key) -> bool:
 		"""
@@ -153,6 +153,16 @@ class Preferences(PySide6.QtCore.QObject):
 		"""
 		logging.debug(f"Changing preference {key}, index {index} to {value}.")
 		self.values[key][index] = value
+		self.changed_internally(key)
+
+	def changed_internally(self, _key) -> None:
+		"""
+		Trigger an update of things listening to the preferences, after something changed internally in an object saved
+		in the preferences.
+
+		This should be used, for instance, if an element of a dict has changed, or if appending or removing from a list.
+		:param _key: The element that changed. This is not used for now.
+		"""
 		self.save_timer.start()
 		self.valuesChanged.emit()
 
