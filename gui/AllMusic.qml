@@ -140,6 +140,7 @@ Item {
 						} else { //Right button.
 							change_dialogue.field = music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole);
 							change_dialogue.path = music_directory.headerData(row, Qt.Vertical, Qt.DisplayRole);
+							change_dialogue.value = display; //Put the old value in the text box.
 							change_dialogue.open();
 						}
 					}
