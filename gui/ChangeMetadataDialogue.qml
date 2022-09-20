@@ -12,6 +12,7 @@ import Lyn 1.0 as Lyn
 import "./widgets" as Widgets
 
 Dialog {
+	id: change_metadata_dialogue
 	width: Lyn.Theme.size["dialogue"].width
 	height: Lyn.Theme.size["dialogue"].height
 
@@ -41,6 +42,8 @@ Dialog {
 		Widgets.TextField {
 			id: textfield
 			width: parent.width
+
+			onAccepted: change_metadata_dialogue.accept();
 		}
 	}
 }
