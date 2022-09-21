@@ -4,6 +4,7 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import logging
 import pygame  # The media player we're using to play music.
 import PySide6.QtCore  # Exposing the player to QML.
 
@@ -28,4 +29,17 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		if path in self.sounds:
 			return  # Already pre-loaded.
+		logging.debug(f"Pre-loading track: {path}")
 		self.sounds[path] = pygame.mixer.Sound(path)
+
+	def unload(self, path) -> None:
+		"""
+		Unload an audio file from memory, releasing the memory used by it.
+
+		This is useful if the file has been played to completion and will not likely be played again soon.
+		:param path: The file to unload.
+		"""
+		if path not in self.sounds:
+			return
+		logging.debug(f"Unloading track: {path}")
+		del self.sounds[path]

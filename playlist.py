@@ -31,7 +31,6 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		def preload_files():
 			play = player.Player()
 			for track in prefs.get("playlist/playlist"):
-				logging.debug(f"Pre-loading track: {track['path']}")
 				play.preload(track["path"])
 		preload_thread = threading.Thread(target=preload_files)
 		preload_thread.start()  # Fire and forget.
