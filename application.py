@@ -6,6 +6,7 @@
 
 import logging
 import os
+import pygame  # To initialise the sound engine.
 import PySide6.QtCore
 import PySide6.QtGui  # This is a GUI application.
 import PySide6.QtQml  # To register types with the QML engine.
@@ -59,6 +60,9 @@ class Application(PySide6.QtGui.QGuiApplication):
 
 		# Icon needs to be added AFTER the main window is loaded.
 		self.setWindowIcon(PySide6.QtGui.QIcon(os.path.join(storage.source(), "icon.svg")))
+
+		logging.debug("Loading media engine.")
+		pygame.init()
 
 		logging.info("Start-up complete.")
 
