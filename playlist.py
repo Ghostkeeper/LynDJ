@@ -25,7 +25,6 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		prefs = preferences.Preferences.getInstance()
 		if not prefs.has("playlist/playlist"):
 			prefs.add("playlist/playlist", [])
-		self.playlist = prefs.get("playlist/playlist")  # The actual data contained in this table.
 
 		user_role = PySide6.QtCore.Qt.UserRole
 		self.role_to_field = {
