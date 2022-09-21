@@ -9,8 +9,10 @@ import logging
 import math  # To format durations.
 import PySide6.QtCore  # To expose this list to QML.
 import PySide6.QtGui  # To calculate display colours for song tempo.
+import threading  # Pre-loading tracks is done on a separate thread.
 
 import metadata  # To show file metadata in the playlist table.
+import player  # To call upon the player to pre-load tracks.
 import preferences  # To store the playlist between restarts.
 import theme  # To get the colours for the BPM indication.
 
@@ -25,6 +27,14 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		prefs = preferences.Preferences.getInstance()
 		if not prefs.has("playlist/playlist"):
 			prefs.add("playlist/playlist", [])
+
+		def preload_files():
+			play = player.Player()
+			for track in prefs.get("playlist/playlist"):
+				logging.debug(f"Pre-loading track: {track['path']}")
+				play.preload(track["path"])
+		preload_thread = threading.Thread(target=preload_files)
+		preload_thread.start()  # Fire and forget.
 
 		user_role = PySide6.QtCore.Qt.UserRole
 		self.role_to_field = {
@@ -136,6 +146,13 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		playlist.append(file_metadata)
 		prefs.changed_internally("playlist/playlist")
 		self.endInsertRows()
+
+		# Load the file into the media engine in advance so it can be played once it arrives in the front of the queue.
+		def preload_file():
+			play = player.Player()
+			play.preload(path)
+		preload_thread = threading.Thread(target=preload_file)
+		preload_thread.start()
 
 	@PySide6.QtCore.Slot(int)
 	def remove(self, index) -> None:
