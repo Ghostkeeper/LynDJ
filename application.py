@@ -45,9 +45,11 @@ class Application(PySide6.QtGui.QGuiApplication):
 		logging.debug("Loading metadata database.")
 		metadata.load()
 
-		self.create_gui_preferences()
+		logging.debug("Loading media engine.")
+		pygame.init()
 
 		logging.debug("Registering QML types.")
+		self.create_gui_preferences()
 		PySide6.QtQml.qmlRegisterSingletonInstance(preferences.Preferences, "Lyn", 1, 0, "Preferences", preferences.Preferences.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(theme.Theme, "Lyn", 1, 0, "Theme", theme.Theme.getInstance())
 		PySide6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
@@ -60,9 +62,6 @@ class Application(PySide6.QtGui.QGuiApplication):
 
 		# Icon needs to be added AFTER the main window is loaded.
 		self.setWindowIcon(PySide6.QtGui.QIcon(os.path.join(storage.source(), "icon.svg")))
-
-		logging.debug("Loading media engine.")
-		pygame.init()
 
 		logging.info("Start-up complete.")
 
