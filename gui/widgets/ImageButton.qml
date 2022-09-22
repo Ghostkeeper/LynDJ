@@ -14,8 +14,8 @@ Button {
 	width: foreground_image.width
 	height: foreground_image.height
 
-	property alias background_source: background_image.source
-	property alias background_colour: background_image.colour
+	property alias backgroundSource: background_image.source
+	property alias backgroundColour: background_image.colour
 	property alias source: foreground_image.source
 	property alias colour: foreground_image.colour
 
