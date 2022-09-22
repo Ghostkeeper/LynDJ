@@ -5,7 +5,8 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import logging
-import os
+import os  # To find the home directory, resource files and to edit environment variables in the local context.
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "YES"  # Before importing pygame!
 import pygame  # To initialise the sound engine.
 import PySide6.QtCore
 import PySide6.QtGui  # This is a GUI application.
