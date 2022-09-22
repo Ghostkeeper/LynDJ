@@ -11,16 +11,22 @@ import "." as Widgets
 
 Button {
 	id: image_button
-	width: background_image.width
-	height: background_image.height
+	width: foreground_image.width
+	height: foreground_image.height
 
-	property alias source: background_image.source
-	property alias colour: background_image.colour
+	property alias background_source: background_image.source
+	property alias background_colour: background_image.colour
+	property alias source: foreground_image.source
+	property alias colour: foreground_image.colour
 
-	background: Item {} //No background. Just foreground.
+	background: Item {} //Can't use IDs in the background, which we do need for the alias. So we make our own background manually.
 
 	Widgets.ColourImage {
 		id: background_image
+	}
+
+	Widgets.ColourImage {
+		id: foreground_image
 	}
 
 	MouseArea { //To change the cursor.

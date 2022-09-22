@@ -27,6 +27,7 @@
 		"accent_background": [248, 244, 235, 255],
 		"disabled_background": [227, 224, 216, 255],
 
+		"highlight_foreground": [34, 27, 12, 255],
 		"disabled_foreground": [68, 55, 24, 255],
 
 		"highlight_primary": [216, 195, 145, 255],

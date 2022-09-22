@@ -78,7 +78,9 @@ Rectangle {
 			top: parent.top
 		}
 
-		source: Lyn.Theme.icon["play"]
-		colour: Lyn.Theme.colour["lining"]
+		background_source: Lyn.Theme.icon["play_background"]
+		background_colour: Lyn.Theme.colour["lining"]
+		source: Lyn.Theme.icon["play_foreground"]
+		colour: Lyn.Theme.colour[hovered ? "highlight_foreground" : "foreground"]
 	}
 }

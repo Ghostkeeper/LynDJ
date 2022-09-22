@@ -1,6 +1,5 @@
 <?xml version="1.0" ?>
 <svg width="150" height="160" xmlns="http://www.w3.org/2000/svg">
-<polygon points="16,22 16,153 129.9,87.5" />
 <g stroke="black" fill="none">
 	<g stroke-width="2">
 		<polygon fill="none" points="13,16.8 13,158.2 135.9,87.5" />
