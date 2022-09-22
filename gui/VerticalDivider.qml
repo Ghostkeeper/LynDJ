@@ -35,8 +35,10 @@ Item {
 		anchors.horizontalCenter: parent.horizontalCenter
 		y: parent.height / 4 - height
 
-		source: Lyn.Theme.icon["queue"]
-		colour: Lyn.Theme.colour["lining"]
+		background_source: Lyn.Theme.icon["queue_background"]
+		background_colour: Lyn.Theme.colour["lining"]
+		source: Lyn.Theme.icon["queue_foreground"]
+		colour: Lyn.Theme.colour[enabled ? (hovered ? "highlight_foreground" : "foreground") : "disabled_foreground"]
 		onClicked: queueButtonHandler()
 	}
 	Widgets.ImageButton {
@@ -46,8 +48,10 @@ Item {
 			top: queue_button.bottom
 		}
 
-		source: Lyn.Theme.icon["unqueue"]
-		colour: Lyn.Theme.colour["lining"]
+		background_source: Lyn.Theme.icon["unqueue_background"]
+		background_colour: Lyn.Theme.colour["lining"]
+		source: Lyn.Theme.icon["unqueue_foreground"]
+		colour: Lyn.Theme.colour[enabled ? (hovered ? "highlight_foreground" : "foreground") : "disabled_foreground"]
 		onClicked: unqueueButtonHandler()
 	}
 	Widgets.ColourImage {
