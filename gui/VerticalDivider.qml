@@ -17,8 +17,8 @@ Item {
 
 	property var queueButtonHandler
 	property var unqueueButtonHandler
-	property alias queueButtonEnabled: queue_area.enabled
-	property alias unqueueButtonEnabled: unqueue_area.enabled
+	property alias queueButtonEnabled: queue_button.enabled
+	property alias unqueueButtonEnabled: unqueue_button.enabled
 
 	Widgets.ColourImage {
 		anchors {
@@ -30,22 +30,16 @@ Item {
 		source: Lyn.Theme.icon["vertical_divider"]
 		colour: Lyn.Theme.colour["lining"]
 	}
-	Widgets.ColourImage {
+	Widgets.ImageButton {
 		id: queue_button
 		anchors.horizontalCenter: parent.horizontalCenter
 		y: parent.height / 4 - height
 
 		source: Lyn.Theme.icon["queue"]
 		colour: Lyn.Theme.colour["lining"]
-		MouseArea {
-			id: queue_area
-			anchors.fill: parent
-
-			onClicked: queueButtonHandler()
-			cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-		}
+		onClicked: queueButtonHandler()
 	}
-	Widgets.ColourImage {
+	Widgets.ImageButton {
 		id: unqueue_button
 		anchors {
 			horizontalCenter: parent.horizontalCenter
@@ -54,13 +48,7 @@ Item {
 
 		source: Lyn.Theme.icon["unqueue"]
 		colour: Lyn.Theme.colour["lining"]
-		MouseArea {
-			id: unqueue_area
-			anchors.fill: parent
-
-			onClicked: unqueueButtonHandler()
-			cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-		}
+		onClicked: unqueueButtonHandler()
 	}
 	Widgets.ColourImage {
 		anchors {
