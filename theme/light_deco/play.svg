@@ -1,4 +1,18 @@
 <?xml version="1.0" ?>
-<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-<polygon points="4,0 4,32 28,16" />
+<svg width="150" height="160" xmlns="http://www.w3.org/2000/svg">
+<polygon points="16,7 16,138 129.9,72.5" />
+<g stroke="black" fill="none">
+	<g stroke-width="2">
+		<polygon fill="none" points="13,1.8 13,143.2 135.9,72.5" />
+		<path d="M13,160 v-10.5 l124,-71.3 v81.8" />
+		<line x1="8" y1="160" x2="8" y2="130" />
+		<line x1="142" y1="69.5" x2="124" y2="59" />
+	</g>
+	<g stroke-width="4">
+		<path d="M7,160 v-11 l-4,-4 v-19" />
+		<line x1="18" y1="160" x2="18" y2="146.5" />
+		<line x1="132" y1="160" x2="132" y2="81" />
+		<path d="M142,160 v-96.5 l-20,-11.75" />
+	</g>
+</g>
 </svg>
