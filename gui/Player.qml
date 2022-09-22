@@ -69,4 +69,16 @@ Rectangle {
 			colour: Lyn.Theme.colour["lining"]
 		}
 	}
+
+	Widgets.ImageButton {
+		id: play_stop_button
+		anchors {
+			right: parent.right
+			rightMargin: Lyn.Theme.size["margin"].width
+			top: parent.top
+		}
+
+		source: Lyn.Theme.icon["play"]
+		colour: Lyn.Theme.colour["lining"]
+	}
 }
