@@ -14,6 +14,7 @@ import PySide6.QtQml  # To register types with the QML engine.
 
 import metadata  # Loading metadata on start-up.
 import music_directory  # To register this with QML.
+import player  # To register this with QML.
 import playlist  # To register this with QML.
 import preferences  # To register this with QML and define some preferences.
 import storage  # To find the window icon.
@@ -55,6 +56,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		PySide6.QtQml.qmlRegisterSingletonInstance(theme.Theme, "Lyn", 1, 0, "Theme", theme.Theme.getInstance())
 		PySide6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
 		PySide6.QtQml.qmlRegisterType(playlist.Playlist, "Lyn", 1, 0, "Playlist")
+		PySide6.QtQml.qmlRegisterType(player.Player, "Lyn", 1, 0, "Player")
 
 		logging.debug("Loading QML engine.")
 		self.engine = PySide6.QtQml.QQmlApplicationEngine()
