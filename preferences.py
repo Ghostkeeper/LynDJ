@@ -173,10 +173,10 @@ class Preferences(PySide6.QtCore.QObject):
 		"""
 		return os.path.join(storage.config(), "preferences.json")
 
+	valuesChanged = PySide6.QtCore.Signal()
 	"""
 	Triggered when any preference value changed.
 	"""
-	valuesChanged = PySide6.QtCore.Signal()
 
 	@PySide6.QtCore.Property("QVariantMap", notify=valuesChanged)
 	def preferences(self) -> typing.Dict[str, typing.Union[str, int, float, list, dict]]:
