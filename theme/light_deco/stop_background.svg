@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<svg width="150" height="160" xmlns="http://www.w3.org/2000/svg">
+<g stroke="black" fill="none">
+	<g stroke-width="2">
+		<rect x="13" y="15" width="124" height="124" />
+		<path d="M13,0 v10 h124 v-10" />
+		<line x1="8" y1="0" x2="8" y2="30" />
+		<line x1="142" y1="0" x2="142" y2="30" />
+	</g>
+	<g stroke-width="4">
+		<path d="M7,0 v11 l-4,4 v19" />
+		<line x1="18" y1="0" x2="18" y2="10" />
+		<line x1="132" y1="0" x2="132" y2="10" />
+		<path d="M143,0 v11 l4,4 v19" />
+	</g>
+</g>
+</svg>
