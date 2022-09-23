@@ -18,7 +18,15 @@ class Player(PySide6.QtCore.QObject):
 	from there.
 	"""
 
-	sounds = {}  # Dict mapping paths to sound files to pre-loaded sound objects in Pygame.
+	sounds = {}
+	"""
+	Dict mapping paths to sound files to pre-loaded sound objects in Pygame.
+	"""
+
+	is_playing = False
+	"""
+	Whether the music currently is (or should be) playing.
+	"""
 
 	def preload(self, path) -> None:
 		"""
@@ -43,3 +51,25 @@ class Player(PySide6.QtCore.QObject):
 			return
 		logging.debug(f"Unloading track: {path}")
 		del self.sounds[path]
+
+	is_playing_changed = PySide6.QtCore.Signal()
+
+	def is_playing_set(self, new_is_playing) -> None:
+		"""
+		Start or stop the music.
+		:param new_is_playing: Whether the music should be playing or not.
+		"""
+		self.is_playing = new_is_playing
+		self.is_playing_changed.emit()
+		# TODO: Start/stop the music.
+
+	@PySide6.QtCore.Property(bool, fset=is_playing_set, notify=is_playing_changed)
+	def isPlaying(self) -> bool:
+		"""
+		Get whether the music is currently playing, or should be playing.
+
+		If the music is paused, it is considered to be playing too. Only when it is stopped is it considered to not be
+		playing.
+		:return: ``True`` if the music is currently playing, or ``False`` if it is stopped.
+		"""
+		return self.is_playing
