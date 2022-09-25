@@ -8,6 +8,7 @@ import logging
 import pygame  # The media player we're using to play music.
 import PySide6.QtCore  # Exposing the player to QML.
 
+import music_control  # To control the currently playing track.
 import playlist  # To get the next track to play.
 import preferences  # To get the playlist.
 
@@ -26,6 +27,13 @@ class Player(PySide6.QtCore.QObject):
 	If a song is playing, this holds the currently playing track.
 
 	If no song is playing, this is ``None``.
+	"""
+
+	control_track = None
+	"""
+	If a song is playing, this holds an object that controls playback of the current track.
+
+	This object controls volume, equalizer, and so on for the current track.
 	"""
 
 	def __init__(self, parent=None) -> None:
@@ -73,6 +81,7 @@ class Player(PySide6.QtCore.QObject):
 		logging.info(f"Starting playback of track: {next_song}")
 		self.current_track = pygame.mixer.Sound(next_song)
 		self.current_track.play()
+		self.control_track = music_control.MusicControl(next_song, self.current_track, self)
 
 		# Remove that track from the playlist.
 		playlist.Playlist.getInstance().remove(0)
