@@ -154,13 +154,6 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		prefs.changed_internally("playlist/playlist")
 		self.endInsertRows()
 
-		# Load the file into the media engine in advance so it can be played once it arrives in the front of the queue.
-		def preload_file():
-			play = player.Player()
-			play.preload(path)
-		preload_thread = threading.Thread(target=preload_file)
-		preload_thread.start()
-
 	@PySide6.QtCore.Slot(int)
 	def remove(self, index) -> None:
 		"""
