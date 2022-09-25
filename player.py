@@ -74,19 +74,11 @@ class Player(PySide6.QtCore.QObject):
 		Start or stop the music.
 		:param new_is_playing: Whether the music should be playing or not.
 		"""
-		prefs = preferences.Preferences.getInstance()
 		if self.current_track is None and new_is_playing:
-			current_playlist = prefs.get("playlist/playlist")
-			next_song = current_playlist[0]["path"]
-			logging.info(f"Starting playback of track: {next_song}")
-			self.current_track = self.sounds[next_song]
-			self.current_track.play()
-
-			# Remove that track from the playlist.
-			playlist.Playlist.getInstance().remove(0)
+			self.play_next()
 		elif self.current_track is not None and not new_is_playing:
 			logging.info(f"Stopping playback.")
-			self.current_track.fadeout(round(prefs.get("player/fadeout") * 1000))  # Fade-out, convert to milliseconds for Pygame.
+			self.current_track.fadeout(round(preferences.Preferences.getInstance().get("player/fadeout") * 1000))  # Fade-out, convert to milliseconds for Pygame.
 			self.current_track = None
 		self.is_playing_changed.emit()
 
@@ -100,3 +92,16 @@ class Player(PySide6.QtCore.QObject):
 		:return: ``True`` if the music is currently playing, or ``False`` if it is stopped.
 		"""
 		return self.current_track is not None
+
+	def play_next(self):
+		"""
+		Play the next song in the playlist.
+		"""
+		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
+		next_song = current_playlist[0]["path"]
+		logging.info(f"Starting playback of track: {next_song}")
+		self.current_track = self.sounds[next_song]
+		self.current_track.play()
+
+		# Remove that track from the playlist.
+		playlist.Playlist.getInstance().remove(0)
