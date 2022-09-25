@@ -43,13 +43,6 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		if not prefs.has("playlist/playlist"):
 			prefs.add("playlist/playlist", [])
 
-		def preload_files():
-			play = player.Player()
-			for track in prefs.get("playlist/playlist"):
-				play.preload(track["path"])
-		preload_thread = threading.Thread(target=preload_files)
-		preload_thread.start()  # Fire and forget.
-
 		user_role = PySide6.QtCore.Qt.UserRole
 		self.role_to_field = {
 			user_role + 1: "path",

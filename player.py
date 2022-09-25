@@ -21,11 +21,6 @@ class Player(PySide6.QtCore.QObject):
 	from there.
 	"""
 
-	sounds = {}
-	"""
-	Dict mapping paths to sound files to pre-loaded sound objects in Pygame.
-	"""
-
 	current_track = None
 	"""
 	If a song is playing, this holds the currently playing track.
@@ -42,30 +37,6 @@ class Player(PySide6.QtCore.QObject):
 		prefs = preferences.Preferences.getInstance()
 		if not prefs.has("player/fadeout"):
 			prefs.add("player/fadeout", 2.0)  # Fade-out for 2 seconds by default.
-
-	def preload(self, path) -> None:
-		"""
-		Load an audio file into memory, readying it for playback without latency.
-
-		This function is best called on a thread that does not block the interface. It will not hold the GIL though.
-		:param path: A path to an audio file to load for playback.
-		"""
-		if path in self.sounds:
-			return  # Already pre-loaded.
-		logging.debug(f"Pre-loading track: {path}")
-		self.sounds[path] = pygame.mixer.Sound(path)
-
-	def unload(self, path) -> None:
-		"""
-		Unload an audio file from memory, releasing the memory used by it.
-
-		This is useful if the file has been played to completion and will not likely be played again soon.
-		:param path: The file to unload.
-		"""
-		if path not in self.sounds:
-			return
-		logging.debug(f"Unloading track: {path}")
-		del self.sounds[path]
 
 	is_playing_changed = PySide6.QtCore.Signal()
 
@@ -100,7 +71,7 @@ class Player(PySide6.QtCore.QObject):
 		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
 		next_song = current_playlist[0]["path"]
 		logging.info(f"Starting playback of track: {next_song}")
-		self.current_track = self.sounds[next_song]
+		self.current_track = pygame.mixer.Sound(next_song)
 		self.current_track.play()
 
 		# Remove that track from the playlist.
