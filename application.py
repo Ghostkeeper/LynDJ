@@ -54,8 +54,8 @@ class Application(PySide6.QtGui.QGuiApplication):
 		self.create_gui_preferences()
 		PySide6.QtQml.qmlRegisterSingletonInstance(preferences.Preferences, "Lyn", 1, 0, "Preferences", preferences.Preferences.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(theme.Theme, "Lyn", 1, 0, "Theme", theme.Theme.getInstance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(playlist.Playlist, "Lyn", 1, 0, "Playlist", playlist.Playlist.getInstance())
 		PySide6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
-		PySide6.QtQml.qmlRegisterType(playlist.Playlist, "Lyn", 1, 0, "Playlist")
 		PySide6.QtQml.qmlRegisterType(player.Player, "Lyn", 1, 0, "Player")
 
 		logging.debug("Loading QML engine.")

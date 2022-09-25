@@ -11,23 +11,14 @@ import Lyn 1.0 as Lyn
 import "./widgets" as Widgets
 
 ListView {
-	id: playlist_root
+	id: playlist
 
 	verticalLayoutDirection: ListView.BottomToTop
 	clip: true
 	ScrollBar.vertical: Widgets.ScrollBar {}
 	currentIndex: -1 //Start off with no items selected.
 
-	function add(path) {
-		playlist.add(path);
-	}
-	function remove(index) {
-		playlist.remove(index);
-	}
-
-	model: Lyn.Playlist {
-		id: playlist
-	}
+	model: Lyn.Playlist
 
 	delegate: Rectangle {
 		width: parent ? parent.width : 0
@@ -50,7 +41,7 @@ ListView {
 			ToolTip.delay: 500
 			drag.target: parent
 			drag.axis: Drag.YAxis
-			drag.minimumY: -playlist_root.contentHeight
+			drag.minimumY: -playlist.contentHeight
 			drag.maximumY: -parent.height
 			drag.threshold: parent.height / 8
 
@@ -59,40 +50,40 @@ ListView {
 					//Restore everything to its original position.
 					const old_index = index;
 					const new_index = Math.round(parent.y / -height) - 1;
-					for(let i = 0; i < playlist_root.count; i++) {
-						if(playlist_root.itemAtIndex(i)) {
-							playlist_root.itemAtIndex(i).y = -parent.height * (i + 1);
+					for(let i = 0; i < playlist.count; i++) {
+						if(playlist.itemAtIndex(i)) {
+							playlist.itemAtIndex(i).y = -parent.height * (i + 1);
 						}
 					}
 					if(new_index != old_index) {
-						playlist.reorder(path, new_index);
+						Lyn.Playlist.reorder(path, new_index);
 					}
 				}
 			}
 			onClicked: {
-				playlist_root.currentIndex = index;
+				playlist.currentIndex = index;
 			}
 		}
 		onYChanged: {
 			//When this item is being dragged, we want to reorder it in the list.
 			if(mouse_area.drag.active) {
-				playlist_root.currentIndex = index;
+				playlist.currentIndex = index;
 
 				//Everything that we just crossed needs to be re-positioned to pretend that it already moved.
 				const old_index = index;
 				const new_index = Math.round(y / -height) - 1;
-				for(let i = 0; i < playlist_root.count; i++) {
-					if(i != old_index && playlist_root.itemAtIndex(i)) {
-						playlist_root.itemAtIndex(i).y = -height * (i + 1);
+				for(let i = 0; i < playlist.count; i++) {
+					if(i != old_index && playlist.itemAtIndex(i)) {
+						playlist.itemAtIndex(i).y = -height * (i + 1);
 					}
 				}
 				if(new_index > old_index) {
 					for(let i = old_index + 1; i <= new_index; i++) {
-						playlist_root.itemAtIndex(i).y = -height * i;
+						playlist.itemAtIndex(i).y = -height * i;
 					}
 				} else if(new_index < old_index) {
 					for(let i = old_index - 1; i >= new_index; i--) {
-						playlist_root.itemAtIndex(i).y = -height * (i + 2);
+						playlist.itemAtIndex(i).y = -height * (i + 2);
 					}
 				}
 			}

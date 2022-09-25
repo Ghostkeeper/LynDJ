@@ -115,12 +115,12 @@ ApplicationWindow {
 
 			queueButtonHandler: function() {
 				if(file_browser.selectedFilePath !== "") {
-					playlist.add(file_browser.selectedFilePath);
+					Lyn.Playlist.add(file_browser.selectedFilePath);
 				}
 			}
 			unqueueButtonHandler: function() {
 				if(playlist.currentIndex != -1) {
-					playlist.remove(playlist.currentIndex);
+					Lyn.Playlist.remove(playlist.currentIndex);
 				}
 			}
 			queueButtonEnabled: file_browser.selectedFilePath !== ""

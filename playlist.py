@@ -19,7 +19,22 @@ import theme  # To get the colours for the BPM indication.
 class Playlist(PySide6.QtCore.QAbstractListModel):
 	"""
 	A list of the tracks that are about to be played.
+
+	This object is a singleton. There can only be one playlist. That way there is no confusion as to which playlist the
+	player is taking tracks from.
 	"""
+
+	instance = None
+
+	@classmethod
+	def getInstance(cls):
+		"""
+		Gets the singleton instance. If no instance was made yet, it will be instantiated here.
+		:return: The single instance of this class.
+		"""
+		if cls.instance is None:
+			cls.instance = Playlist()
+		return cls.instance
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
