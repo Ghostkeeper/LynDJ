@@ -8,6 +8,7 @@ import logging
 import pygame  # The media player we're using to play music.
 import PySide6.QtCore  # Exposing the player to QML.
 
+import playlist  # To get the next track to play.
 import preferences  # To get the playlist.
 
 class Player(PySide6.QtCore.QObject):
@@ -75,10 +76,14 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		prefs = preferences.Preferences.getInstance()
 		if self.current_track is None and new_is_playing:
-			next_song = prefs.get("playlist/playlist")[0]["path"]
+			current_playlist = prefs.get("playlist/playlist")
+			next_song = current_playlist[0]["path"]
 			logging.info(f"Starting playback of track: {next_song}")
 			self.current_track = self.sounds[next_song]
 			self.current_track.play()
+
+			# Remove that track from the playlist.
+			playlist.Playlist.getInstance().remove(0)
 		elif self.current_track is not None and not new_is_playing:
 			logging.info(f"Stopping playback.")
 			self.current_track.fadeout(round(prefs.get("player/fadeout") * 1000))  # Fade-out, convert to milliseconds for Pygame.
