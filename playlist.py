@@ -186,6 +186,16 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		prefs.changed_internally("playlist/playlist")
 		self.endRemoveRows()
 
+		# Update the cumulative durations in the part of the list that got changed.
+		for i in range(index, len(playlist)):
+			if i == 0:
+				playlist[0]["cumulative_duration"] = playlist[0]["duration"]
+			else:
+				playlist[i]["cumulative_duration"] = playlist[i]["duration"] + playlist[i - 1]["cumulative_duration"]
+		prefs.changed_internally("playlist/playlist")
+		self.layoutChanged.emit()  # Trigger QML to update everything, even though it only removed one.
+		self.dataChanged.emit(self.createIndex(index, 0), len(playlist))
+
 	@PySide6.QtCore.Slot(str, int)
 	def reorder(self, path, new_index) -> None:
 		"""
