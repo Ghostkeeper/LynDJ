@@ -141,7 +141,7 @@ class Preferences(PySide6.QtCore.QObject):
 		logging.debug(f"Changing preference {key} to {value}.")
 		self.values[key] = value
 		self.save_timer.start()
-		self.valuesChanged.emit()
+		self.valuesChanged.emit(key)
 
 	@PySide6.QtCore.Slot(str, int, "QVariant")
 	def set_element(self, key, index, value) -> None:
@@ -155,7 +155,7 @@ class Preferences(PySide6.QtCore.QObject):
 		self.values[key][index] = value
 		self.changed_internally(key)
 
-	def changed_internally(self, _key) -> None:
+	def changed_internally(self, key) -> None:
 		"""
 		Trigger an update of things listening to the preferences, after something changed internally in an object saved
 		in the preferences.
@@ -164,7 +164,7 @@ class Preferences(PySide6.QtCore.QObject):
 		:param _key: The element that changed. This is not used for now.
 		"""
 		self.save_timer.start()
-		self.valuesChanged.emit()
+		self.valuesChanged.emit(key)
 
 	def storage_location(self) -> str:
 		"""
@@ -173,7 +173,7 @@ class Preferences(PySide6.QtCore.QObject):
 		"""
 		return os.path.join(storage.config(), "preferences.json")
 
-	valuesChanged = PySide6.QtCore.Signal()
+	valuesChanged = PySide6.QtCore.Signal(str)
 	"""
 	Triggered when any preference value changed.
 	"""
