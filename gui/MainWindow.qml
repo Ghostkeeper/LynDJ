@@ -71,6 +71,9 @@ ApplicationWindow {
 			case Window.Maximized: Lyn.Preferences.set("window/visibility", "maximised"); break;
 		}
 	}
+	onClosing: {
+		Lyn.Application.closing();
+	}
 
 	Item {
 		anchors {

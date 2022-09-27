@@ -55,6 +55,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		PySide6.QtQml.qmlRegisterSingletonInstance(preferences.Preferences, "Lyn", 1, 0, "Preferences", preferences.Preferences.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(theme.Theme, "Lyn", 1, 0, "Theme", theme.Theme.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(playlist.Playlist, "Lyn", 1, 0, "Playlist", playlist.Playlist.getInstance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(Application, "Lyn", 1, 0, "Application", self)
 		PySide6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
 		PySide6.QtQml.qmlRegisterType(player.Player, "Lyn", 1, 0, "Player")
 
@@ -82,3 +83,10 @@ class Application(PySide6.QtGui.QGuiApplication):
 		prefs.add("window/y", 100)
 		prefs.add("window/visibility", "normal")
 		prefs.add("divider_pos", 0.5)  # As a fraction of the width of the window.
+
+	@PySide6.QtCore.Slot()
+	def closing(self) -> None:
+		"""
+		Triggered when the main window is closed.
+		"""
+		player.Player.control_thread = None
