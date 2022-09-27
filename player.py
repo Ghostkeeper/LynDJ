@@ -53,14 +53,14 @@ class Player(PySide6.QtCore.QObject):
 		if not prefs.has("player/fadeout"):
 			prefs.add("player/fadeout", 2.0)  # Fade-out for 2 seconds by default.
 
-		if self.control_thread is None:
+		if Player.control_thread is None:
 			def loop_control():
-				while self.control_thread is not None:  # Loop until the thread is unlinked.
-					if self.control_track is not None:
-						self.control_track.loop()
+				while Player.control_thread is not None:  # Loop until the thread is unlinked.
+					if Player.control_track is not None:
+						Player.control_track.loop()
 					time.sleep(0.1)  # Loop every 10th of a second.
-			self.control_thread = threading.Thread(target=loop_control)
-			self.control_thread.start()
+			Player.control_thread = threading.Thread(target=loop_control)
+			Player.control_thread.start()
 
 	is_playing_changed = PySide6.QtCore.Signal()
 
@@ -69,12 +69,12 @@ class Player(PySide6.QtCore.QObject):
 		Start or stop the music.
 		:param new_is_playing: Whether the music should be playing or not.
 		"""
-		if self.current_track is None and new_is_playing:
+		if Player.current_track is None and new_is_playing:
 			self.play_next()
-		elif self.current_track is not None and not new_is_playing:
+		elif Player.current_track is not None and not new_is_playing:
 			logging.info(f"Stopping playback.")
-			self.current_track.fadeout(round(preferences.Preferences.getInstance().get("player/fadeout") * 1000))  # Fade-out, convert to milliseconds for Pygame.
-			self.current_track = None
+			Player.current_track.fadeout(round(preferences.Preferences.getInstance().get("player/fadeout") * 1000))  # Fade-out, convert to milliseconds for Pygame.
+			Player.current_track = None
 		self.is_playing_changed.emit()
 
 	@PySide6.QtCore.Property(bool, fset=is_playing_set, notify=is_playing_changed)
@@ -95,9 +95,9 @@ class Player(PySide6.QtCore.QObject):
 		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
 		next_song = current_playlist[0]["path"]
 		logging.info(f"Starting playback of track: {next_song}")
-		self.current_track = pygame.mixer.Sound(next_song)
-		self.current_track.play()
-		self.control_track = music_control.MusicControl(next_song, self.current_track, self)
+		Player.current_track = pygame.mixer.Sound(next_song)
+		Player.current_track.play()
+		Player.control_track = music_control.MusicControl(next_song, Player.current_track, self)
 
 		# Remove that track from the playlist.
 		playlist.Playlist.getInstance().remove(0)
