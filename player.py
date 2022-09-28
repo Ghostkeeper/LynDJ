@@ -38,11 +38,6 @@ class Player(PySide6.QtCore.QObject):
 	This object controls volume, equalizer, and so on for the current track.
 	"""
 
-	control_thread = None
-	"""
-	Thread that runs the control track. This thread continuously calls the loop() function of the control track.
-	"""
-
 	def __init__(self, parent=None) -> None:
 		"""
 		Ensures that a few global things are properly initialised before using this class.
@@ -52,15 +47,6 @@ class Player(PySide6.QtCore.QObject):
 		prefs = preferences.Preferences.getInstance()
 		if not prefs.has("player/fadeout"):
 			prefs.add("player/fadeout", 2.0)  # Fade-out for 2 seconds by default.
-
-		if Player.control_thread is None:
-			def loop_control():
-				while Player.control_thread is not None:  # Loop until the thread is unlinked.
-					if Player.control_track is not None:
-						Player.control_track.loop()
-					time.sleep(0.1)  # Loop every 10th of a second.
-			Player.control_thread = threading.Thread(target=loop_control)
-			Player.control_thread.start()
 
 	is_playing_changed = PySide6.QtCore.Signal()
 

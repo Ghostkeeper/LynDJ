@@ -4,13 +4,18 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import PySide6.QtCore  # For QTimers to execute code after a certain amount of time.
+
+import metadata  # To get the events for a track.
+
 class MusicControl:
 	"""
 	A music control track that sees to it when the music needs to stop, have its volume changed, trigger the next song
 	to play, and so on.
 
-	This will run a separate thread that continuously watches the time played on the currently playing song. At certain
-	timestamps, it will trigger events.
+	This object will generate a bunch of events to execute at certain timestamps in the track, and will start a bunch of
+	timers for those events. It controls the pausing, resuming and cancelling of those events if playback is
+	interrupted.
 	"""
 
 	def __init__(self, path, sound, player):
@@ -24,13 +29,10 @@ class MusicControl:
 		self.sound = sound
 		self.player = player
 
-	def loop(self):
-		"""
-		This function will be called multiple times per second in order to allow this track to exert control over the
-		music.
-
-		The performance of this function is quite critical. Anything happening in this loop needs to be able to execute
-		at the frequency that the loop is called. Occasionally triggering a more expensive function is okay, as long as
-		this doesn't happen during playback of the actual song.
-		"""
-		pass  # TODO
+		# Create a list of events for this track.
+		self.events = []
+		duration = metadata.get(path, "duration")
+		song_end_timer = PySide6.QtCore.QTimer()
+		song_end_timer.setInterval(round(duration * 1000))
+		song_end_timer.setSingleShot(True)
+		self.events.append(song_end_timer)
