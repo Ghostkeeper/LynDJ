@@ -4,6 +4,7 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import logging
 import PySide6.QtCore  # For QTimers to execute code after a certain amount of time.
 
 import metadata  # To get the events for a track.
@@ -35,4 +36,15 @@ class MusicControl:
 		song_end_timer = PySide6.QtCore.QTimer()
 		song_end_timer.setInterval(round(duration * 1000))
 		song_end_timer.setSingleShot(True)
+		song_end_timer.timeout.connect(self.song_ends)
 		self.events.append(song_end_timer)
+
+		for event in self.events:
+			event.start()
+
+	def song_ends(self):
+		"""
+		Triggered when the music file has finished playing.
+		"""
+		logging.debug(f"Event for {self.path}: Song ends")
+		self.player.play_next()
