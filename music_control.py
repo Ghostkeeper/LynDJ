@@ -39,8 +39,19 @@ class MusicControl:
 		song_end_timer.timeout.connect(self.song_ends)
 		self.events.append(song_end_timer)
 
+	def play(self):
+		"""
+		Start all the timers for the events, causing the events to occur in order.
+		"""
 		for event in self.events:
 			event.start()
+
+	def stop(self):
+		"""
+		Cancel all of the timers for the events, interrupting them from being executed.
+		"""
+		for event in self.events:
+			event.stop()
 
 	def song_ends(self):
 		"""

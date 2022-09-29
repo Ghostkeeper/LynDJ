@@ -61,6 +61,8 @@ class Player(PySide6.QtCore.QObject):
 			logging.info(f"Stopping playback.")
 			Player.current_track.fadeout(round(preferences.Preferences.getInstance().get("player/fadeout") * 1000))  # Fade-out, convert to milliseconds for Pygame.
 			Player.current_track = None
+			Player.control_track.stop()
+			Player.control_track = None
 		self.is_playing_changed.emit()
 
 	@PySide6.QtCore.Property(bool, fset=is_playing_set, notify=is_playing_changed)
@@ -82,8 +84,9 @@ class Player(PySide6.QtCore.QObject):
 		next_song = current_playlist[0]["path"]
 		logging.info(f"Starting playback of track: {next_song}")
 		Player.current_track = pygame.mixer.Sound(next_song)
-		Player.current_track.play()
 		Player.control_track = music_control.MusicControl(next_song, Player.current_track, self)
+		Player.current_track.play()
+		Player.control_track.play()
 
 		# Remove that track from the playlist.
 		playlist.Playlist.getInstance().remove(0)
