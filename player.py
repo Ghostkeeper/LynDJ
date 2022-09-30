@@ -100,6 +100,10 @@ class Player(PySide6.QtCore.QObject):
 		Play the next song in the playlist.
 		"""
 		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
+		if len(current_playlist) == 0:  # Nothing left in the playlist.
+			self.is_playing_set(False)
+			return
+
 		next_song = current_playlist[0]["path"]
 		logging.info(f"Starting playback of track: {next_song}")
 		Player.current_track = pygame.mixer.Sound(next_song)
