@@ -124,7 +124,7 @@ class Player(PySide6.QtCore.QObject):
 		num_channels = prefs.get("player/fourier_channels")
 		waveform_numpy = numpy.frombuffer(waveform, dtype=waveform_dtype)[::stereo_channels]  # Only take one channel, e.g. the left stereo channel.
 		chunks = numpy.array_split(waveform_numpy, num_chunks)
-		transformed = numpy.zeros((num_chunks, num_channels), dtype=numpy.ubyte)  # Result array for the transformed chunks.
+		transformed = numpy.zeros((num_chunks, num_channels), dtype=numpy.float)  # Result array for the transformed chunks.
 		for i, chunk in enumerate(chunks):
 			fourier = scipy.fft.rfft(chunk)
 			fourier = numpy.abs(fourier[0:len(fourier) // 2 // num_channels * num_channels])  # Ignore the top 50% of the image which repeats due to Nyquist.
@@ -132,12 +132,14 @@ class Player(PySide6.QtCore.QObject):
 			# Then sum up those ranges to get the brightness for individual pixels.
 			fourier_pixels = numpy.sum(numpy.array_split(fourier, num_channels), axis=1)
 			# Scale to the range 0-256 for the image.
-			max_value = numpy.max(fourier_pixels) / 256
-			fourier_pixels /= max_value
 
 			transformed[i] = fourier_pixels
+		# Normalise so that it fits in the 8-bit grayscale channel of the image.
+		max_value = numpy.max(transformed)
+		transformed /= max_value / 255
+		normalised = transformed.astype(numpy.ubyte)
 
 		# Generate an image from it.
-		transformed = numpy.transpose(transformed).copy()
-		result = PySide6.QtGui.QImage(transformed, num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)
+		normalised = numpy.transpose(normalised).copy()
+		result = PySide6.QtGui.QImage(normalised, num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)
 		#result.save("test.png")
