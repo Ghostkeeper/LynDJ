@@ -115,7 +115,7 @@ class Player(PySide6.QtCore.QObject):
 		prefs = preferences.Preferences.getInstance()
 		num_chunks = prefs.get("player/fourier_samples")
 		num_channels = prefs.get("player/fourier_channels")
-		waveform_numpy = numpy.frombuffer(waveform, dtype=numpy.ubyte)
+		waveform_numpy = numpy.frombuffer(waveform, dtype=numpy.ubyte)[::2]  # Only take one channel of the (hopefully) stereo sound.
 		chunks = numpy.array_split(waveform_numpy, num_chunks)
 		transformed = numpy.zeros((num_chunks, num_channels), dtype=numpy.ubyte)
 		for i, chunk in enumerate(chunks):
