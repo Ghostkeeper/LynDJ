@@ -110,7 +110,7 @@ class Player(PySide6.QtCore.QObject):
 		Player.control_track = music_control.MusicControl(next_song, Player.current_track, self)
 
 		fourier_file = metadata.get(next_song, "fourier")
-		if fourier_file == "":  # Not generated yet.
+		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
 			fourier = self.generate_fourier(Player.current_track, next_song)
 			filename = os.path.splitext(os.path.basename(next_song))[0] + uuid.uuid4().hex[:8] + ".png"  # File's filename, but with an 8-character random string to prevent collisions.
 			filepath = os.path.join(storage.cache(), "fourier", filename)
