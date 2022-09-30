@@ -175,6 +175,7 @@ class Player(PySide6.QtCore.QObject):
 		# Normalise so that it fits in the 8-bit grayscale channel of the image.
 		max_value = numpy.max(transformed)
 		transformed /= max_value / 255
+		transformed = numpy.power(255 * (transformed / 255), 1.5)  # Make the image a bit brighter (gamma correction factor 1.5).
 		normalised = transformed.astype(numpy.ubyte)
 
 		# Generate an image from it.
