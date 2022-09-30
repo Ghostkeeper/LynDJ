@@ -5,6 +5,7 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import logging
+import mutagen  # To get metadata on the samples of the sound.
 import numpy  # For the Fourier transform in Scipy.
 import pygame  # The media player we're using to play music.
 import PySide6.QtCore  # Exposing the player to QML.
@@ -97,24 +98,31 @@ class Player(PySide6.QtCore.QObject):
 		next_song = current_playlist[0]["path"]
 		logging.info(f"Starting playback of track: {next_song}")
 		Player.current_track = pygame.mixer.Sound(next_song)
-		self.generate_fourier(Player.current_track)  # TODO: Cache this.
+		self.generate_fourier(Player.current_track, next_song)  # TODO: Cache this.
 		Player.control_track = music_control.MusicControl(next_song, Player.current_track, self)
 		Player.start_time = time.time()
 		Player.current_track.play()
 		Player.control_track.play()
 
-	def generate_fourier(self, sound):
+	def generate_fourier(self, sound, path):
 		"""
 		Generate an image of the fourier transform of a track.
-		:param sound: A sound sample to generate the fourier transform from.
-		:return: A QImage of the fourier transform of the given track.
+		:param sound: A sound sample to generate the Fourier transform from.
+		:param path: A path to the file we're generating the Fourier transform for.
+		:return: A QImage of the Fourier transform of the given track.
 		"""
+		# Get some metadata about this sound. We need the number of (stereo) channels and the bit depth.
+		mutagen_file = mutagen.File(path)
+		stereo_channels = mutagen_file.info.channels
+		bit_depth = mutagen_file.info.bits_per_sample
+		waveform_dtype = numpy.byte if bit_depth == 8 else numpy.short
+
 		# Get the waveform and transform it into frequency space.
 		waveform = sound.get_raw()
 		prefs = preferences.Preferences.getInstance()
 		num_chunks = prefs.get("player/fourier_samples")
 		num_channels = prefs.get("player/fourier_channels")
-		waveform_numpy = numpy.frombuffer(waveform, dtype=numpy.ubyte)[::2]  # Only take one channel of the (hopefully) stereo sound.
+		waveform_numpy = numpy.frombuffer(waveform, dtype=waveform_dtype)[::stereo_channels]  # Only take one channel, e.g. the left stereo channel.
 		chunks = numpy.array_split(waveform_numpy, num_chunks)
 		transformed = numpy.zeros((num_chunks, num_channels), dtype=numpy.ubyte)  # Result array for the transformed chunks.
 		for i, chunk in enumerate(chunks):
