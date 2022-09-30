@@ -104,8 +104,11 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		value = preferences.Preferences.getInstance().get("playlist/playlist")[index.row()][field]
 		if field == "duration" or field == "cumulative_duration":
 			# Display duration as minutes:seconds.
-			seconds = round(value)
-			return str(math.floor(seconds / 60)) + ":" + ("0" if (seconds % 60 < 10) else "") + str(seconds % 60)
+			if value > 0:
+				seconds = round(value)
+				return str(math.floor(seconds / 60)) + ":" + ("0" if (seconds % 60 < 10) else "") + str(seconds % 60)
+			else:
+				return "0:00"
 		if field == "bpm":
 			# Display tempo as a colour!
 			theme_inst = theme.Theme.getInstance()
