@@ -132,7 +132,10 @@ class Player(PySide6.QtCore.QObject):
 		# Get some metadata about this sound. We need the number of (stereo) channels and the bit depth.
 		mutagen_file = mutagen.File(path)
 		stereo_channels = mutagen_file.info.channels
-		bit_depth = mutagen_file.info.bits_per_sample
+		if hasattr(mutagen_file.info, "bits_per_sample"):
+			bit_depth = mutagen_file.info.bits_per_sample
+		else:  # Mutagen doesn't expose bit depth for MP3 files. Only bitrate (which is the compressed bit rate) and sample rate. They don't tell anything about what is in the waveform bytes.
+			bit_depth = 16  # Assume 16-bit, which is common.
 		waveform_dtype = numpy.byte if bit_depth == 8 else numpy.short
 
 		# Get the waveform and transform it into frequency space.
