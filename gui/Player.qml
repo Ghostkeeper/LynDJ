@@ -82,9 +82,9 @@ Rectangle {
 			top: parent.top
 		}
 
-		backgroundSource: Lyn.Theme.icon[player_instance.isPlaying ? "stop_background" : "play_background"]
+		backgroundSource: player_instance !== null ? Lyn.Theme.icon[player_instance.isPlaying ? "stop_background" : "play_background"] : ""
 		backgroundColour: Lyn.Theme.colour["lining"]
-		source: Lyn.Theme.icon[player_instance.isPlaying ? "stop_foreground" : "play_foreground"]
+		source: player_instance !== null ? Lyn.Theme.icon[player_instance.isPlaying ? "stop_foreground" : "play_foreground"] : ""
 		colour: Lyn.Theme.colour[hovered ? "highlight_foreground" : "foreground"]
 		onClicked: player_instance.isPlaying = !player_instance.isPlaying
 	}
