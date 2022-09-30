@@ -9,7 +9,7 @@ import logging
 import math  # To format durations.
 import PySide6.QtCore  # To expose this list to QML.
 import PySide6.QtGui  # To calculate display colours for song tempo.
-import threading  # Pre-loading tracks is done on a separate thread.
+import time  # To determine the remaining time until songs in the playlist start/end playing.
 
 import metadata  # To show file metadata in the playlist table.
 import player  # To call upon the player to pre-load tracks.
@@ -52,6 +52,11 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			user_role + 5: "comment",
 			user_role + 6: "cumulative_duration"
 		}
+
+		self.cumulative_update_timer = PySide6.QtCore.QTimer()
+		self.cumulative_update_timer.setInterval(1000)  # Due to time drift it may sometimes skip a second. But this is such a small detail and it should be rare.
+		self.cumulative_update_timer.timeout.connect(self.cumulative_update)
+		self.cumulative_update_timer.start()
 
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
 		"""
@@ -228,3 +233,21 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 				playlist[i]["cumulative_duration"] = playlist[i]["duration"] + playlist[i - 1]["cumulative_duration"]
 		prefs.changed_internally("playlist/playlist")
 		self.dataChanged.emit(self.createIndex(lower, 0), self.createIndex(upper, 0))
+
+	def cumulative_update(self):
+		"""
+		Updates the cumulative duration timer with the currently remaining times.
+		:return:
+		"""
+		prefs = preferences.Preferences.getInstance()
+		playlist = prefs.get("playlist/playlist")
+		if player.Player.start_time is None:
+			cumulative_duration = 0
+		else:
+			cumulative_duration = player.Player.start_time - time.time()  # Start off with the negative current playtime.
+		for track in playlist:
+			duration = track["duration"]
+			cumulative_duration += duration
+			track["cumulative_duration"] = cumulative_duration
+		prefs.changed_internally("playlist/playlist")
+		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(playlist), 0))
