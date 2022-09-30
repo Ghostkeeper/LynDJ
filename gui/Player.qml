@@ -84,4 +84,18 @@ Rectangle {
 		colour: Lyn.Theme.colour[hovered ? "highlight_foreground" : "foreground"]
 		onClicked: Lyn.Player.isPlaying = !Lyn.Player.isPlaying
 	}
+	Image {
+		id: timeline
+		anchors {
+			right: play_stop_button.left
+			rightMargin: Lyn.Theme.size["margin"].width
+			left: parent.left
+			leftMargin: Lyn.Theme.size["margin"].width
+			bottom: parent.bottom
+			bottomMargin: Lyn.Theme.size["margin"].height
+			top: parent.top
+			topMargin: Lyn.Theme.size["margin"].height
+		}
+		source: Lyn.Player.currentFourier
+	}
 }
