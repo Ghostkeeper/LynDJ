@@ -87,6 +87,3 @@ class Player(PySide6.QtCore.QObject):
 		Player.control_track = music_control.MusicControl(next_song, Player.current_track, self)
 		Player.current_track.play()
 		Player.control_track.play()
-
-		# Remove that track from the playlist.
-		playlist.Playlist.getInstance().remove(0)

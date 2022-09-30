@@ -8,6 +8,7 @@ import logging
 import PySide6.QtCore  # For QTimers to execute code after a certain amount of time.
 
 import metadata  # To get the events for a track.
+import playlist  # To remove the track from the playlist when it finishes playing.
 
 class MusicControl:
 	"""
@@ -58,4 +59,6 @@ class MusicControl:
 		Triggered when the music file has finished playing.
 		"""
 		logging.debug(f"Event for {self.path}: Song ends")
+		# Remove the previous track from the playlist.
+		playlist.Playlist.getInstance().remove(0)
 		self.player.play_next()
