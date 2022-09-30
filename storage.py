@@ -53,6 +53,10 @@ def ensure_exists() -> None:
 	if not os.path.exists(cache_path):
 		logging.info(f"Creating cache directory in {cache_path}")
 		os.makedirs(cache_path)
+	fourier_path = os.path.join(cache(), "fourier")
+	if not os.path.exists(fourier_path):
+		logging.debug(f"Creating fourier subfolder in {fourier_path}")
+		os.makedirs(fourier_path)
 	data_path = data()
 	if not os.path.exists(data_path):
 		logging.info(f"Creating data directory in {data_path}")
