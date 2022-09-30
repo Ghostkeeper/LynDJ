@@ -39,7 +39,7 @@ ListView {
 			ToolTip.visible: containsMouse && !drag.active
 			ToolTip.text: model.title + "<br />" + model.comment
 			ToolTip.delay: 500
-			drag.target: parent
+			drag.target: (index == 0 && Lyn.Player.isPlaying) ? null : parent  //The currently playing item cannot be dragged.
 			drag.axis: Drag.YAxis
 			drag.minimumY: -playlist.contentHeight
 			drag.maximumY: -parent.height
