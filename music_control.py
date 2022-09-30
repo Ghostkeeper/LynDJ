@@ -9,6 +9,7 @@ import PySide6.QtCore  # For QTimers to execute code after a certain amount of t
 
 import metadata  # To get the events for a track.
 import playlist  # To remove the track from the playlist when it finishes playing.
+import preferences  # For some playback preferences.
 
 class MusicControl:
 	"""
@@ -31,11 +32,16 @@ class MusicControl:
 		self.sound = sound
 		self.player = player
 
+		prefs = preferences.Preferences.getInstance()
+		if not prefs.has("player/silence"):
+			prefs.add("player/silence", 2.0)  # The pause between songs.
+		pause_between_songs = prefs.get("player/silence")
+
 		# Create a list of events for this track.
 		self.events = []
 		duration = metadata.get(path, "duration")
 		song_end_timer = PySide6.QtCore.QTimer()
-		song_end_timer.setInterval(round(duration * 1000))
+		song_end_timer.setInterval(round((duration + pause_between_songs) * 1000))
 		song_end_timer.setSingleShot(True)
 		song_end_timer.timeout.connect(self.song_ends)
 		self.events.append(song_end_timer)
