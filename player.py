@@ -9,10 +9,7 @@ import pygame  # The media player we're using to play music.
 import PySide6.QtCore  # Exposing the player to QML.
 
 import music_control  # To control the currently playing track.
-import playlist  # To get the next track to play.
 import preferences  # To get the playlist.
-import threading  # To run the control thread.
-import time  # To rate-limit the control track.
 
 class Player(PySide6.QtCore.QObject):
 	"""
