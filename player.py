@@ -5,8 +5,12 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import logging
+import math  # For the Fourier transform.
+import numpy  # For the Fourier transform in Scipy.
 import pygame  # The media player we're using to play music.
 import PySide6.QtCore  # Exposing the player to QML.
+import PySide6.QtGui  # For the QImage to display the Fourier transform.
+import scipy.fft  # For the Fourier transform.
 import time  # To track playtime.
 
 import music_control  # To control the currently playing track.
@@ -52,6 +56,10 @@ class Player(PySide6.QtCore.QObject):
 		prefs = preferences.Preferences.getInstance()
 		if not prefs.has("player/fadeout"):
 			prefs.add("player/fadeout", 2.0)  # Fade-out for 2 seconds by default.
+		if not prefs.has("player/fourier_samples"):
+			prefs.add("player/fourier_samples", 2048)  # Number of samples of the fourier image (horizontal).
+		if not prefs.has("player/fourier_channels"):
+			prefs.add("player/fourier_channels", 256)  # Resolution of the samples of the fourier image (vertical).
 
 	is_playing_changed = PySide6.QtCore.Signal()
 
@@ -90,7 +98,39 @@ class Player(PySide6.QtCore.QObject):
 		next_song = current_playlist[0]["path"]
 		logging.info(f"Starting playback of track: {next_song}")
 		Player.current_track = pygame.mixer.Sound(next_song)
+		self.generate_fourier(Player.current_track)  # TODO: Cache this.
 		Player.control_track = music_control.MusicControl(next_song, Player.current_track, self)
 		Player.start_time = time.time()
 		Player.current_track.play()
 		Player.control_track.play()
+
+	def generate_fourier(self, sound):
+		"""
+		Generate an image of the fourier transform of a track.
+		:param sound: A sound sample to generate the fourier transform from.
+		:return: A QImage of the fourier transform of the given track.
+		"""
+		# Get the waveform and transform it into frequency space.
+		waveform = sound.get_raw()
+		prefs = preferences.Preferences.getInstance()
+		num_chunks = prefs.get("player/fourier_samples")
+		num_channels = prefs.get("player/fourier_channels")
+		waveform_numpy = numpy.frombuffer(waveform, dtype=numpy.ubyte)
+		chunks = numpy.array_split(waveform_numpy, num_chunks)
+		transformed = numpy.zeros((num_chunks, num_channels), dtype=numpy.ubyte)
+		for i, chunk in enumerate(chunks):
+			fourier = scipy.fft.fft(chunk)
+			fourier = numpy.abs(fourier[0:math.floor(len(fourier) / 2 / num_channels) * num_channels])
+			# Split the frequencies into ranges.
+			# Then sum up those ranges to get the brightness for individual pixels.
+			fourier_pixels = numpy.sum(numpy.array_split(fourier, num_channels), axis=1)
+			# Scale to the range 0-256 for the image.
+			max_value = numpy.max(fourier_pixels) / 256
+			fourier_pixels /= max_value
+
+			transformed[i] = fourier_pixels
+
+		# Generate an image from it.
+		transformed = numpy.transpose(transformed).copy()
+		result = PySide6.QtGui.QImage(transformed, num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)
+		#result.save("test.png")
