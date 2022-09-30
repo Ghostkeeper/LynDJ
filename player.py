@@ -5,7 +5,6 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import logging
-import math  # For the Fourier transform.
 import numpy  # For the Fourier transform in Scipy.
 import pygame  # The media player we're using to play music.
 import PySide6.QtCore  # Exposing the player to QML.
@@ -120,7 +119,7 @@ class Player(PySide6.QtCore.QObject):
 		transformed = numpy.zeros((num_chunks, num_channels), dtype=numpy.ubyte)
 		for i, chunk in enumerate(chunks):
 			fourier = scipy.fft.fft(chunk)
-			fourier = numpy.abs(fourier[0:math.floor(len(fourier) / 2 / num_channels) * num_channels])
+			fourier = numpy.abs(fourier[0:len(fourier) // 2 // num_channels * num_channels])  # Ignore the top 50% of the image which repeats due to Nyquist.
 			# Split the frequencies into ranges.
 			# Then sum up those ranges to get the brightness for individual pixels.
 			fourier_pixels = numpy.sum(numpy.array_split(fourier, num_channels), axis=1)
