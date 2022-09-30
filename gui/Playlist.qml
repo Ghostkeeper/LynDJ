@@ -42,7 +42,7 @@ ListView {
 			drag.target: (index == 0 && Lyn.Player.isPlaying) ? null : parent  //The currently playing item cannot be dragged.
 			drag.axis: Drag.YAxis
 			drag.minimumY: -playlist.contentHeight
-			drag.maximumY: -parent.height
+			drag.maximumY: -parent.height - (Lyn.Player.isPlaying ? parent.height : 0)  //If playing, you can't drag items below the currently playing item.
 			drag.threshold: parent.height / 8
 
 			onReleased: {
