@@ -56,8 +56,8 @@ class Application(PySide6.QtGui.QGuiApplication):
 		PySide6.QtQml.qmlRegisterSingletonInstance(theme.Theme, "Lyn", 1, 0, "Theme", theme.Theme.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(playlist.Playlist, "Lyn", 1, 0, "Playlist", playlist.Playlist.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(Application, "Lyn", 1, 0, "Application", self)
+		PySide6.QtQml.qmlRegisterSingletonInstance(player.Player, "Lyn", 1, 0, "Player", player.Player.get_instance())
 		PySide6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
-		PySide6.QtQml.qmlRegisterType(player.Player, "Lyn", 1, 0, "Player")
 
 		logging.debug("Loading QML engine.")
 		self.engine = PySide6.QtQml.QQmlApplicationEngine()

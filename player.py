@@ -52,6 +52,21 @@ class Player(PySide6.QtCore.QObject):
 	If no track is playing, this should be set to ``None``.
 	"""
 
+	instance = None
+	"""
+	This class is a singleton. This stores the one instance that is allowed to exist.
+	"""
+
+	@classmethod
+	def get_instance(cls):
+		"""
+		Get the single instance of this class, or create it if it wasn't created yet.
+		:return: The instance of this class.
+		"""
+		if cls.instance is None:
+			cls.instance = Player()
+		return cls.instance
+
 	def __init__(self, parent=None) -> None:
 		"""
 		Ensures that a few global things are properly initialised before using this class.

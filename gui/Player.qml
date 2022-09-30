@@ -16,10 +16,6 @@ Rectangle {
 
 	color: Lyn.Theme.colour["primary_background"]
 
-	Lyn.Player {
-		id: player_instance
-	}
-
 	//Border extends above the player!
 	Item {
 		anchors {
@@ -82,10 +78,10 @@ Rectangle {
 			top: parent.top
 		}
 
-		backgroundSource: player_instance !== null ? Lyn.Theme.icon[player_instance.isPlaying ? "stop_background" : "play_background"] : ""
+		backgroundSource: Lyn.Theme.icon[Lyn.Player.isPlaying ? "stop_background" : "play_background"]
 		backgroundColour: Lyn.Theme.colour["lining"]
-		source: player_instance !== null ? Lyn.Theme.icon[player_instance.isPlaying ? "stop_foreground" : "play_foreground"] : ""
+		source: Lyn.Theme.icon[Lyn.Player.isPlaying ? "stop_foreground" : "play_foreground"]
 		colour: Lyn.Theme.colour[hovered ? "highlight_foreground" : "foreground"]
-		onClicked: player_instance.isPlaying = !player_instance.isPlaying
+		onClicked: Lyn.Player.isPlaying = !Lyn.Player.isPlaying
 	}
 }
