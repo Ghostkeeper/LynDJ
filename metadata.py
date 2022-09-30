@@ -39,7 +39,7 @@ def load():
 	logging.debug("Reading metadata from database.")
 
 	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
-	for path, title, author, comment, duration, bpm, cachetime in connection.execute("SELECT * FROM metadata"):
+	for path, title, author, comment, duration, bpm, fourier, cachetime in connection.execute("SELECT * FROM metadata"):
 		new_metadata[path] = {
 			"path": path,
 			"title": title,
@@ -47,6 +47,7 @@ def load():
 			"comment": comment,
 			"duration": duration,
 			"bpm": bpm,
+			"fourier": fourier,
 			"cachetime": cachetime
 		}
 	metadata.update(new_metadata)
@@ -67,6 +68,7 @@ def store():
 			comment text,
 			duration real,
 			bpm real,
+			fourier text,
 			cachetime real
 		)""")
 	else:
@@ -74,8 +76,8 @@ def store():
 
 	local_metadata = metadata  # Cache locally for performance.
 	for path, entry in local_metadata.items():
-		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?)",
-			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["cachetime"]))
+		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, fourier, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["fourier"], entry["cachetime"]))
 	connection.commit()
 
 # When we change the database, save the database to disk after a short delay.
@@ -159,6 +161,7 @@ def add_file(path):
 		"comment": comment,
 		"duration": duration,
 		"bpm": bpm,
+		"fourier": "",
 		"cachetime": last_modified
 	})
 
@@ -172,34 +175,37 @@ def change(path, key, value) -> None:
 	:param value: The new value for this metadata entry.
 	"""
 	logging.info(f"Changing metadata of {path}: {key}={value}")
-	try:
-		f = mutagen.File(path)
-		if type(f) in {mutagen.mp3.MP3, mutagen.wave.WAVE}:  # Uses ID3 tags.
-			if key == "comment":  # There is no EasyID3 for comments.
-				id3 = mutagen.id3.ID3(path)
-				id3.setall("COMM:ID3v1 Comment:eng", [mutagen.id3.COMM(encoding=3, lang="eng", text=[value])])
-				id3.save()
-			else:
+
+	# Some metadata will also be stored in the file.
+	if key in {"title", "author", "comment", "bpm"}:
+		try:
+			f = mutagen.File(path)
+			if type(f) in {mutagen.mp3.MP3, mutagen.wave.WAVE}:  # Uses ID3 tags.
+				if key == "comment":  # There is no EasyID3 for comments.
+					id3 = mutagen.id3.ID3(path)
+					id3.setall("COMM:ID3v1 Comment:eng", [mutagen.id3.COMM(encoding=3, lang="eng", text=[value])])
+					id3.save()
+				else:
+					if key == "author":
+						save_key = "artist"
+					else:
+						save_key = key
+					id3 = mutagen.easyid3.EasyID3(path)
+					id3[save_key] = value
+					id3.save()
+			elif isinstance(f, mutagen.ogg.OggFileType) or type(f) == mutagen.flac.FLAC:  # These types use Vorbis Comments.
 				if key == "author":
 					save_key = "artist"
 				else:
 					save_key = key
-				id3 = mutagen.easyid3.EasyID3(path)
-				id3[save_key] = value
-				id3.save()
-		elif isinstance(f, mutagen.ogg.OggFileType) or type(f) == mutagen.flac.FLAC:  # These types use Vorbis Comments.
-			if key == "author":
-				save_key = "artist"
-			else:
-				save_key = key
-			flac = mutagen.flac.FLAC(path)
-			flac[save_key] = [value]
-			flac.save()
-		else:  # Unknown file type.
-			logging.warning(f"Cannot save metadata to file type of {path}!")
-	except mutagen.MutagenError as e:
-		logging.error(f"Unable to save metadata in {path}: {e}")
-		return
+				flac = mutagen.flac.FLAC(path)
+				flac[save_key] = [value]
+				flac.save()
+			else:  # Unknown file type.
+				logging.warning(f"Cannot save metadata to file type of {path}!")
+		except mutagen.MutagenError as e:
+			logging.error(f"Unable to save metadata in {path}: {e}")
+			return
 
 	metadata[path][key] = value
 	store_timer.start()

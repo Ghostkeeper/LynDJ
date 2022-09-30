@@ -8,14 +8,18 @@ import logging
 import math  # Transformations on the Fourier transform.
 import mutagen  # To get metadata on the samples of the sound.
 import numpy  # For the Fourier transform in Scipy.
+import os.path  # To cache Fourier transform images.
 import pygame  # The media player we're using to play music.
 import PySide6.QtCore  # Exposing the player to QML.
 import PySide6.QtGui  # For the QImage to display the Fourier transform.
 import scipy.fft  # For the Fourier transform.
 import time  # To track playtime.
+import uuid  # To generate filenames for the Fourier transform cache.
 
+import metadata  # To find or generate the Fourier transform image.
 import music_control  # To control the currently playing track.
 import preferences  # To get the playlist.
+import storage  # To cache Fourier transform images.
 
 class Player(PySide6.QtCore.QObject):
 	"""
@@ -99,8 +103,16 @@ class Player(PySide6.QtCore.QObject):
 		next_song = current_playlist[0]["path"]
 		logging.info(f"Starting playback of track: {next_song}")
 		Player.current_track = pygame.mixer.Sound(next_song)
-		self.generate_fourier(Player.current_track, next_song)  # TODO: Cache this.
 		Player.control_track = music_control.MusicControl(next_song, Player.current_track, self)
+
+		fourier_file = metadata.get(next_song, "fourier")
+		if fourier_file == "":  # Not generated yet.
+			fourier = self.generate_fourier(Player.current_track, next_song)
+			filename = os.path.splitext(os.path.basename(next_song))[0] + uuid.uuid4().hex[:8] + ".png"  # File's filename, but with an 8-character random string to prevent collisions.
+			filepath = os.path.join(storage.cache(), "fourier", filename)
+			fourier.save(filepath)
+			metadata.change(next_song, "fourier", filepath)
+
 		Player.start_time = time.time()
 		Player.current_track.play()
 		Player.control_track.play()
@@ -112,6 +124,7 @@ class Player(PySide6.QtCore.QObject):
 		:param path: A path to the file we're generating the Fourier transform for.
 		:return: A QImage of the Fourier transform of the given track.
 		"""
+		logging.debug(f"Generating Fourier image for {path}")
 		# Get some metadata about this sound. We need the number of (stereo) channels and the bit depth.
 		mutagen_file = mutagen.File(path)
 		stereo_channels = mutagen_file.info.channels
@@ -144,5 +157,4 @@ class Player(PySide6.QtCore.QObject):
 		# Generate an image from it.
 		normalised = numpy.flip(numpy.transpose(normalised), axis=0).copy()  # Transposed to have time horizontally, frequency vertically. Flipped to have bass at the bottom, trebles at the top.
 		result = PySide6.QtGui.QImage(normalised, num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)  # Reinterpret as pixels. Easy image!
-		#result.save("test.png")
 		return result
