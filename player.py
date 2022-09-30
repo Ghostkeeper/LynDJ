@@ -116,9 +116,9 @@ class Player(PySide6.QtCore.QObject):
 		num_channels = prefs.get("player/fourier_channels")
 		waveform_numpy = numpy.frombuffer(waveform, dtype=numpy.ubyte)[::2]  # Only take one channel of the (hopefully) stereo sound.
 		chunks = numpy.array_split(waveform_numpy, num_chunks)
-		transformed = numpy.zeros((num_chunks, num_channels), dtype=numpy.ubyte)
+		transformed = numpy.zeros((num_chunks, num_channels), dtype=numpy.ubyte)  # Result array for the transformed chunks.
 		for i, chunk in enumerate(chunks):
-			fourier = scipy.fft.fft(chunk)
+			fourier = scipy.fft.rfft(chunk)
 			fourier = numpy.abs(fourier[0:len(fourier) // 2 // num_channels * num_channels])  # Ignore the top 50% of the image which repeats due to Nyquist.
 			# Split the frequencies into ranges.
 			# Then sum up those ranges to get the brightness for individual pixels.
