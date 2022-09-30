@@ -5,6 +5,7 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import logging
+import math  # Transformations on the Fourier transform.
 import mutagen  # To get metadata on the samples of the sound.
 import numpy  # For the Fourier transform in Scipy.
 import pygame  # The media player we're using to play music.
@@ -123,16 +124,17 @@ class Player(PySide6.QtCore.QObject):
 		num_chunks = prefs.get("player/fourier_samples")
 		num_channels = prefs.get("player/fourier_channels")
 		waveform_numpy = numpy.frombuffer(waveform, dtype=waveform_dtype)[::stereo_channels]  # Only take one channel, e.g. the left stereo channel.
-		chunks = numpy.array_split(waveform_numpy, num_chunks)
+		chunks = numpy.array_split(waveform_numpy, num_chunks)  # Split the sound in chunks, each of which will be displayed as 1 horizontal pixel.
+		chunk_size = len(chunks[0])
+		split_points = numpy.logspace(1, math.log10(chunk_size), num_channels).astype(numpy.int32)  # We'll display a certain number of frequencies as vertical pixels. They are logarithmically spaced on the frequency spectrum.
+		split_points = split_points[:-1]  # The last one is not a split point, but the end. No need to split there.
+
 		transformed = numpy.zeros((num_chunks, num_channels), dtype=numpy.float)  # Result array for the transformed chunks.
 		for i, chunk in enumerate(chunks):
 			fourier = scipy.fft.rfft(chunk)
-			fourier = numpy.abs(fourier[0:len(fourier) // 2 // num_channels * num_channels])  # Ignore the top 50% of the image which repeats due to Nyquist.
-			# Split the frequencies into ranges.
-			# Then sum up those ranges to get the brightness for individual pixels.
-			fourier_pixels = numpy.sum(numpy.array_split(fourier, num_channels), axis=1)
-			# Scale to the range 0-256 for the image.
-
+			fourier = numpy.abs(fourier[0:len(fourier) // 2])  # Ignore the top 50% of the image which repeats due to Nyquist.
+			fourier_buckets = numpy.split(fourier, split_points)  # Split the frequencies into logarithmically-spaced ranges.
+			fourier_pixels = numpy.array([numpy.sum(arr) for arr in fourier_buckets])  # Then sum up those ranges to get the brightness for individual pixels.
 			transformed[i] = fourier_pixels
 		# Normalise so that it fits in the 8-bit grayscale channel of the image.
 		max_value = numpy.max(transformed)
@@ -140,6 +142,7 @@ class Player(PySide6.QtCore.QObject):
 		normalised = transformed.astype(numpy.ubyte)
 
 		# Generate an image from it.
-		normalised = numpy.transpose(normalised).copy()
-		result = PySide6.QtGui.QImage(normalised, num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)
+		normalised = numpy.flip(numpy.transpose(normalised), axis=0).copy()  # Transposed to have time horizontally, frequency vertically. Flipped to have bass at the bottom, trebles at the top.
+		result = PySide6.QtGui.QImage(normalised, num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)  # Reinterpret as pixels. Easy image!
 		#result.save("test.png")
+		return result
