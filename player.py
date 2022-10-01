@@ -31,6 +31,11 @@ class Player(PySide6.QtCore.QObject):
 	from there.
 	"""
 
+	instance = None
+	"""
+	This class is a singleton. This stores the one instance that is allowed to exist.
+	"""
+
 	current_track = None
 	"""
 	If a song is playing, this holds the currently playing track.
@@ -52,9 +57,9 @@ class Player(PySide6.QtCore.QObject):
 	If no track is playing, this should be set to ``None``.
 	"""
 
-	instance = None
+	main_volume = 1
 	"""
-	This class is a singleton. This stores the one instance that is allowed to exist.
+	The master volume control to play music at.
 	"""
 
 	@classmethod
@@ -131,6 +136,8 @@ class Player(PySide6.QtCore.QObject):
 			filepath = os.path.join(storage.cache(), "fourier", filename)
 			fourier.save(filepath)
 			metadata.change(next_song, "fourier", filepath)
+
+		Player.current_track.set_volume(Player.main_volume)  # Also apply the volume to this new track.
 
 		self.songChanged.emit()  # We loaded up a new song.
 		Player.start_time = time.time()
@@ -210,3 +217,27 @@ class Player(PySide6.QtCore.QObject):
 			return 0
 		current_path = current_playlist[0]["path"]
 		return metadata.get(current_path, "duration")
+
+	volume_changed = PySide6.QtCore.Signal()
+	"""
+	Triggered when something changes the playback volume of the current song.
+	"""
+
+	def set_volume(self, value) -> None:
+		"""
+		Changes the master volume to play music at.
+		:param value: The new volume, between 0 and 1.
+		"""
+		if Player.main_volume != value:
+			Player.main_volume = value
+			if Player.current_track is not None:
+				Player.current_track.set_volume(value)
+			self.volume_changed.emit()
+
+	@PySide6.QtCore.Property(float, fset=set_volume, notify=volume_changed)
+	def volume(self) -> float:
+		"""
+		The master volume control. This property determines how loud to play the music.
+		:return: The current volume level.
+		"""
+		return Player.main_volume
