@@ -127,7 +127,7 @@ Rectangle {
 				duration: Lyn.Player.currentDuration * 1000
 				running: Lyn.Player.isPlaying
 
-				readonly property var __: Connections {
+				readonly property var __: Connections { //NumberAnimation cannot have child elements. Store this in a property. It still works.
 					target: Lyn.Player
 					function onSongChanged() {
 						progress_animation.restart();

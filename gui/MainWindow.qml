@@ -127,7 +127,7 @@ ApplicationWindow {
 				}
 			}
 			queueButtonEnabled: file_browser.selectedFilePath !== ""
-			unqueueButtonEnabled: playlist.currentIndex != -1
+			unqueueButtonEnabled: playlist.currentIndex != -1 && !(playlist.currentIndex == 0 && Lyn.Player.isPlaying)
 		}
 	}
 
