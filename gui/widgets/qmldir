@@ -5,6 +5,7 @@ ColourImage    1.0 ColourImage.qml
 ColumnResizer  1.0 ColumnResizer.qml
 DirectoryField 1.0 DirectoryField.qml
 ImageButton    1.0 ImageButton.qml
+ScreenImage    1.0 ScreenImage.qml
 ScrollBar      1.0 ScrollBar.qml
 TableHeader    1.0 TableHeader.qml
 TextField      1.0 TextField.qml
