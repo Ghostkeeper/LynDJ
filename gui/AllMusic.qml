@@ -77,6 +77,7 @@ Item {
 			}
 		}
 		Widgets.TableHeader {
+			id: header_comment
 			width: music_table.columnWidthProvider(4)
 
 			text: "Comment"
@@ -87,6 +88,19 @@ Item {
 			Widgets.ColumnResizer {
 				previous_column_width: header_bpm.width
 				previous_index: 3
+			}
+		}
+		Widgets.TableHeader {
+			width: music_table.columnWidthProvider(5)
+
+			text: "Last Played"
+			onWidthChanged: music_table.forceLayout()
+			role: "last_played"
+			table: music_table.model
+
+			Widgets.ColumnResizer {
+				previous_column_width: header_comment.width
+				previous_index: 4
 			}
 		}
 	}
