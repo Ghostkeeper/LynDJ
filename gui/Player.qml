@@ -132,6 +132,10 @@ Rectangle {
 					function onSongChanged() {
 						progress_animation.restart();
 					}
+					function onIsPlayingChanged() {
+						progress_animation.restart();
+						progress_animation.running = Lyn.Player.isPlaying;
+					}
 				}
 			}
 		}
