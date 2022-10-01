@@ -13,7 +13,7 @@ import pygame  # The media player we're using to play music.
 import PySide6.QtCore  # Exposing the player to QML.
 import PySide6.QtGui  # For the QImage to display the Fourier transform.
 import scipy.fft  # For the Fourier transform.
-import time  # To track playtime.
+import time  # To track playtime, and last played time.
 import uuid  # To generate filenames for the Fourier transform cache.
 
 import metadata  # To find or generate the Fourier transform image.
@@ -143,6 +143,8 @@ class Player(PySide6.QtCore.QObject):
 		Player.start_time = time.time()
 		Player.current_track.play()
 		Player.control_track.play()
+
+		metadata.change(next_song, "last_played", time.time())
 
 	def generate_fourier(self, sound, path):
 		"""

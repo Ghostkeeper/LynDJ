@@ -39,7 +39,7 @@ def load():
 	logging.debug("Reading metadata from database.")
 
 	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
-	for path, title, author, comment, duration, bpm, fourier, cachetime in connection.execute("SELECT * FROM metadata"):
+	for path, title, author, comment, duration, bpm, last_played, fourier, cachetime in connection.execute("SELECT * FROM metadata"):
 		new_metadata[path] = {
 			"path": path,
 			"title": title,
@@ -47,6 +47,7 @@ def load():
 			"comment": comment,
 			"duration": duration,
 			"bpm": bpm,
+			"last_played": last_played,
 			"fourier": fourier,
 			"cachetime": cachetime
 		}
@@ -68,6 +69,7 @@ def store():
 			comment text,
 			duration real,
 			bpm real,
+			last_played real,
 			fourier text,
 			cachetime real
 		)""")
@@ -76,8 +78,8 @@ def store():
 
 	local_metadata = metadata  # Cache locally for performance.
 	for path, entry in local_metadata.items():
-		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, fourier, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["fourier"], entry["cachetime"]))
+		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, fourier, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["fourier"], entry["cachetime"]))
 	connection.commit()
 
 # When we change the database, save the database to disk after a short delay.
@@ -120,6 +122,9 @@ def add_file(path):
 	if path in local_metadata:
 		if local_metadata[path]["cachetime"] >= last_modified:
 			return  # Already up to date.
+		last_played = local_metadata[path]["last_played"]
+	else:
+		last_played = -1  # Never played.
 	logging.debug(f"Updating metadata for {path}")
 
 	try:
@@ -161,6 +166,7 @@ def add_file(path):
 		"comment": comment,
 		"duration": duration,
 		"bpm": bpm,
+		"last_played": last_played,
 		"fourier": "",
 		"cachetime": last_modified
 	})
