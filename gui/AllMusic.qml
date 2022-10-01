@@ -105,6 +105,7 @@ Item {
 			}
 		}
 		Widgets.TableHeader {
+			id: header_age
 			width: music_table.columnWidthProvider(6)
 
 			text: "Age"
@@ -115,6 +116,19 @@ Item {
 			Widgets.ColumnResizer {
 				previous_column_width: header_last_played.width
 				previous_index: 5
+			}
+		}
+		Widgets.TableHeader {
+			width: music_table.columnWidthProvider(7)
+
+			text: "Style"
+			onWidthChanged: music_table.forceLayout()
+			role: "style"
+			table: music_table.model
+
+			Widgets.ColumnResizer {
+				previous_column_width: header_age.width
+				previous_index: 6
 			}
 		}
 	}
@@ -167,7 +181,7 @@ Item {
 							music_table.focus = true;
 						} else { //Right button.
 							const field = music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole);
-							if(field === "title" || field === "author" || field === "bpm" || field === "comment" || field === "age") {
+							if(field === "title" || field === "author" || field === "bpm" || field === "comment" || field === "age" || field === "style") {
 								change_dialogue.field = field
 								change_dialogue.path = music_directory.headerData(row, Qt.Vertical, Qt.DisplayRole);
 								change_dialogue.value = display; //Put the old value in the text box.
