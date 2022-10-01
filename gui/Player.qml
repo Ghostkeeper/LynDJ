@@ -85,6 +85,21 @@ Rectangle {
 		onClicked: Lyn.Player.isPlaying = !Lyn.Player.isPlaying
 	}
 
+	//Fourier image above the progress indicator.
+	Widgets.ScreenImage {
+		id: fourier
+		anchors {
+			right: progress_indicator.right
+			left: progress_indicator.left
+			bottom: progress_indicator.top
+			top: parent.top
+			topMargin: Lyn.Theme.size["margin"].height
+		}
+
+		colour: Lyn.Theme.colour["foreground"]
+		source: Lyn.Player.currentFourier
+	}
+
 	//Progress indicator.
 	Item {
 		id: progress_indicator
@@ -96,7 +111,7 @@ Rectangle {
 			bottom: parent.bottom
 			bottomMargin: Lyn.Theme.size["margin"].height
 		}
-		height: childrenRect.height
+		height: progress_hook.height
 
 		Widgets.ColourImage {
 			id: progress_bar
@@ -121,25 +136,24 @@ Rectangle {
 			}
 		}
 		Widgets.ColourImage { //Hook at the end of the progress bar.
+			id: progress_hook
 			anchors.horizontalCenter: progress_bar.right
 
+			visible: Lyn.Player.isPlaying
 			colour: Lyn.Theme.colour["foreground"]
 			source: Lyn.Theme.icon["progress_end"]
 		}
-	}
+		//Progress marker overlaying the fourier timeline.
+		Rectangle {
+			anchors {
+				horizontalCenter: progress_hook.horizontalCenter
+				bottom: progress_hook.top
+			}
+			width: 2
+			height: fourier.height
 
-	//Fourier image above the progress indicator.
-	Widgets.ScreenImage {
-		id: timeline
-		anchors {
-			right: progress_indicator.right
-			left: progress_indicator.left
-			bottom: progress_indicator.top
-			top: parent.top
-			topMargin: Lyn.Theme.size["margin"].height
+			visible: Lyn.Player.isPlaying
+			color: Lyn.Theme.colour["translucent_foreground"]
 		}
-
-		colour: Lyn.Theme.colour["foreground"]
-		source: Lyn.Player.currentFourier
 	}
 }
