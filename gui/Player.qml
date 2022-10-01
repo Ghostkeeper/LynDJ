@@ -105,6 +105,9 @@ Rectangle {
 			bottom: parent.bottom
 			bottomMargin: Lyn.Theme.size["margin"].height
 		}
+
+		value: Lyn.Player.volume
+		onValueChanged: Lyn.Player.volume = value
 	}
 
 	//Fourier image above the progress indicator.
