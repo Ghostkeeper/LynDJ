@@ -132,7 +132,7 @@ class Player(PySide6.QtCore.QObject):
 			fourier.save(filepath)
 			metadata.change(next_song, "fourier", filepath)
 
-		self.song_changed.emit()  # We loaded up a new song.
+		self.songChanged.emit()  # We loaded up a new song.
 		Player.start_time = time.time()
 		Player.current_track.play()
 		Player.control_track.play()
@@ -183,14 +183,30 @@ class Player(PySide6.QtCore.QObject):
 		result = PySide6.QtGui.QImage(normalised, num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)  # Reinterpret as pixels. Easy image!
 		return result
 
-	song_changed = PySide6.QtCore.Signal()
+	songChanged = PySide6.QtCore.Signal()
 
-	@PySide6.QtCore.Property(str, notify=song_changed)
+	@PySide6.QtCore.Property(str, notify=songChanged)
 	def currentFourier(self) -> str:
 		"""
 		Get the path to the currently playing song's Fourier image.
 		:return: A path to an image.
 		"""
 		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
+		if len(current_playlist) == 0:
+			return ""
 		current_path = current_playlist[0]["path"]
 		return metadata.get(current_path, "fourier")
+
+	@PySide6.QtCore.Property(float, notify=songChanged)
+	def currentDuration(self) -> float:
+		"""
+		Get the duration of the current song, in seconds.
+
+		If there is no current song playing, this returns 0.
+		:return: The duration of the current song, in seconds.
+		"""
+		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
+		if len(current_playlist) == 0:
+			return 0
+		current_path = current_playlist[0]["path"]
+		return metadata.get(current_path, "duration")

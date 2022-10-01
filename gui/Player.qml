@@ -84,8 +84,10 @@ Rectangle {
 		colour: Lyn.Theme.colour[hovered ? "highlight_foreground" : "foreground"]
 		onClicked: Lyn.Player.isPlaying = !Lyn.Player.isPlaying
 	}
-	Widgets.ScreenImage {
-		id: timeline
+
+	//Progress indicator.
+	Item {
+		id: progress_indicator
 		anchors {
 			right: play_stop_button.left
 			rightMargin: Lyn.Theme.size["margin"].width
@@ -93,6 +95,46 @@ Rectangle {
 			leftMargin: Lyn.Theme.size["margin"].width
 			bottom: parent.bottom
 			bottomMargin: Lyn.Theme.size["margin"].height
+		}
+		height: childrenRect.height
+
+		Widgets.ColourImage {
+			id: progress_bar
+			width: 0
+
+			colour: Lyn.Theme.colour["foreground"]
+			source: Lyn.Theme.icon["progress_bar"]
+
+			NumberAnimation on width {
+				id: progress_animation
+				from: 0
+				to: progress_indicator.width
+				duration: Lyn.Player.currentDuration * 1000
+				running: Lyn.Player.isPlaying
+
+				readonly property var __: Connections {
+					target: Lyn.Player
+					function onSongChanged() {
+						progress_animation.restart();
+					}
+				}
+			}
+		}
+		Widgets.ColourImage { //Hook at the end of the progress bar.
+			anchors.horizontalCenter: progress_bar.right
+
+			colour: Lyn.Theme.colour["foreground"]
+			source: Lyn.Theme.icon["progress_end"]
+		}
+	}
+
+	//Fourier image above the progress indicator.
+	Widgets.ScreenImage {
+		id: timeline
+		anchors {
+			right: progress_indicator.right
+			left: progress_indicator.left
+			bottom: progress_indicator.top
 			top: parent.top
 			topMargin: Lyn.Theme.size["margin"].height
 		}
