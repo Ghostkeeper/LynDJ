@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<svg width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+<g fill="none" stroke="black" stroke-width="2">
+	<circle cx="24" cy="24" r="23" /> <!-- Outline. -->
+	<path d="M28,16 a20,20 0 0 1 0,16 m4,-20 a20,20 0 0 1 0,24" /> <!-- Sound waves. -->
+</g>
+<polygon points="10,24 24,36 24,12" /> <!-- Speaker cone. -->
+</svg>

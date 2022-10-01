@@ -85,6 +85,28 @@ Rectangle {
 		onClicked: Lyn.Player.isPlaying = !Lyn.Player.isPlaying
 	}
 
+	Widgets.ColourImage {
+		id: volume_icon
+		anchors {
+			left: parent.left
+			leftMargin: Lyn.Theme.size["margin"].width
+			top: parent.top
+			topMargin: Lyn.Theme.size["margin"].height
+		}
+
+		colour: Lyn.Theme.colour["foreground"]
+		source: Lyn.Theme.icon["volume"]
+	}
+	Widgets.Slider {
+		id: volume_control
+		anchors {
+			left: volume_icon.left
+			top: volume_icon.bottom
+			bottom: parent.bottom
+			bottomMargin: Lyn.Theme.size["margin"].height
+		}
+	}
+
 	//Fourier image above the progress indicator.
 	Widgets.ScreenImage {
 		id: fourier
@@ -106,7 +128,7 @@ Rectangle {
 		anchors {
 			right: play_stop_button.left
 			rightMargin: Lyn.Theme.size["margin"].width
-			left: parent.left
+			left: volume_control.right
 			leftMargin: Lyn.Theme.size["margin"].width
 			bottom: parent.bottom
 			bottomMargin: Lyn.Theme.size["margin"].height
