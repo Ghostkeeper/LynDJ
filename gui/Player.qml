@@ -185,4 +185,15 @@ Rectangle {
 			color: Lyn.Theme.colour["translucent_foreground"]
 		}
 	}
+
+	Text
+	{
+		anchors {
+			left: fourier.left
+			top: fourier.top
+		}
+
+		font: Lyn.Theme.font["title"]
+		text: Lyn.Player.currentTitle
+	}
 }
