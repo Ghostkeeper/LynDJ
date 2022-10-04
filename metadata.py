@@ -39,7 +39,7 @@ def load():
 	logging.debug("Reading metadata from database.")
 
 	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
-	for path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, cachetime in connection.execute("SELECT * FROM metadata"):
+	for path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime in connection.execute("SELECT * FROM metadata"):
 		new_metadata[path] = {
 			"path": path,
 			"title": title,
@@ -52,6 +52,10 @@ def load():
 			"style": style,
 			"energy": energy,
 			"fourier": fourier,
+			"volume_waypoints": volume_waypoints,
+			"bass_waypoints": bass_waypoints,
+			"mids_waypoints": mids_waypoints,
+			"treble_waypoints": treble_waypoints,
 			"cachetime": cachetime
 		}
 	metadata.update(new_metadata)
@@ -77,6 +81,10 @@ def store():
 			style text,
 			energy text,
 			fourier text,
+			volume_waypoints text,
+			bass_waypoints text,
+			mids_waypoints text,
+			treble_waypoints text,
 			cachetime real
 		)""")
 	else:
@@ -84,8 +92,8 @@ def store():
 
 	local_metadata = metadata  # Cache locally for performance.
 	for path, entry in local_metadata.items():
-		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["cachetime"]))
+		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"]))
 	connection.commit()
 
 # When we change the database, save the database to disk after a short delay.
@@ -132,11 +140,19 @@ def add_file(path):
 		age = local_metadata[path]["age"]
 		style = local_metadata[path]["style"]
 		energy = local_metadata[path]["energy"]
+		volume_waypoints = local_metadata[path]["volume_waypoints"]
+		bass_waypoints = local_metadata[path]["bass_waypoints"]
+		mids_waypoints = local_metadata[path]["mids_waypoints"]
+		treble_waypoints = local_metadata[path]["treble_waypoints"]
 	else:
 		last_played = -1  # Never played.
 		age = ""
 		style = ""
 		energy = ""
+		volume_waypoints = ""
+		bass_waypoints = ""
+		mids_waypoints = ""
+		treble_waypoints = ""
 	logging.debug(f"Updating metadata for {path}")
 
 	try:
@@ -183,6 +199,10 @@ def add_file(path):
 		"style": style,
 		"energy": energy,
 		"fourier": "",
+		"volume_waypoints": "",
+		"bass_waypoints": "",
+		"mids_waypoints": "",
+		"treble_waypoints": "",
 		"cachetime": last_modified
 	})
 
