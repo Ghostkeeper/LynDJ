@@ -39,7 +39,7 @@ def load():
 	logging.debug("Reading metadata from database.")
 
 	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
-	for path, title, author, comment, duration, bpm, last_played, age, style, fourier, cachetime in connection.execute("SELECT * FROM metadata"):
+	for path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, cachetime in connection.execute("SELECT * FROM metadata"):
 		new_metadata[path] = {
 			"path": path,
 			"title": title,
@@ -50,6 +50,7 @@ def load():
 			"last_played": last_played,
 			"age": age,
 			"style": style,
+			"energy": energy,
 			"fourier": fourier,
 			"cachetime": cachetime
 		}
@@ -74,6 +75,7 @@ def store():
 			last_played real,
 			age text,
 			style text,
+			energy text,
 			fourier text,
 			cachetime real
 		)""")
@@ -82,8 +84,8 @@ def store():
 
 	local_metadata = metadata  # Cache locally for performance.
 	for path, entry in local_metadata.items():
-		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, fourier, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["fourier"], entry["cachetime"]))
+		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["cachetime"]))
 	connection.commit()
 
 # When we change the database, save the database to disk after a short delay.
@@ -129,10 +131,12 @@ def add_file(path):
 		last_played = local_metadata[path]["last_played"]
 		age = local_metadata[path]["age"]
 		style = local_metadata[path]["style"]
+		energy = local_metadata[path]["energy"]
 	else:
 		last_played = -1  # Never played.
 		age = ""
 		style = ""
+		energy = ""
 	logging.debug(f"Updating metadata for {path}")
 
 	try:
@@ -177,6 +181,7 @@ def add_file(path):
 		"last_played": last_played,
 		"age": age,
 		"style": style,
+		"energy": energy,
 		"fourier": "",
 		"cachetime": last_modified
 	})

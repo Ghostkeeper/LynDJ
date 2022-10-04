@@ -27,19 +27,19 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		"""
 		super().__init__(parent)
 
-		self.column_fields = ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style"]
+		self.column_fields = ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy"]
 
 		self._directory = ""
 		prefs = preferences.Preferences.getInstance()
 		if not prefs.has("directory/sort_order"):
-			prefs.add("directory/sort_order", ["bpm", "last_played", "age", "style", "title", "duration", "author", "comment"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
+			prefs.add("directory/sort_order", ["bpm", "last_played", "age", "style", "energy", "title", "duration", "author", "comment"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
 		if not prefs.has("directory/sort_direction"):
-			prefs.add("directory/sort_direction", [False, False, False, False, False, False, False, False])  # For each sort order, whether it is descending (True) or ascending (False).
+			prefs.add("directory/sort_direction", [False, False, False, False, False, False, False, False, False])  # For each sort order, whether it is descending (True) or ascending (False).
 		self.music = []  # The actual data contained in this table.
 
 		if not prefs.has("directory/column_width"):
 			fraction = 1.0 / len(self.column_fields)  # Equal fraction for each column.
-			prefs.add("directory/column_width", [fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction])
+			prefs.add("directory/column_width", [fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction])
 
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
 		"""
@@ -122,7 +122,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		if role != PySide6.QtCore.Qt.DisplayRole:
 			return None
 		if orientation == PySide6.QtCore.Qt.Orientation.Horizontal:
-			return ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style"][section]
+			return ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy"][section]
 		elif orientation == PySide6.QtCore.Qt.Orientation.Vertical:
 			return self.music[section]["path"]
 		else:
