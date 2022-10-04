@@ -51,6 +51,39 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 	The fill colour of the nodes.
 	"""
 
+	@classmethod
+	def parse_waypoints(cls, waypoints_serialised) -> list:
+		"""
+		Parses a waypoints string to produce the waypoints it represents.
+
+		The format of the waypoints serialisation is human-readable and quite simple.
+		* The waypoints are separated by pipes, and are ordered by timestamp.
+		* Each individual waypoint consists of two floating point numbers, separated by semicolons.
+		* The first of the numbers represents the timestamp at which this waypoint occurs.
+		* The second of the numbers represents the level that must be achieved in this timestamp.
+
+		For example, a waypoint string may look like this:
+		``64.224167;0.5|66.224167;0.8|77.245023;0.8|77.2245023;0.4``
+		:param waypoints_serialised: A string representing a list of waypoints.
+		:return: The list of waypoints it represents, as list of tuples. The first element of each tuple is the
+		timestamp in seconds. The second is the level between 0 and 1.
+		"""
+		result = []
+		waypoints_list = waypoints_serialised.split("|")
+		for waypoint_str in waypoints_list:
+			waypoint_parts = waypoint_str.split(";")
+			if len(waypoint_parts) != 2:  # Incorrectly formatted. Each waypoint should be 2 numbers separated by a semicolon.
+				logging.warning(f"Incorrectly formatted waypoint: {waypoint_str}")
+				continue  # Skip.
+			try:
+				timestamp = float(waypoint_parts[0])
+				level = float(waypoint_parts[1])
+			except ValueError:
+				logging.warning(f"Incorrectly formatted float in waypoint: {waypoint_str}")
+				continue  # Skip.
+			result.append((timestamp, level))
+		return result
+
 	def __init__(self, path, field, parent=None) -> None:
 		"""
 		Creates a timeline element that shows and interacts with the waypoints for a certain property of songs.
@@ -66,22 +99,8 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.renderer = None  # To be filled by the initial call to update_visualisation.
 		self.duration = metadata.get(path, "duration")  # We need to know the duration of the song in order to draw the timestamps in the correct place.
 
-		# Fill the waypoint data from the metadata of the file.
-		self.waypoints = []  # List of tuples, giving first the timestamp in seconds, then the level between 0 and 1.
-		waypoints_serialised = metadata.get(path, field)
-		waypoints_list = waypoints_serialised.split("|")
-		for waypoint_str in waypoints_list:
-			waypoint_parts = waypoint_str.split(";")
-			if len(waypoint_parts) != 2:  # Incorrectly formatted. Each waypoint should be 2 numbers separated by a semicolon.
-				logging.warning(f"Incorrectly formatted waypoint for {path}/{field}: {waypoint_str}")
-				continue  # Skip.
-			try:
-				timestamp = float(waypoint_parts[0])
-				level = float(waypoint_parts[1])
-			except ValueError:
-				logging.warning(f"Incorrectly formatted float in waypoint for {path}/{field}: {waypoint_str}")
-				continue  # Skip.
-			self.waypoints.append((timestamp, level))
+		# Fill the waypoint data from the metadata of the file, then generate the initial graph.
+		self.waypoints = self.parse_waypoints(metadata.get(path, field))
 		self.generate_graph()
 
 	def generate_graph(self) -> None:
