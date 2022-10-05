@@ -136,3 +136,56 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		"""
 		if self.renderer:
 			self.renderer.render(painter)  # Simply forward to the renderer.
+
+	def add_transition(self, time_start, time_end, level_end) -> None:
+		"""
+		Inserts a transition to the waypoints of this song.
+
+		The starting point of the transition will determine the level of the start point. If this transition overlaps
+		with another transition's starting point, that transition will be erased in favour of the new one.
+		:param time_start: The timestamp of the start of the transition, in seconds.
+		:param time_end: The timestamp of the end of the transition, in seconds.
+		:param level_end: The level at the end of the transition, between 0 and 1.
+		"""
+		# First find where in the current set of transitions this new transition starts.
+		pos_start = 0
+		for pos_start in range(len(self.waypoints)):
+			if self.waypoints[pos_start][0] > time_start:
+				break  # Insert before this waypoint.
+
+		# Test whether this waypoint is within a transition or in between transitions.
+		if pos_start == 0:
+			starts_within = False  # Before the first waypoint is never inside of a transition.
+		elif self.waypoints[pos_start - 1][1] == self.waypoints[pos_start][1]:
+			starts_within = False  # If the levels around the new waypoint are the same, that's not within a transition.
+		else:
+			starts_within = True
+
+		# Test how many waypoints are overridden by the transition.
+		pos_end = pos_start
+		for pos_end in range(pos_start, len(self.waypoints)):
+			if self.waypoints[pos_end][0] > time_end:
+				break
+		# If the end waypoint is within a transition, expand the end position by 1 to also remove the end of that transition.
+		if pos_end != 0 and self.waypoints[pos_end - 1][1] != self.waypoints[pos_end][1]:
+			pos_end += 1
+
+		# Figure out the starting level.
+		if pos_start == 0:  # Must be the starting level then, i.e. the starting level of the first transition.
+			if len(self.waypoints) == 0:  # No transitions.
+				level_start = 0.5  # Default level.
+			else:
+				level_start = self.waypoints[0][1]
+		elif starts_within:  # Halfway between waypoints, so interpolate the level.
+			time_before = self.waypoints[pos_start - 1][0]
+			ratio = (time_start - time_before) / (self.waypoints[pos_start][0] - time_before)
+			level_before = self.waypoints[pos_start - 1][1]
+			level_start = level_before + ratio * (self.waypoints[pos_start][1] - level_before)
+		else:  # Between transitions, so it's easy then. Just take the level from either side, since they are the same.
+			level_start = self.waypoints[pos_start - 1][1]  # (Actually, do take before since it might also be after the last one.)
+
+		# Remove the waypoints that would get overridden.
+		del self.waypoints[pos_start : pos_end]
+		# Insert the new waypoints.
+		self.waypoints.insert(pos_start, (time_start, level_start))
+		self.waypoints.insert(pos_start + 1, (time_end, level_end))
