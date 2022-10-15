@@ -98,10 +98,10 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.current_field = field
 		self.svg = ""
 		self.renderer = None  # To be filled by the initial call to update_visualisation.
-		self.duration = metadata.get(path, "duration")  # We need to know the duration of the song in order to draw the timestamps in the correct place.
+		self.duration = 0  # We need to know the duration of the song in order to draw the timestamps in the correct place.
 
 		# Fill the waypoint data from the metadata of the file, then generate the initial graph.
-		self.waypoints = self.parse_waypoints(metadata.get(path, field))
+		self.waypoints = []
 		self.generate_graph()
 
 	path_changed = PySide6.QtCore.Signal()
@@ -116,6 +116,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 			self.waypoints = self.parse_waypoints(metadata.get(new_path, self.current_field))  # Update the waypoints to represent the new path.
 		except KeyError:  # Path doesn't exist. Happens at init when path is still empty string.
 			self.waypoints = []
+		self.duration = metadata.get(new_path, "duration")
 		self.generate_graph()
 
 	@PySide6.QtCore.Property(str, fset=set_path, notify=path_changed)
