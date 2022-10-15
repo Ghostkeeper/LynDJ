@@ -5,6 +5,7 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import logging
+import PySide6.QtCore  # For custom properties.
 import PySide6.QtQuick  # This class extends QQuickPaintedItem.
 import PySide6.QtSvg  # To render the graph.
 
@@ -84,17 +85,17 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 			result.append((timestamp, level))
 		return result
 
-	def __init__(self, path, field, parent=None) -> None:
+	def __init__(self, field, parent=None) -> None:
 		"""
 		Creates a timeline element that shows and interacts with the waypoints for a certain property of songs.
-		:param path: The path to the song, used to reference the metadata and store any changes to the waypoints.
+		:param path:
 		:param field: The type of waypoints to show and adjust, e.g. volume, bass, mids or treble. This should be one of
 		the metadata fields of the song.
 		:param parent: The parent QML element to store this element under.
 		"""
 		super().__init__(parent)
-		self.path = path
-		self.field = field
+		self.current_path = ""  # The path to the song, used to reference the metadata and store any changes to the waypoints.
+		self.current_field = field
 		self.svg = ""
 		self.renderer = None  # To be filled by the initial call to update_visualisation.
 		self.duration = metadata.get(path, "duration")  # We need to know the duration of the song in order to draw the timestamps in the correct place.
@@ -102,6 +103,28 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		# Fill the waypoint data from the metadata of the file, then generate the initial graph.
 		self.waypoints = self.parse_waypoints(metadata.get(path, field))
 		self.generate_graph()
+
+	path_changed = PySide6.QtCore.Signal()
+
+	def set_path(self, new_path) -> None:
+		"""
+		Change the current path.
+		:param new_path: The new path to store the waypoints of.
+		"""
+		self.current_path = new_path
+		try:
+			self.waypoints = self.parse_waypoints(metadata.get(new_path, self.current_field))  # Update the waypoints to represent the new path.
+		except KeyError:  # Path doesn't exist. Happens at init when path is still empty string.
+			self.waypoints = []
+		self.generate_graph()
+
+	@PySide6.QtCore.Property(str, fset=set_path, notify=path_changed)
+	def path(self) -> str:
+		"""
+		Get the currently assigned song path.
+		:return: The path to the track that this item represents the waypoints of.
+		"""
+		return self.current_path
 
 	def generate_graph(self) -> None:
 		"""
