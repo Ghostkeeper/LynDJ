@@ -88,14 +88,11 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 	def __init__(self, field, parent=None) -> None:
 		"""
 		Creates a timeline element that shows and interacts with the waypoints for a certain property of songs.
-		:param path:
-		:param field: The type of waypoints to show and adjust, e.g. volume, bass, mids or treble. This should be one of
-		the metadata fields of the song.
 		:param parent: The parent QML element to store this element under.
 		"""
 		super().__init__(parent)
 		self.current_path = ""  # The path to the song, used to reference the metadata and store any changes to the waypoints.
-		self.current_field = field
+		self.current_field = ""  # The type of waypoints to show and adjust, e.g. volume, bass, mids or treble. This should be one of the metadata fields of the song.
 		self.svg = ""
 		self.renderer = None  # To be filled by the initial call to update_visualisation.
 		self.duration = 0  # We need to know the duration of the song in order to draw the timestamps in the correct place.
@@ -126,6 +123,31 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		:return: The path to the track that this item represents the waypoints of.
 		"""
 		return self.current_path
+
+	field_changed = PySide6.QtCore.Signal()
+
+	def set_field(self, new_field) -> None:
+		"""
+		Change the current metadata field to display.
+		:param new_field: The new field to display.
+		"""
+		self.current_field = new_field
+		try:
+			self.waypoints = self.parse_waypoints(metadata.get(self.current_path, new_field))  # Update the waypoints to represent the new path.
+		except KeyError:  # Field doesn't exist. Happens at init when path is still empty string.
+			self.waypoints = []
+		self.generate_graph()
+
+	@PySide6.QtCore.Property(str, fset=set_field, notify=field_changed)
+	def field(self) -> str:
+		"""
+		Get the currently assigned metadata field that is displayed.
+
+		For example, you can display the volume, bass, mids or treble. This should be one of the metadata fields of the
+		file.
+		:return: The metadata field containing waypoints that is displayed in this image.
+		"""
+		return self.current_field
 
 	def generate_graph(self) -> None:
 		"""
