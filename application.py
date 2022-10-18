@@ -19,6 +19,7 @@ import playlist  # To register this with QML.
 import preferences  # To register this with QML and define some preferences.
 import storage  # To find the window icon.
 import theme  # To register this with QML.
+import waypoints_timeline  # To register this with QML.
 
 class Application(PySide6.QtGui.QGuiApplication):
 	"""
@@ -58,6 +59,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		PySide6.QtQml.qmlRegisterSingletonInstance(Application, "Lyn", 1, 0, "Application", self)
 		PySide6.QtQml.qmlRegisterSingletonInstance(player.Player, "Lyn", 1, 0, "Player", player.Player.get_instance())
 		PySide6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
+		PySide6.QtQml.qmlRegisterType(waypoints_timeline.WaypointsTimeline, "Lyn", 1, 0, "WaypointsTimeline")
 
 		logging.debug("Loading QML engine.")
 		self.engine = PySide6.QtQml.QQmlApplicationEngine()
