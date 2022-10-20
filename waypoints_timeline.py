@@ -12,6 +12,18 @@ import PySide6.QtSvg  # To render the graph.
 import metadata  # To get the waypoints of a song.
 import theme  # To get the cololurs to draw the graph in.
 
+
+def colour_to_hex(colour) -> str:
+	"""
+	Converts a QColor colour to a hex string that can be inserted in SVG code.
+
+	Transparency (the alpha channel) is not taken into account.
+	:param colour: A colour as obtained from the theme.
+	:return: A hex string appropriate for SVG.
+	"""
+	return hex(colour.red()) + hex(colour.green()) + hex(colour.blue())
+
+
 class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 	"""
 	This is a QML item that draws a waypoint graph on the screen, using lines and circles.
@@ -20,17 +32,6 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 	a given set of waypoints. The colours of the graph are also automatically adjusted to the theme, so no recolouring
 	is necessary.
 	"""
-
-	@classmethod
-	def colourToHex(cls, colour) -> str:
-		"""
-		Converts a QColor colour to a hex string that can be inserted in SVG code.
-
-		Transparency (the alpha channel) is not taken into account.
-		:param colour: A colour as obtained from the theme.
-		:return: A hex string appropriate for SVG.
-		"""
-		return hex(colour.red()) + hex(colour.green()) + hex(colour.blue())
 
 	line_width = 2
 	"""
@@ -42,12 +43,12 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 	The radius to draw the nodes with.
 	"""
 
-	colour = colourToHex(theme.Theme.getInstance().colours["foreground"])
+	colour = colour_to_hex(theme.Theme.getInstance().colours["foreground"])
 	"""
 	The colour of the lines and nodes.
 	"""
 
-	background_colour = colourToHex(theme.Theme.getInstance().colours["background"])
+	background_colour = colour_to_hex(theme.Theme.getInstance().colours["background"])
 	"""
 	The fill colour of the nodes.
 	"""
