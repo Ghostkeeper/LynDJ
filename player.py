@@ -232,6 +232,17 @@ class Player(PySide6.QtCore.QObject):
 		current_path = current_playlist[0]["path"]  # Don't request from the playlist, which may be outdated. Get directly from metadata.
 		return metadata.get(current_path, "title")
 
+	@PySide6.QtCore.Property(str, notify=songChanged)
+	def currentPath(self) -> str:
+		"""
+		Get the path to the current song.
+		:return: The path of the currently playing song.
+		"""
+		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
+		if len(current_playlist) == 0:
+			return ""
+		return current_playlist[0]["path"]
+
 	volume_changed = PySide6.QtCore.Signal()
 	"""
 	Triggered when something changes the playback volume of the current song.
