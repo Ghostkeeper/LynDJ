@@ -21,7 +21,7 @@ def colour_to_hex(colour) -> str:
 	:param colour: A colour as obtained from the theme.
 	:return: A hex string appropriate for SVG.
 	"""
-	return hex(colour.red()) + hex(colour.green()) + hex(colour.blue())
+	return hex(colour.red())[2:] + hex(colour.green())[2:] + hex(colour.blue())[2:]
 
 
 class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
