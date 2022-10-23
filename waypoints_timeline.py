@@ -86,7 +86,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 			result.append((timestamp, level))
 		return result
 
-	def __init__(self, field, parent=None) -> None:
+	def __init__(self, parent=None) -> None:
 		"""
 		Creates a timeline element that shows and interacts with the waypoints for a certain property of songs.
 		:param parent: The parent QML element to store this element under.
