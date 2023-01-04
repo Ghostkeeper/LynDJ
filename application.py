@@ -12,6 +12,7 @@ import PySide6.QtCore
 import PySide6.QtGui  # This is a GUI application.
 import PySide6.QtQml  # To register types with the QML engine.
 
+import background_tasks  # To register this with QML.
 import metadata  # Loading metadata on start-up.
 import music_directory  # To register this with QML.
 import player  # To register this with QML.
@@ -58,6 +59,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		PySide6.QtQml.qmlRegisterSingletonInstance(playlist.Playlist, "Lyn", 1, 0, "Playlist", playlist.Playlist.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(Application, "Lyn", 1, 0, "Application", self)
 		PySide6.QtQml.qmlRegisterSingletonInstance(player.Player, "Lyn", 1, 0, "Player", player.Player.get_instance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(background_tasks.BackgroundTasks, "Lyn", 1, 0, "BackgroundTasks", background_tasks.BackgroundTasks.get_instance())
 		PySide6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
 		PySide6.QtQml.qmlRegisterType(waypoints_timeline.WaypointsTimeline, "Lyn", 1, 0, "WaypointsTimeline")
 
