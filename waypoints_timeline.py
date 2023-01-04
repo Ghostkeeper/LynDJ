@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2022 Ghostkeeper
+# Copyright (C) 2023 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -10,8 +10,7 @@ import PySide6.QtQuick  # This class extends QQuickPaintedItem.
 import PySide6.QtSvg  # To render the graph.
 
 import metadata  # To get the waypoints of a song.
-import theme  # To get the cololurs to draw the graph in.
-
+import theme  # To get the colours to draw the graph in.
 
 def colour_to_hex(colour) -> str:
 	"""
@@ -43,12 +42,12 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 	The radius to draw the nodes with.
 	"""
 
-	colour = colour_to_hex(theme.Theme.getInstance().colours["foreground"])
+	colour = "000000"
 	"""
 	The colour of the lines and nodes.
 	"""
 
-	background_colour = colour_to_hex(theme.Theme.getInstance().colours["background"])
+	background_colour = "FFFFFF"
 	"""
 	The fill colour of the nodes.
 	"""
@@ -97,6 +96,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.svg = ""
 		self.renderer = None  # To be filled by the initial call to update_visualisation.
 		self.duration = 0  # We need to know the duration of the song in order to draw the timestamps in the correct place.
+
+		self.colour = colour_to_hex(theme.Theme.getInstance().colours["foreground"])
+		self.background_colour = colour_to_hex(theme.Theme.getInstance().colours["background"])
 
 		# Fill the waypoint data from the metadata of the file, then generate the initial graph.
 		self.waypoints = []
