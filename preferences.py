@@ -113,7 +113,10 @@ class Preferences(PySide6.QtCore.QObject):
 		logging.info(f"Loading preferences from: {filepath}")
 		with open(filepath) as f:
 			self.values = copy.deepcopy(self.defaults)
-			self.values.update(json.load(f))
+			try:
+				self.values.update(json.load(f))
+			except json.JSONDecodeError:
+				logging.error("Could not load preferences. Resetting preferences!")
 
 	def save(self) -> None:
 		"""
