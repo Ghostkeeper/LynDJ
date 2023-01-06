@@ -53,6 +53,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		:param task: A callable object, which executes the task to be done in the background.
 		"""
 		self.tasks.put(task)
+		self.progressChanged.emit()
 
 	def worker(self):
 		"""
