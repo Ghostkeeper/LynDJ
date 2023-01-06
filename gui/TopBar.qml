@@ -5,6 +5,7 @@
 //You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import QtQuick 2.15
+import QtQuick.Controls 2.15
 
 import "./widgets" as Widgets
 import Lyn 1.0 as Lyn
@@ -15,6 +16,45 @@ Rectangle {
 	height: Lyn.Theme.size["topbar"].height
 
 	color: Lyn.Theme.colour["primary_background"]
+
+	Item {
+		anchors {
+			top: parent.top
+			topMargin: Lyn.Theme.size["margin"].height
+			right: parent.right
+			rightMargin: Lyn.Theme.size["margin"].width
+			bottom: parent.bottom
+			bottomMargin: Lyn.Theme.size["margin"].height
+		}
+		width: childrenRect.width
+
+		visible: Lyn.BackgroundTasks.progress != 1.0 //Only visible if there is something processing.
+
+		Widgets.ColourImage {
+			id: processing_icon
+			height: parent.height - Lyn.Theme.size["margin"].height - progress_bar.height
+			width: height
+
+			source: Lyn.Theme.icon["processing"]
+			colour: Lyn.Theme.colour["foreground"]
+		}
+
+		ProgressBar {
+			id: progress_bar
+			anchors.top: processing_icon.bottom
+			anchors.topMargin: Lyn.Theme.size["margin"].height
+			width: processing_icon.width
+			height: Lyn.Theme.size["lining"].height
+
+			value: Lyn.BackgroundTasks.progress
+			background: Item {} //No background.
+			contentItem: Rectangle {
+				width: progress_bar.visualPosition * progress_bar.width
+				height: progress_bar.height
+				color: Lyn.Theme.colour["foreground"]
+			}
+		}
+	}
 
 	//Border extends below the actual size of the top bar!
 	Item {
