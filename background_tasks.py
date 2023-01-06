@@ -99,3 +99,19 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		if self.tasks.empty():
 			return 1.0
 		return self.num_done / (self.num_done + self.tasks.qsize())
+
+	@PySide6.QtCore.Property(int, notify=progressChanged)
+	def numDone(self):
+		"""
+		Get the amount of tasks that have been completed since the last time the queue was empty.
+		:return: The amount of tasks done.
+		"""
+		return self.num_done
+
+	@PySide6.QtCore.Property(int, notify=progressChanged)
+	def numTotal(self):
+		"""
+		Get the amount of tasks that are queued since the last time the queue was empty.
+		:return: The amount of tasks to do plus the amount of tasks done.
+		"""
+		return self.num_done + self.tasks.qsize()

@@ -17,7 +17,7 @@ Rectangle {
 
 	color: Lyn.Theme.colour["primary_background"]
 
-	Item {
+	MouseArea {
 		anchors {
 			top: parent.top
 			topMargin: Lyn.Theme.size["margin"].height
@@ -29,6 +29,9 @@ Rectangle {
 		width: childrenRect.width
 
 		visible: Lyn.BackgroundTasks.progress != 1.0 //Only visible if there is something processing.
+		hoverEnabled: visible
+		ToolTip.visible: visible && containsMouse
+		ToolTip.text: "Background tasks: " + Lyn.BackgroundTasks.numDone + " / " + Lyn.BackgroundTasks.numTotal
 
 		Widgets.ColourImage {
 			id: processing_icon
