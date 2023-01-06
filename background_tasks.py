@@ -62,8 +62,10 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		"""
 		while True:
 			time.sleep(1)  # 1 second gives reasonably low priority to checking if there are any tasks to run.
-
-			task = self.tasks.get()
+			try:
+				task = self.tasks.get(block=False)
+			except queue.Empty:
+				continue  # Just check again 1 iteration later.
 			task()  # Execute this task.
 			self.num_done += 1
 			if self.tasks.empty():
