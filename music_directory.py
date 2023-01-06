@@ -210,12 +210,12 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 
 		# Add background tasks for caching Fourier images.
 		def cache_fourier(path):
-			fourier_file = metadata.get(path, "fourier")
-			if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
-				player.Player.get_instance().load_and_generate_fourier(path)
+			player.Player.get_instance().load_and_generate_fourier(path)
 		tasks = background_tasks.BackgroundTasks.get_instance()
 		for path in files:
-			tasks.add(lambda p=path: cache_fourier(p), allow_during_playback=False)
+			fourier_file = metadata.get(path, "fourier")
+			if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
+				tasks.add(lambda p=path: cache_fourier(p), allow_during_playback=False)
 
 	@PySide6.QtCore.Property(str, fset=directory_set)
 	def directory(self) -> str:
