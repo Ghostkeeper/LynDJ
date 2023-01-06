@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2022 Ghostkeeper
+# Copyright (C) 2023 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -146,9 +146,29 @@ class Player(PySide6.QtCore.QObject):
 
 		metadata.change(next_song, "last_played", time.time())
 
+	def load_and_generate_fourier(self, path):
+		"""
+		Load a sound waveform and generate a Fourier image with it.
+
+		This is less efficient than generating a Fourier image from an already loaded sound. The waveform is discarded
+		afterwards.
+		The resulting Fourier image is stored on disk, to be cached for later use.
+		If there is already a Fourier image for this sound, it is not re-generated.
+		:param path: The path to the file we're generating the Fourier transform for.
+		"""
+		logging.debug(f"Caching Fourier image for {path}")
+		fourier_file = metadata.get(path, "fourier")
+		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
+			waveform = pygame.mixer.Sound(path)
+			fourier = self.generate_fourier(waveform, path)
+			filename = os.path.splitext(os.path.basename(path))[0] + uuid.uuid4().hex[:8] + ".png"  # File's filename, but with an 8-character random string to prevent collisions.
+			filepath = os.path.join(storage.cache(), "fourier", filename)
+			fourier.save(filepath)
+			metadata.change(path, "fourier", filepath)
+
 	def generate_fourier(self, sound, path):
 		"""
-		Generate an image of the fourier transform of a track.
+		Generate an image of the Fourier transform of a track.
 		:param sound: A sound sample to generate the Fourier transform from.
 		:param path: A path to the file we're generating the Fourier transform for.
 		:return: A QImage of the Fourier transform of the given track.

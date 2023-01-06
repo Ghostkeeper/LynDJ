@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2022 Ghostkeeper
+# Copyright (C) 2023 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -11,7 +11,9 @@ import os.path  # To list file paths in the music directory.
 import PySide6.QtCore  # To expose this table to QML.
 import time  # To display the last played time relative to the current time.
 
+import background_tasks
 import metadata  # To get information about the files in the music directory.
+import player  # To cache Fourier images of the tracks in this directory.
 import preferences  # To store the sorting order.
 import sorting  # To invert a sorting order.
 
@@ -205,6 +207,13 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		self.resort()  # In the same sorting order as what the table is currently configured at.
 
 		self._directory = new_directory
+
+		# Add background tasks for caching Fourier images.
+		def cache_fourier(path):
+			player.Player.get_instance().load_and_generate_fourier(path)
+		tasks = background_tasks.BackgroundTasks.get_instance()
+		for path in files:
+			tasks.add(lambda p=path: cache_fourier(p))
 
 	@PySide6.QtCore.Property(str, fset=directory_set)
 	def directory(self) -> str:
