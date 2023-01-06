@@ -9,6 +9,8 @@ import queue  # A task queue.
 import threading  # To run tasks in a background thread.
 import time  # To sleep the background thread regularly.
 
+import player  # To test if music is playing. Some tasks may not execute while music is playing.
+
 class BackgroundTasks(PySide6.QtCore.QObject):
 	"""
 	A runner that runs computation tasks in the background.
@@ -47,12 +49,14 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		self.num_done = 0  # How many tasks were completed since the queue was last empty. This is used to show a progress bar.
 		self.runner_thread.start()
 
-	def add(self, task):
+	def add(self, task, allow_during_playback=True):
 		"""
 		Add a task to be executed in the background.
 		:param task: A callable object, which executes the task to be done in the background.
+		:param allow_during_playback: If True, this task can be executed at any time. If False, this task is not allowed
+		to be executed while music is playing.
 		"""
-		self.tasks.put(task)
+		self.tasks.put((task, allow_during_playback))
 		self.progressChanged.emit()
 
 	def worker(self):
@@ -64,9 +68,12 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		while True:
 			time.sleep(0.1)  # 0.1 seconds gives reasonably low priority to checking if there are any tasks to run.
 			try:
-				task = self.tasks.get(block=False)
+				task, allow_during_playback = self.tasks.get(block=False)
 			except queue.Empty:
 				continue  # Just check again 1 iteration later.
+			if not allow_during_playback and player.Player.get_instance().isPlaying:
+				self.tasks.put((task, allow_during_playback))  # Put it back at the end of the queue.
+				continue
 			task()  # Execute this task.
 			self.num_done += 1
 			if self.tasks.empty():

@@ -215,7 +215,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 				player.Player.get_instance().load_and_generate_fourier(path)
 		tasks = background_tasks.BackgroundTasks.get_instance()
 		for path in files:
-			tasks.add(lambda p=path: cache_fourier(p))
+			tasks.add(lambda p=path: cache_fourier(p), allow_during_playback=False)
 
 	@PySide6.QtCore.Property(str, fset=directory_set)
 	def directory(self) -> str:
