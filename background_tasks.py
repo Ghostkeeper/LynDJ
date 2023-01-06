@@ -45,6 +45,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		self.runner_thread = threading.Thread(target=self.worker, daemon=True)
 		self.tasks = queue.SimpleQueue()  # A list of callables containing tasks to execute.
 		self.num_done = 0  # How many tasks were completed since the queue was last empty. This is used to show a progress bar.
+		self.runner_thread.start()
 
 	def add(self, task):
 		"""
