@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2022 Ghostkeeper
+# Copyright (C) 2023 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -14,6 +14,8 @@ import mutagen.ogg
 import mutagen.wave
 import os.path  # To know where to store the database.
 import PySide6.QtCore  # For a timer to write the database.
+import threading  # To store the database after a certain amount of time.
+import time  # To store the database after a certain amount of time.
 import sqlite3  # To cache metadata on disk.
 
 import storage  # To know where to store the database.
@@ -60,6 +62,42 @@ def load():
 		}
 	metadata.update(new_metadata)
 
+# When we change the database, save the database to disk after a short delay.
+# If there's multiple changes in short succession, those will be combined into a single write.
+def store_after():
+	"""
+	Waits a certain amount of time, then stores the metadata to disk.
+
+	This function should be run on a thread, so as to not freeze the application.
+	"""
+	time.sleep(0.25)
+	store()
+	global store_thread
+	store_thread = None
+
+store_thread = None
+"""
+Thread that waits a moment, and then stores the database.
+
+The wait is to coalesce more changes into a single write, if many metadata entries change at once.
+
+If this thread is None, no thread is running and a new thread should be started if there is more metadata to write. If
+the thread is still running, the database is not yet saved.
+
+Note that this is imperfect. If the metadata changes while the database is still writing (after the sleep), the latest
+changes will not be written to disk. As such, it is wise to also save the database at application closing. 
+"""
+
+def trigger_store():
+	"""
+	After a set amount of time, triggers the serialisation of metadata to disk.
+	"""
+	global store_thread
+	if store_thread is None:
+		store_thread = threading.Thread(target=store_after)
+	if not store_thread.is_alive():
+		store_thread.start()
+
 def store():
 	"""
 	Serialises the metadata on disk in a database file.
@@ -96,8 +134,6 @@ def store():
 			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"]))
 	connection.commit()
 
-# When we change the database, save the database to disk after a short delay.
-# If there's multiple changes in short succession, those will be combined into a single write.
 store_timer = PySide6.QtCore.QTimer()
 store_timer.setSingleShot(True)
 store_timer.setInterval(250)
@@ -120,7 +156,7 @@ def add(path, entry):
 	:param entry: A dictionary containing metadata.
 	"""
 	metadata[path] = entry
-	store_timer.start()
+	trigger_store()
 
 def add_file(path):
 	"""
@@ -253,7 +289,7 @@ def change(path, key, value) -> None:
 			return
 
 	metadata[path][key] = value
-	store_timer.start()
+	trigger_store()
 
 def is_music_file(path) -> bool:
 	"""

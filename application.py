@@ -93,4 +93,5 @@ class Application(PySide6.QtGui.QGuiApplication):
 		"""
 		Triggered when the main window is closed.
 		"""
+		metadata.store()  # Write any last changes to disk.
 		player.Player.control_thread = None
