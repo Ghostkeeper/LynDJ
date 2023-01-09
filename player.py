@@ -10,6 +10,7 @@ import mutagen  # To get metadata on the samples of the sound.
 import numpy  # For the Fourier transform in Scipy.
 import os.path  # To cache Fourier transform images.
 import pydub  # The media player we're using to play music.
+import pydub.utils  # For our custom silence detector.
 import pydub.playback  # The playback module of Pydub.
 import PySide6.QtCore  # Exposing the player to QML.
 import PySide6.QtGui  # For the QImage to display the Fourier transform.
@@ -133,7 +134,8 @@ class Player(PySide6.QtCore.QObject):
 			codec = "flac"
 		else:
 			codec = None
-		Player.current_track = pydub.AudioSegment.from_file(next_song, codec=codec)
+		track = pydub.AudioSegment.from_file(next_song, codec=codec)
+		Player.current_track = self.trim_silence(track)
 		Player.control_track = music_control.MusicControl(next_song, Player.current_track, self)
 
 		fourier_file = metadata.get(next_song, "fourier")
@@ -151,6 +153,34 @@ class Player(PySide6.QtCore.QObject):
 
 		metadata.change(next_song, "last_played", time.time())
 
+	def trim_silence(self, track):
+		"""
+		Trims silence from the start and end of a track.
+		:param track: A track to trim.
+		:return: A trimmed track.
+		"""
+		threshold_db = -64  # If the volume gets below -64db, we consider it silence.
+		threshold_value = pydub.utils.db_to_float(threshold_db) * track.max_possible_amplitude
+		slice_size = 10  # Break the audio in 10ms slices, to check each slice for its volume.
+
+		# Forward scan from the start.
+		pos = 0
+		for pos in range(0, len(track), slice_size):
+			slice = track[pos:pos + slice_size]
+			if slice.rms > threshold_value:
+				break
+		start_trim = pos
+
+		# Backward scan from the end.
+		pos = len(track) - slice_size
+		for pos in range(len(track) - slice_size, 0, -slice_size):
+			slice = track[pos:pos + slice_size]
+			if slice.rms > threshold_value:
+				break
+		end_trim = pos + slice_size
+
+		return track[start_trim:end_trim]
+
 	def load_and_generate_fourier(self, path):
 		"""
 		Load a sound waveform and generate a Fourier image with it.
@@ -165,6 +195,7 @@ class Player(PySide6.QtCore.QObject):
 		fourier_file = metadata.get(path, "fourier")
 		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
 			segment = pydub.AudioSegment.from_file(path)
+			segment = self.trim_silence(segment)
 			fourier = self.generate_fourier(segment, path)
 			filename = os.path.splitext(os.path.basename(path))[0] + uuid.uuid4().hex[:8] + ".png"  # File's filename, but with an 8-character random string to prevent collisions.
 			filepath = os.path.join(storage.cache(), "fourier", filename)
