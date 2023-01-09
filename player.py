@@ -144,8 +144,6 @@ class Player(PySide6.QtCore.QObject):
 			fourier.save(filepath)
 			metadata.change(next_song, "fourier", filepath)
 
-		#Player.current_track.set_volume(Player.main_volume)  # Also apply the volume to this new track.
-
 		self.songChanged.emit()  # We loaded up a new song.
 		Player.start_time = time.time()
 		playback.play(Player.current_track)
@@ -286,8 +284,6 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		if Player.main_volume != value:
 			Player.main_volume = value
-			if Player.current_track is not None:
-				Player.current_track.set_volume(value)
 			self.volume_changed.emit()
 
 	@PySide6.QtCore.Property(float, fset=set_volume, notify=volume_changed)

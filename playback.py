@@ -5,6 +5,7 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import pyaudio  # Used to play audio.
+import pydub.utils  # For volume effects.
 import time  # To sleep the thread when there is no audio to play.
 import threading  # The audio is played on a different thread.
 
@@ -31,6 +32,21 @@ def swap(new_audio):
 	"""
 	global audio_source
 	audio_source = new_audio
+
+def filter(chunk):
+	"""
+	Apply effects to a chunk of audio.
+
+	This will be called on each chunk individually, which is a short interval of audio, so it should perform well.
+
+	The filters applied currently are:
+	- Volume.
+	:param chunk: A chunk of audio.
+	:return: A filtered chunk of audio.
+	"""
+	volume = player.Player.main_volume
+	gain = pydub.utils.ratio_to_db(volume)
+	return chunk + gain
 
 def play_loop():
 	"""
@@ -61,7 +77,9 @@ def play_loop():
 				current_rate = audio_source.frame_rate
 				current_channels = audio_source.channels
 				stream = audio_server.open(format=audio_server.get_format_from_width(current_sample_width), rate=current_rate, channels=current_channels, output=True)
-			stream.write(audio_source[current_position:current_position + chunk_size]._data)
+			chunk = audio_source[current_position:current_position + chunk_size]
+			chunk = filter(chunk)
+			stream.write(chunk._data)
 			current_position += chunk_size
 	finally:
 		if stream:
