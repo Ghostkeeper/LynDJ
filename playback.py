@@ -57,6 +57,7 @@ def play_loop():
 	necessary.
 	"""
 	global current_position
+	global audio_source
 	audio_server = None
 	stream = None
 	try:
@@ -77,9 +78,12 @@ def play_loop():
 				current_rate = audio_source.frame_rate
 				current_channels = audio_source.channels
 				stream = audio_server.open(format=audio_server.get_format_from_width(current_sample_width), rate=current_rate, channels=current_channels, output=True)
+			if current_position >= len(audio_source):  # Playback completed. Stop taking the GIL and go into stand-by.
+				audio_source = None
+				continue
 			chunk = audio_source[current_position:current_position + chunk_size]
 			chunk = filter(chunk)
-			stream.write(chunk._data)
+			stream.write(chunk.raw_data)
 			current_position += chunk_size
 	finally:
 		if stream:
