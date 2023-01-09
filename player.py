@@ -243,11 +243,9 @@ class Player(PySide6.QtCore.QObject):
 		If there is no current song playing, this returns 0.
 		:return: The duration of the current song, in seconds.
 		"""
-		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
-		if len(current_playlist) == 0:
+		if Player.current_track is None:
 			return 0
-		current_path = current_playlist[0]["path"]
-		return metadata.get(current_path, "duration")
+		return len(Player.current_track) / 1000.0
 
 	@PySide6.QtCore.Property(str, notify=songChanged)
 	def currentTitle(self) -> str:
