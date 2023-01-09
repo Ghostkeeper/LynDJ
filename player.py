@@ -188,6 +188,10 @@ class Player(PySide6.QtCore.QObject):
 		prefs = preferences.Preferences.getInstance()
 		num_chunks = prefs.get("player/fourier_samples")
 		num_channels = prefs.get("player/fourier_channels")
+		if len(waveform) == 0:  # We were unable to read the audio file.
+			logging.error(f"Unable to read waveform from audio file to generate Fourier: {path}")
+			return PySide6.QtGui.QImage(numpy.zeros((num_channels, num_chunks), dtype=numpy.ubyte), num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)
+
 		waveform_numpy = numpy.frombuffer(waveform, dtype=waveform_dtype)[::stereo_channels]  # Only take one channel, e.g. the left stereo channel.
 		chunks = numpy.array_split(waveform_numpy, num_chunks)  # Split the sound in chunks, each of which will be displayed as 1 horizontal pixel.
 		chunk_size = len(chunks[0])
