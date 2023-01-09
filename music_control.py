@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2022 Ghostkeeper
+# Copyright (C) 2023 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -35,13 +35,13 @@ class MusicControl:
 		prefs = preferences.Preferences.getInstance()
 		if not prefs.has("player/silence"):
 			prefs.add("player/silence", 2.0)  # The pause between songs.
-		pause_between_songs = prefs.get("player/silence")
+		pause_between_songs = prefs.get("player/silence") * 1000
 
 		# Create a list of events for this track.
 		self.events = []
-		duration = metadata.get(path, "duration")
+		duration = len(sound)
 		song_end_timer = PySide6.QtCore.QTimer()
-		song_end_timer.setInterval(round((duration + pause_between_songs) * 1000))
+		song_end_timer.setInterval(round(duration + pause_between_songs))
 		song_end_timer.setSingleShot(True)
 		song_end_timer.timeout.connect(self.song_ends)
 		self.events.append(song_end_timer)
