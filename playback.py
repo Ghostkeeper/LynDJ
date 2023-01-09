@@ -8,17 +8,38 @@ import pyaudio  # Used to play audio.
 import time  # To sleep the thread when there is no audio to play.
 import threading  # The audio is played on a different thread.
 
+import player  # To get the playback parameters.
+
 audio_source = None
 chunk_size = 100  # Size of chunks to send to audio server, in ms. Larger chunks are more efficient, but cause greater delays.
 current_position = 0  # Location in the file where we are currently playing (in ms).
 
 def play(new_audio):
+	"""
+	Start the playback of a new audio source.
+	:param new_audio: The new audio source to play.
+	"""
 	global audio_source
 	audio_source = new_audio
 	global current_position
-	current_position = 0
+	current_position = 0  # Start from the start.
+
+def swap(new_audio):
+	"""
+	Swap out an audio source for another without changing the playback position.
+	:param new_audio: The new audio source to play.
+	"""
+	global audio_source
+	audio_source = new_audio
 
 def play_loop():
+	"""
+	Main loop of the playback server.
+
+	This function runs indefinitely. It should be ran on a different thread than the main GUI thread.
+	It will continuously look for the current position in the current audio source and play it, applying filters if
+	necessary.
+	"""
 	global current_position
 	audio_server = None
 	stream = None

@@ -99,7 +99,8 @@ class Player(PySide6.QtCore.QObject):
 			self.play_next()
 		elif Player.current_track is not None and not new_is_playing:
 			logging.info(f"Stopping playback.")
-			Player.current_track.fadeout(round(preferences.Preferences.getInstance().get("player/fadeout") * 1000))  # Fade-out, convert to milliseconds for Pygame.
+			fading = Player.current_track.fade(to_gain=-120, start=playback.current_position, duration=round(preferences.Preferences.getInstance().get("player/fadeout") * 1000))
+			playback.swap(fading)
 			Player.current_track = None
 			Player.control_track.stop()
 			Player.control_track = None
