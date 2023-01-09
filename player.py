@@ -9,7 +9,8 @@ import math  # Transformations on the Fourier transform.
 import mutagen  # To get metadata on the samples of the sound.
 import numpy  # For the Fourier transform in Scipy.
 import os.path  # To cache Fourier transform images.
-import pygame  # The media player we're using to play music.
+import pydub  # The media player we're using to play music.
+import pydub.playback  # The playback module of Pydub.
 import PySide6.QtCore  # Exposing the player to QML.
 import PySide6.QtGui  # For the QImage to display the Fourier transform.
 import scipy.fft  # For the Fourier transform.
@@ -18,6 +19,7 @@ import uuid  # To generate filenames for the Fourier transform cache.
 
 import metadata  # To find or generate the Fourier transform image.
 import music_control  # To control the currently playing track.
+import playback  # To actually play the music.
 import preferences  # To get the playlist.
 import storage  # To cache Fourier transform images.
 
@@ -126,7 +128,11 @@ class Player(PySide6.QtCore.QObject):
 
 		next_song = current_playlist[0]["path"]
 		logging.info(f"Starting playback of track: {next_song}")
-		Player.current_track = pygame.mixer.Sound(next_song)
+		if next_song.endswith(".flac"):
+			codec = "flac"
+		else:
+			codec = None
+		Player.current_track = pydub.AudioSegment.from_file(next_song, codec=codec)
 		Player.control_track = music_control.MusicControl(next_song, Player.current_track, self)
 
 		fourier_file = metadata.get(next_song, "fourier")
@@ -137,11 +143,11 @@ class Player(PySide6.QtCore.QObject):
 			fourier.save(filepath)
 			metadata.change(next_song, "fourier", filepath)
 
-		Player.current_track.set_volume(Player.main_volume)  # Also apply the volume to this new track.
+		#Player.current_track.set_volume(Player.main_volume)  # Also apply the volume to this new track.
 
 		self.songChanged.emit()  # We loaded up a new song.
 		Player.start_time = time.time()
-		Player.current_track.play()
+		playback.play(Player.current_track)
 		Player.control_track.play()
 
 		metadata.change(next_song, "last_played", time.time())
@@ -159,8 +165,8 @@ class Player(PySide6.QtCore.QObject):
 		logging.debug(f"Caching Fourier image for {path}")
 		fourier_file = metadata.get(path, "fourier")
 		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
-			waveform = pygame.mixer.Sound(path)
-			fourier = self.generate_fourier(waveform, path)
+			segment = pydub.AudioSegment.from_file(path)
+			fourier = self.generate_fourier(segment, path)
 			filename = os.path.splitext(os.path.basename(path))[0] + uuid.uuid4().hex[:8] + ".png"  # File's filename, but with an 8-character random string to prevent collisions.
 			filepath = os.path.join(storage.cache(), "fourier", filename)
 			fourier.save(filepath)
@@ -184,7 +190,7 @@ class Player(PySide6.QtCore.QObject):
 		waveform_dtype = numpy.byte if bit_depth == 8 else numpy.short
 
 		# Get the waveform and transform it into frequency space.
-		waveform = sound.get_raw()
+		waveform = sound.get_array_of_samples()
 		prefs = preferences.Preferences.getInstance()
 		num_chunks = prefs.get("player/fourier_samples")
 		num_channels = prefs.get("player/fourier_channels")
