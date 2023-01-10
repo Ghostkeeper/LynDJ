@@ -178,7 +178,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		"""
 		width = self.width()
 		height = self.height()
-		svg = "<svg version=\"1.0\">\n"
+		svg = f"<svg version=\"1.0\" width=\"{width}\" height=\"{height}\">\n"
 
 		nodes = []
 		polyline = ""
