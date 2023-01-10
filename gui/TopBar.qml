@@ -75,6 +75,20 @@ Rectangle {
 			onClicked: Lyn.Player.mono = !Lyn.Player.mono
 			ToolTip.text: Lyn.Player.mono ? "Mono" : "Stereo"
 		}
+
+		//Preferences screen.
+		Widgets.ImageButton {
+			height: parent.height
+			width: height
+
+			source: Lyn.Theme.icon["preferences"]
+			colour: Lyn.Theme.colour["foreground"]
+			onClicked: preferences.show()
+
+			Preferences {
+				id: preferences
+			}
+		}
 	}
 
 	//Border extends below the actual size of the top bar!
