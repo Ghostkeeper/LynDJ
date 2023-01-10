@@ -87,6 +87,17 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 			result.append((timestamp, level))
 		return result
 
+	@classmethod
+	def serialise_waypoints(cls, waypoints):
+		"""
+		Serialise the waypoints to a string, so that it can be stored in a database.
+
+		For a reference to the format of this serialisation, see the parse_waypoints function documentation.
+		:param waypoints: A list of waypoints to serialise.
+		:return: A string representing that list of waypoints.
+		"""
+		return "|".join([";".join([str(part) for part in waypoint]) for waypoint in waypoints])
+
 	def __init__(self, parent=None) -> None:
 		"""
 		Creates a timeline element that shows and interacts with the waypoints for a certain property of songs.
@@ -247,6 +258,11 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		# Insert the new waypoints.
 		self.waypoints.insert(pos_start, (time_start, level_start))
 		self.waypoints.insert(pos_start + 1, (time_end, level_end))
+
+		# Store this information and re-render.
+		metadata.change(self.current_path, self.current_field, self.serialise_waypoints(self.waypoints))
+		self.generate_graph()
+		self.update()
 
 	@PySide6.QtCore.Slot()
 	def start_transition(self) -> None:
