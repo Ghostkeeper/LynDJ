@@ -215,7 +215,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		for path in files:
 			fourier_file = metadata.get(path, "fourier")
 			if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
-				tasks.add(lambda p=path: cache_fourier(p), allow_during_playback=False)
+				tasks.add(lambda p=path: cache_fourier(p), "Generating spectrograph", allow_during_playback=False)
 
 	@PySide6.QtCore.Property(str, fset=directory_set)
 	def directory(self) -> str:

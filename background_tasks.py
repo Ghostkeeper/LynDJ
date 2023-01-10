@@ -47,16 +47,18 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		self.runner_thread = threading.Thread(target=self.worker, daemon=True)
 		self.tasks = queue.SimpleQueue()  # A list of callables containing tasks to execute.
 		self.num_done = 0  # How many tasks were completed since the queue was last empty. This is used to show a progress bar.
+		self.current_description = ""
 		self.runner_thread.start()
 
-	def add(self, task, allow_during_playback=True):
+	def add(self, task, description, allow_during_playback=True):
 		"""
 		Add a task to be executed in the background.
 		:param task: A callable object, which executes the task to be done in the background.
+		:param description: A user-readable description of what the task is doing.
 		:param allow_during_playback: If True, this task can be executed at any time. If False, this task is not allowed
 		to be executed while music is playing.
 		"""
-		self.tasks.put((task, allow_during_playback))
+		self.tasks.put((task, description, allow_during_playback))
 		self.progressChanged.emit()
 
 	def worker(self):
@@ -68,16 +70,20 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		while True:
 			time.sleep(0.1)  # 0.1 seconds gives reasonably low priority to checking if there are any tasks to run.
 			try:
-				task, allow_during_playback = self.tasks.get(block=False)
+				task, description, allow_during_playback = self.tasks.get(block=False)
 			except queue.Empty:
 				continue  # Just check again 1 iteration later.
 			if not allow_during_playback and player.Player.get_instance().isPlaying:
-				self.tasks.put((task, allow_during_playback))  # Put it back at the end of the queue.
+				self.tasks.put((task, description, allow_during_playback))  # Put it back at the end of the queue.
 				continue
+			if self.current_description != description:
+				self.current_description = description
+				self.progressChanged.emit()
 			task()  # Execute this task.
 			self.num_done += 1
 			if self.tasks.empty():
 				self.num_done = 0
+				self.current_description = ""
 			self.progressChanged.emit()  # Tell the front-end to update its progress trackers.
 
 	progressChanged = PySide6.QtCore.Signal()
@@ -115,3 +121,11 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		:return: The amount of tasks to do plus the amount of tasks done.
 		"""
 		return self.num_done + self.tasks.qsize()
+
+	@PySide6.QtCore.Property(str, notify=progressChanged)
+	def currentDescription(self):
+		"""
+		Get a human-readable description of the currently running task.
+		:return: A description of the currently running task.
+		"""
+		return self.current_description
