@@ -112,6 +112,45 @@ Window {
 					color: Lyn.Theme.colour["foreground"]
 				}
 			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SpinBox {
+					id: silence_time
+					anchors.right: parent.right
+
+					//SpinBox only supports integers, so do everything times 10 to allow 0.1 second intervals.
+					value: Math.round(Lyn.Preferences.preferences["player/silence"] * 10)
+					from: 0
+					to: 100
+
+					onValueModified: {
+						Lyn.Preferences.set("player/silence", value / 10)
+					}
+
+					validator: DoubleValidator {
+						bottom: fadeout_time.from
+						top: fadeout_time.to
+					}
+
+					//Convert back and from fixed-point decimals for SpinBox's integer value.
+					textFromValue: function(value, locale) {
+						return (value / 10.0).toFixed(1);
+					}
+					valueFromText: function(text, locale) {
+						return parseFloat(text) * 10;
+					}
+				}
+				Text {
+					anchors.verticalCenter: silence_time.verticalCenter
+
+					text: "Pause between songs"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+				}
+			}
 		}
 	}
 }

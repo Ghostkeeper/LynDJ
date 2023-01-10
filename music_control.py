@@ -9,7 +9,6 @@ import PySide6.QtCore  # For QTimers to execute code after a certain amount of t
 
 import metadata  # To get the events for a track.
 import playlist  # To remove the track from the playlist when it finishes playing.
-import player  # To change volume from events.
 import preferences  # For some playback preferences.
 import waypoints_timeline  # To parse waypoints.
 
@@ -34,10 +33,7 @@ class MusicControl:
 		self.sound = sound
 		self.player = player
 
-		prefs = preferences.Preferences.getInstance()
-		if not prefs.has("player/silence"):
-			prefs.add("player/silence", 2.0)  # The pause between songs.
-		pause_between_songs = prefs.get("player/silence") * 1000
+		pause_between_songs = preferences.Preferences.getInstance().get("player/silence") * 1000
 
 		# Create a list of events for this track.
 		self.events = []

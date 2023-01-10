@@ -94,6 +94,8 @@ class Player(PySide6.QtCore.QObject):
 			prefs.add("player/fourier_samples", 2048)  # Number of samples of the fourier image (horizontal).
 		if not prefs.has("player/fourier_channels"):
 			prefs.add("player/fourier_channels", 256)  # Resolution of the samples of the fourier image (vertical).
+		if not prefs.has("player/silence"):
+			prefs.add("player/silence", 2.0)  # 2 seconds silence between songs by default.
 
 	is_playing_changed = PySide6.QtCore.Signal()
 
