@@ -211,13 +211,9 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		logging.debug(f"Generating Fourier image for {path}")
 		# Get some metadata about this sound. We need the number of (stereo) channels and the bit depth.
-		mutagen_file = mutagen.File(path)
-		stereo_channels = mutagen_file.info.channels
-		if hasattr(mutagen_file.info, "bits_per_sample"):
-			bit_depth = mutagen_file.info.bits_per_sample
-		else:  # Mutagen doesn't expose bit depth for MP3 files. Only bitrate (which is the compressed bit rate) and sample rate. They don't tell anything about what is in the waveform bytes.
-			bit_depth = 16  # Assume 16-bit, which is common.
-		waveform_dtype = numpy.byte if bit_depth == 8 else numpy.short
+		stereo_channels = sound.channels
+		bit_depth = sound.sample_width * 8
+		waveform_dtype = numpy.byte if bit_depth == 8 else numpy.short if bit_depth == 16 else numpy.int
 
 		# Get the waveform and transform it into frequency space.
 		waveform = sound.get_array_of_samples()
