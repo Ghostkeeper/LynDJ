@@ -194,9 +194,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 				polyline += f"M0,{(1 - level) * height}"
 			x = width * timestamp / self.duration
 			y = (1 - level) * height
-			nodes.append(f"<circle cx=\"{x}\" cy=\"{y}\" r=\"{self.node_radius}\" />\n")
+			nodes.append(f"<circle cx=\"{x}\" cy=\"{y}\" r=\"{self.node_radius}\" />")
 			polyline += f" L{x},{y}"
-		svg += f"<g stroke=\"{self.colour}\" stroke-width=\"{self.line_width}\" fill=\"{self.background_colour}\">\n"
+		svg += f"<g stroke=\"#{self.colour}\" stroke-width=\"{self.line_width}\" fill=\"#{self.background_colour}\">\n"
 		svg += f"<path fill=\"none\" d=\"{polyline}\" />\n"
 		svg += "\n".join(nodes)
 		svg += "</g>\n</svg>"
