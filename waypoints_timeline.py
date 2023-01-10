@@ -8,8 +8,10 @@ import logging
 import PySide6.QtCore  # For custom properties.
 import PySide6.QtQuick  # This class extends QQuickPaintedItem.
 import PySide6.QtSvg  # To render the graph.
+import time  # To generate timestamps for the graph.
 
 import metadata  # To get the waypoints of a song.
+import player  # To get the current play time.
 import theme  # To get the colours to draw the graph in.
 
 def colour_to_hex(colour) -> str:
@@ -96,6 +98,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.svg = ""
 		self.renderer = None  # To be filled by the initial call to update_visualisation.
 		self.duration = 0  # We need to know the duration of the song in order to draw the timestamps in the correct place.
+
+		# If a transition is currently being made, store the start time of that transition until we can add the complete transition.
+		self.ongoing_transition_start_time = None
 
 		self.colour = colour_to_hex(theme.Theme.getInstance().colours["foreground"])
 		self.background_colour = colour_to_hex(theme.Theme.getInstance().colours["background"])
@@ -242,3 +247,36 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		# Insert the new waypoints.
 		self.waypoints.insert(pos_start, (time_start, level_start))
 		self.waypoints.insert(pos_start + 1, (time_end, level_end))
+
+	@PySide6.QtCore.Slot()
+	def start_transition(self) -> None:
+		"""
+		Triggered when a transition is started by the user.
+
+		This stores the start time and start value of the transition.
+		:param start_time: The time when the transition started.
+		"""
+		if player.Player.start_time is None:
+			return  # No song is currently playing.
+		current_time = time.time() - player.Player.start_time
+		logging.debug(f"Starting transition at {current_time}")
+		self.ongoing_transition_start_time = current_time
+
+	@PySide6.QtCore.Slot(float)
+	def end_transition(self, end_level):
+		"""
+		Triggered when a transition is ended by the user.
+
+		This takes the ongoing transition start time and the end time and end level, to insert a full new transition.
+		:param end_time: The time when the transition ends.
+		:param end_level: The level at which the transition ends.
+		"""
+		if player.Player.start_time is None:
+			return  # No song is currently playing.
+		if self.ongoing_transition_start_time is None:
+			logging.error("Trying to end a transition before starting it.")
+			return
+		current_time = time.time() - player.Player.start_time
+		logging.debug(f"Ending transition from {self.ongoing_transition_start_time} to {current_time}, level {end_level}.")
+		self.add_transition(self.ongoing_transition_start_time, current_time, end_level)
+		self.ongoing_transition_start_time = None  # Reset this one for the next transition.
