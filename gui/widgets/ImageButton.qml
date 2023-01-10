@@ -29,13 +29,16 @@ Button {
 		id: foreground_image
 	}
 
-	MouseArea { //To change the cursor.
+	MouseArea { //To change the cursor and show tooltips.
 		anchors.fill: parent
 
+		hoverEnabled: true
 		onPressed: function(mouse) { //Don't catch the mouse events.
 			mouse.accepted = false;
 		}
 		cursorShape: Qt.PointingHandCursor
 		enabled: parent.enabled
+		ToolTip.visible: ToolTip.text !== "" && containsMouse
+		ToolTip.text: parent.ToolTip.text
 	}
 }
