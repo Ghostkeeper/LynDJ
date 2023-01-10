@@ -46,7 +46,14 @@ def filter(chunk):
 	"""
 	volume = player.Player.main_volume
 	gain = pydub.utils.ratio_to_db(volume)
-	return chunk + gain
+	chunk = chunk + gain
+
+	if player.Player.mono:
+		channels = chunk.split_to_mono()
+		new = channels[0].overlay(channels[1]) - 4  # -4dB because we're doubling the sound, so we must halve the amplitude first.
+		chunk = pydub.AudioSegment.from_mono_audiosegments(new, new)
+
+	return chunk
 
 def play_loop():
 	"""

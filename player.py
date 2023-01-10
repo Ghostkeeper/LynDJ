@@ -65,6 +65,13 @@ class Player(PySide6.QtCore.QObject):
 	The master volume control to play music at.
 	"""
 
+	mono = False
+	"""
+	Whether to convert the output audio to mono.
+
+	Conversion to mono may help if some of the speakers aren't connected properly in the room.
+	"""
+
 	@classmethod
 	def get_instance(cls):
 		"""
