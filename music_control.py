@@ -53,32 +53,33 @@ class MusicControl:
 		# Volume transitions.
 		volume_waypoints = metadata.get(path, "volume_waypoints")
 		volume_waypoints = waypoints_timeline.WaypointsTimeline.parse_waypoints(volume_waypoints)
-		volume = 0.5
-		pos = -1
-		for t in range(50, duration, 100):  # Adjust volume every 100ms if applicable.
-			t /= 1000.0  # Convert to seconds, to compare with timestamps from waypoints.
-			if t >= volume_waypoints[pos + 1][0]:
-				pos += 1
-				if pos >= len(volume_waypoints) - 1:
-					break  # After last waypoint.
-			if pos < 0:
-				continue  # Before first waypoint.
-			# Interpolate the new volume.
-			time_start, level_start = volume_waypoints[pos]
-			time_end, level_end = volume_waypoints[pos + 1]
-			if level_start == level_end:
-				new_volume = level_start  # Common case: Flat between transitions.
-			else:
-				ratio = (t - time_start) / (time_end - time_start)
-				new_volume = level_start + ratio * (level_end - level_start)
-			if new_volume != volume:
-				volume_change_timer = PySide6.QtCore.QTimer()
-				volume_change_timer.setInterval(round(t * 1000))
-				volume_change_timer.setSingleShot(True)
-				volume_change_timer.timeout.connect(lambda v=new_volume: player.set_volume(v))
-				volume_change_timer.setTimerType(PySide6.QtCore.Qt.PreciseTimer)
-				self.events.append(volume_change_timer)
-				volume = new_volume
+		if len(volume_waypoints) > 0:
+			volume = 0.5
+			pos = -1
+			for t in range(50, duration, 100):  # Adjust volume every 100ms if applicable.
+				t /= 1000.0  # Convert to seconds, to compare with timestamps from waypoints.
+				if t >= volume_waypoints[pos + 1][0]:
+					pos += 1
+					if pos >= len(volume_waypoints) - 1:
+						break  # After last waypoint.
+				if pos < 0:
+					continue  # Before first waypoint.
+				# Interpolate the new volume.
+				time_start, level_start = volume_waypoints[pos]
+				time_end, level_end = volume_waypoints[pos + 1]
+				if level_start == level_end:
+					new_volume = level_start  # Common case: Flat between transitions.
+				else:
+					ratio = (t - time_start) / (time_end - time_start)
+					new_volume = level_start + ratio * (level_end - level_start)
+				if new_volume != volume:
+					volume_change_timer = PySide6.QtCore.QTimer()
+					volume_change_timer.setInterval(round(t * 1000))
+					volume_change_timer.setSingleShot(True)
+					volume_change_timer.timeout.connect(lambda v=new_volume: player.set_volume(v))
+					volume_change_timer.setTimerType(PySide6.QtCore.Qt.PreciseTimer)
+					self.events.append(volume_change_timer)
+					volume = new_volume
 
 	def play(self):
 		"""
