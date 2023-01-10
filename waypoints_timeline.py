@@ -196,6 +196,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 			y = (1 - level) * height
 			nodes.append(f"<circle cx=\"{x}\" cy=\"{y}\" r=\"{self.node_radius}\" />")
 			polyline += f" L{x},{y}"
+		if polyline == "":  # Without any nodes, the volume is always at the default.
+			polyline += f"M0, {height / 2}"
+		polyline += f" H{width}"
 		svg += f"<g stroke=\"#{self.colour}\" stroke-width=\"{self.line_width}\" fill=\"#{self.background_colour}\">\n"
 		svg += f"<path fill=\"none\" d=\"{polyline}\" />\n"
 		svg += "\n".join(nodes)
