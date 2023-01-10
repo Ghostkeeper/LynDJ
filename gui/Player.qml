@@ -4,7 +4,8 @@
 //This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 //You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
-import QtQuick 2.15
+import QtQuick 6.2
+import QtQuick.Controls 6.2
 
 import "./widgets" as Widgets
 import Lyn 1.0 as Lyn
@@ -95,6 +96,7 @@ Rectangle {
 		source: Lyn.Theme.icon[Lyn.Player.mono ? "mono" : "stereo"]
 		colour: Lyn.Theme.colour["foreground"]
 		onClicked: Lyn.Player.mono = !Lyn.Player.mono
+		ToolTip.text: Lyn.Player.mono ? "Mono" : "Stereo"
 	}
 
 	Widgets.ColourImage {
