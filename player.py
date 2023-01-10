@@ -6,7 +6,6 @@
 
 import logging
 import math  # Transformations on the Fourier transform.
-import mutagen  # To get metadata on the samples of the sound.
 import numpy  # For the Fourier transform in Scipy.
 import os.path  # To cache Fourier transform images.
 import pydub  # The media player we're using to play music.
@@ -60,7 +59,7 @@ class Player(PySide6.QtCore.QObject):
 	If no track is playing, this should be set to ``None``.
 	"""
 
-	main_volume = 1
+	main_volume = 0.5
 	"""
 	The master volume control to play music at.
 	"""
@@ -152,6 +151,8 @@ class Player(PySide6.QtCore.QObject):
 			filepath = os.path.join(storage.cache(), "fourier", filename)
 			fourier.save(filepath)
 			metadata.change(next_song, "fourier", filepath)
+
+		self.set_volume(0.5)  # Back to default for the next song.
 
 		self.songChanged.emit()  # We loaded up a new song.
 		Player.start_time = time.time()
