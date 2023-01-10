@@ -41,13 +41,16 @@ def filter(chunk):
 
 	The filters applied currently are:
 	- Volume.
+	- Conversion to mono.
 	:param chunk: A chunk of audio.
 	:return: A filtered chunk of audio.
 	"""
+	# Apply player volume.
 	volume = player.Player.main_volume
 	gain = pydub.utils.ratio_to_db(volume)
 	chunk = chunk + gain
 
+	# Convert to mono, if necessary.
 	if player.Player.mono:
 		channels = chunk.split_to_mono()
 		new = channels[0].overlay(channels[1]) - 4  # -4dB because we're doubling the sound, so we must halve the amplitude first.
