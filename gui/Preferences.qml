@@ -50,17 +50,17 @@ Window {
 				height: childrenRect.height
 
 				Widgets.DropDown {
-					id: testField
+					id: theme_selector
 					anchors.right: parent.right
 
 					model: Lyn.Theme.theme_names
 					currentIndex: model.indexOf(Lyn.Preferences.preferences["theme"])
-					onCurrentIndexChanged: {
-						Lyn.Preferences.set("theme", model[currentIndex])
+					onActivated: function(index) {
+						Lyn.Preferences.set("theme", model[index])
 					}
 				}
 				Text {
-					anchors.verticalCenter: testField.verticalCenter
+					anchors.verticalCenter: theme_selector.verticalCenter
 					text: "Theme"
 				}
 			}
