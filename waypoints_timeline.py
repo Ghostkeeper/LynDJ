@@ -270,6 +270,10 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		else:  # Between transitions, so it's easy then. Just take the level from either side, since they are the same.
 			level_start = self.waypoints[pos_start - 1][1]  # (Actually, do take before since it might also be after the last one.)
 
+		# If there are waypoints afterwards, adjust the next waypoint to honour the new current volume.
+		if pos_end < len(self.waypoints) - 1 and self.waypoints[pos_end - 1][1] == self.waypoints[pos_end][1]:
+			self.waypoints[pos_end] = (self.waypoints[pos_end][0], level_end)
+
 		# Remove the waypoints that would get overridden.
 		del self.waypoints[pos_start : pos_end]
 		# Insert the new waypoints.
