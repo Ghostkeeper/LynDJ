@@ -56,7 +56,7 @@ class MusicControl:
 		if len(volume_waypoints) > 0:
 			volume = 0.5
 			pos = -1
-			for t in range(50, duration, 100):  # Adjust volume every 100ms if applicable.
+			for t in range(25, duration, 50):  # Adjust volume every 50ms if applicable.
 				t /= 1000.0  # Convert to seconds, to compare with timestamps from waypoints.
 				if t >= volume_waypoints[pos + 1][0]:
 					pos += 1

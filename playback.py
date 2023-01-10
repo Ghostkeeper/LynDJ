@@ -12,7 +12,7 @@ import threading  # The audio is played on a different thread.
 import player  # To get the playback parameters.
 
 audio_source = None
-chunk_size = 100  # Size of chunks to send to audio server, in ms. Larger chunks are more efficient, but cause greater delays.
+chunk_size = 10  # Size of chunks to send to audio server, in ms. Larger chunks are more efficient, but cause greater delays.
 current_position = 0  # Location in the file where we are currently playing (in ms).
 
 def play(new_audio):
