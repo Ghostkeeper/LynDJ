@@ -61,7 +61,55 @@ Window {
 				}
 				Text {
 					anchors.verticalCenter: theme_selector.verticalCenter
+
 					text: "Theme"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+				}
+			}
+
+			Widgets.Header {
+				width: parent.width
+
+				text: "Playback"
+			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SpinBox {
+					id: fadeout_time
+					anchors.right: parent.right
+
+					//SpinBox only supports integers, so do everything times 10 to allow 0.1 second intervals.
+					value: Math.round(Lyn.Preferences.preferences["player/fadeout"] * 10)
+					from: 0
+					to: 100
+
+					onValueModified: {
+						Lyn.Preferences.set("player/fadeout", value / 10)
+					}
+
+					validator: DoubleValidator {
+						bottom: fadeout_time.from
+						top: fadeout_time.to
+					}
+
+					//Convert back and from fixed-point decimals for SpinBox's integer value.
+					textFromValue: function(value, locale) {
+						return (value / 10.0).toFixed(1);
+					}
+					valueFromText: function(text, locale) {
+						return parseFloat(text) * 10;
+					}
+				}
+				Text {
+					anchors.verticalCenter: fadeout_time.verticalCenter
+
+					text: "Fade-out when stopping"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
 				}
 			}
 		}
