@@ -100,6 +100,10 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.colour = colour_to_hex(theme.Theme.getInstance().colours["foreground"])
 		self.background_colour = colour_to_hex(theme.Theme.getInstance().colours["background"])
 
+		# When resizing the image, we must re-render.
+		self.widthChanged.connect(self.generate_graph)
+		self.heightChanged.connect(self.generate_graph)
+
 		# Fill the waypoint data from the metadata of the file, then generate the initial graph.
 		self.waypoints = []
 		self.generate_graph()
