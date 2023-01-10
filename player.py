@@ -65,7 +65,7 @@ class Player(PySide6.QtCore.QObject):
 	The master volume control to play music at.
 	"""
 
-	mono = False
+	is_mono = False
 	"""
 	Whether to convert the output audio to mono.
 
@@ -325,3 +325,28 @@ class Player(PySide6.QtCore.QObject):
 		:return: The current volume level.
 		"""
 		return Player.main_volume
+
+	mono_changed = PySide6.QtCore.Signal()
+	"""
+	Triggered when something changes between mono and stereo.
+	"""
+
+	def set_mono(self, value) -> None:
+		"""
+		Changes the mono toggle.
+		:param value: The new value, whether to play mono (True) or stereo (False).
+		"""
+		if Player.is_mono != value:
+			Player.is_mono = value
+			self.mono_changed.emit()
+
+	@PySide6.QtCore.Property(bool, fset=set_mono, notify=mono_changed)
+	def mono(self) -> bool:
+		"""
+		Whether to play mono or not.
+
+		If playing mono (True), all output channels will have the same audio data.
+		If not playing mono (False), the original output channels of the audio will be retained.
+		:return: Whether to play mono (True) or not (False).
+		"""
+		return Player.is_mono
