@@ -219,12 +219,14 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		logging.debug(f"Generating Fourier image for {path}")
 		# Get some metadata about this sound. We need the number of (stereo) channels and the bit depth.
-		stereo_channels = sound.channels
+		sound = sound.set_channels(1)  # Mix to mono.
 		bit_depth = sound.sample_width * 8
 		waveform_dtype = numpy.byte if bit_depth == 8 else numpy.short if bit_depth == 16 else numpy.int
 
 		# Get the waveform and transform it into frequency space.
 		waveform = sound.get_array_of_samples()
+		num_samples = math.floor(len(waveform) / sound.sample_width)
+		waveform = waveform[:num_samples * sound.sample_width]
 		prefs = preferences.Preferences.getInstance()
 		num_chunks = prefs.get("player/fourier_samples")
 		num_channels = prefs.get("player/fourier_channels")
@@ -232,7 +234,7 @@ class Player(PySide6.QtCore.QObject):
 			logging.error(f"Unable to read waveform from audio file to generate Fourier: {path}")
 			return PySide6.QtGui.QImage(numpy.zeros((num_channels, num_chunks), dtype=numpy.ubyte), num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)
 
-		waveform_numpy = numpy.frombuffer(waveform, dtype=waveform_dtype)[::stereo_channels]  # Only take one channel, e.g. the left stereo channel.
+		waveform_numpy = numpy.frombuffer(waveform, dtype=waveform_dtype)
 		chunks = numpy.array_split(waveform_numpy, num_chunks)  # Split the sound in chunks, each of which will be displayed as 1 horizontal pixel.
 		chunk_size = len(chunks[0])
 		split_points = numpy.logspace(1, math.log10(chunk_size), num_channels).astype(numpy.int32)  # We'll display a certain number of frequencies as vertical pixels. They are logarithmically spaced on the frequency spectrum.
