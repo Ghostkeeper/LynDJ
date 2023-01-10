@@ -57,6 +57,11 @@
 			"size": 16,
 			"weight": 800
 		},
+		"header": {
+			"family": "sans",
+			"size": 12,
+			"weight": 800
+		},
 		"detail": {
 			"family": "sans",
 			"size": 7,

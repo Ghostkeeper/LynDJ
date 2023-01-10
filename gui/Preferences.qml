@@ -39,6 +39,12 @@ Window {
 
 			spacing: Lyn.Theme.size["margin"].height
 
+			Widgets.Header {
+				width: parent.width
+
+				text: "General"
+			}
+
 			Item {
 				width: parent.width
 				height: childrenRect.height
