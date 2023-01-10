@@ -41,7 +41,9 @@ class Theme(PySide6.QtCore.QObject):
 	def __init__(self):
 		super().__init__(None)
 
-		preferences.Preferences.getInstance().add("theme", "LightDeco")
+		prefs = preferences.Preferences.getInstance()
+		prefs.add("theme", "LightDeco")
+		prefs.valuesChanged.connect(self.change_theme)
 
 		self.sizes = {}
 		self.colours = {}
@@ -49,6 +51,14 @@ class Theme(PySide6.QtCore.QObject):
 		self.icons = {}
 
 		self.load(update_gui=False)
+
+	def change_theme(self, preference_key) -> None:
+		"""
+		Triggered when the preferences change, this function changes the theme if necessary.
+		:param preference_key: The preference that was changed.
+		"""
+		if preference_key == "theme":
+			self.load()
 
 	"""
 	Triggered when the theme changes.
