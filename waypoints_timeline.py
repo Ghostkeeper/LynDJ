@@ -120,6 +120,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.renderer = None  # To be filled by the initial call to update_visualisation.
 		self.duration = 0  # We need to know the duration of the song in order to draw the timestamps in the correct place.
 
+		# When we are playing a song, we have a more accurate duration (stripped from silence).
+		player.Player.get_instance().is_playing_changed.connect(self.update_duration)
+
 		# If a transition is currently being made, store the start time of that transition until we can add the complete transition.
 		self.ongoing_transition_start_time = None
 
@@ -146,7 +149,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 			self.waypoints = self.parse_waypoints(metadata.get(new_path, self.current_field))  # Update the waypoints to represent the new path.
 		except KeyError:  # Path doesn't exist. Happens at init when path is still empty string.
 			self.waypoints = []
-		self.duration = metadata.get(new_path, "duration")
+		self.update_duration()
 		self.generate_graph()
 
 	@PySide6.QtCore.Property(str, fset=set_path, notify=path_changed)
@@ -181,6 +184,18 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		:return: The metadata field containing waypoints that is displayed in this image.
 		"""
 		return self.current_field
+
+	def update_duration(self):
+		"""
+		Set the duration field to the latest known information.
+
+		If a song is playing, it'll use the duration of that song.
+		If no song is playing, it'll get the duration from the metadata of the current path.
+		"""
+		if player.Player.current_track is not None:
+			self.duration = len(player.Player.current_track) / 1000.0
+		else:
+			self.duration = metadata.get(self.current_path, "duration")
 
 	def generate_graph(self) -> None:
 		"""
