@@ -11,6 +11,7 @@ import "./widgets" as Widgets
 import Lyn 1.0 as Lyn
 
 Window {
+	id: preferences_window
 	width: Lyn.Theme.size["popup"].width
 	height: Lyn.Theme.size["popup"].height
 
@@ -28,6 +29,35 @@ Window {
 		}
 
 		Column {
+			anchors {
+				top: parent.top
+				topMargin: Lyn.Theme.size["margin"].height
+				left: parent.left
+				leftMargin: Lyn.Theme.size["margin"].width
+			}
+			width: preferences_window.width - Lyn.Theme.size["margin"].width * 2
+
+			spacing: Lyn.Theme.size["margin"].height
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.DropDown {
+					id: testField
+					anchors.right: parent.right
+
+					model: Lyn.Theme.theme_names
+					currentIndex: model.indexOf(Lyn.Preferences.preferences["theme"])
+					onCurrentIndexChanged: {
+						Lyn.Preferences.set("theme", model[currentIndex])
+					}
+				}
+				Text {
+					anchors.verticalCenter: testField.verticalCenter
+					text: "Theme"
+				}
+			}
 		}
 	}
 }

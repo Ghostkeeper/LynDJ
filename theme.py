@@ -129,3 +129,11 @@ class Theme(PySide6.QtCore.QObject):
 		:return: A dictionary of all theme sizes.
 		"""
 		return self.sizes
+
+	@PySide6.QtCore.Property("QStringList", constant=True)
+	def theme_names(self) -> typing.List[str]:
+		"""
+		Get the list of the available themes to choose from.
+		:return: A list of theme names.
+		"""
+		return os.listdir(os.path.join(storage.source(), "theme"))
