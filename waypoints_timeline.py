@@ -175,7 +175,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		svg += "</g>\n</svg>"
 
 		self.svg = svg
-		self.renderer = PySide6.QtSvg.QSvgRenderer(svg)
+		self.renderer = PySide6.QtSvg.QSvgRenderer(svg.encode("UTF-8"))
 		self.update()
 
 	def paint(self, painter) -> None:
