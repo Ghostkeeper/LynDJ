@@ -5,8 +5,29 @@
 //You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import QtQuick 6.2
+import QtQuick.Controls 6.2
+
+import "./widgets" as Widgets
+import Lyn 1.0 as Lyn
 
 Window {
-	width: 100
-	height: 100
+	width: Lyn.Theme.size["popup"].width
+	height: Lyn.Theme.size["popup"].height
+
+	color: Lyn.Theme.colour["background"]
+	title: "Preferences"
+
+	ScrollView {
+		id: content
+		anchors.fill: parent
+
+		ScrollBar.vertical: Widgets.ScrollBar {
+			anchors.top: parent.top
+			anchors.right: parent.right
+			anchors.bottom: parent.bottom
+		}
+
+		Column {
+		}
+	}
 }

@@ -9,6 +9,7 @@
 		"drag_handle": [6, 0],
 		"table_cell_minimum": [10, 16],
 		"dialogue": [300, 185],
+		"popup": [800, 600],
 
 		"topbar": [0, 52],
 		"player": [0, 252],
