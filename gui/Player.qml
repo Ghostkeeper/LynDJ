@@ -86,19 +86,6 @@ Rectangle {
 		onClicked: Lyn.Player.isPlaying = !Lyn.Player.isPlaying
 	}
 
-	Widgets.ImageButton {
-		anchors {
-			right: play_stop_button.right
-			top: play_stop_button.bottom
-			topMargin: Lyn.Theme.size["margin"].height
-		}
-
-		source: Lyn.Theme.icon[Lyn.Player.mono ? "mono" : "stereo"]
-		colour: Lyn.Theme.colour["foreground"]
-		onClicked: Lyn.Player.mono = !Lyn.Player.mono
-		ToolTip.text: Lyn.Player.mono ? "Mono" : "Stereo"
-	}
-
 	Widgets.ColourImage {
 		id: volume_icon
 		anchors {

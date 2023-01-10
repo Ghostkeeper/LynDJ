@@ -17,7 +17,8 @@ Rectangle {
 
 	color: Lyn.Theme.colour["primary_background"]
 
-	MouseArea {
+	//Row of buttons on the top right.
+	Row {
 		anchors {
 			top: parent.top
 			topMargin: Lyn.Theme.size["margin"].height
@@ -26,36 +27,53 @@ Rectangle {
 			bottom: parent.bottom
 			bottomMargin: Lyn.Theme.size["margin"].height
 		}
-		width: childrenRect.width
 
-		visible: Lyn.BackgroundTasks.progress != 1.0 //Only visible if there is something processing.
-		hoverEnabled: visible
-		ToolTip.visible: visible && containsMouse
-		ToolTip.text: "Background tasks: " + Lyn.BackgroundTasks.numDone + " / " + Lyn.BackgroundTasks.numTotal + " (" + Lyn.BackgroundTasks.currentDescription + ")"
+		spacing: Lyn.Theme.size["margin"].width
 
-		Widgets.ColourImage {
-			id: processing_icon
-			height: parent.height - Lyn.Theme.size["margin"].height - progress_bar.height
-			width: height
+		MouseArea {
+			height: parent.height
+			width: childrenRect.width
 
-			source: Lyn.Theme.icon["processing"]
-			colour: Lyn.Theme.colour["foreground"]
+			visible: Lyn.BackgroundTasks.progress != 1.0 //Only visible if there is something processing.
+			hoverEnabled: visible
+			ToolTip.visible: visible && containsMouse
+			ToolTip.text: "Background tasks: " + Lyn.BackgroundTasks.numDone + " / " + Lyn.BackgroundTasks.numTotal + " (" + Lyn.BackgroundTasks.currentDescription + ")"
+
+			Widgets.ColourImage {
+				id: processing_icon
+				height: parent.height - Lyn.Theme.size["margin"].height - progress_bar.height
+				width: height
+
+				source: Lyn.Theme.icon["processing"]
+				colour: Lyn.Theme.colour["foreground"]
+			}
+
+			ProgressBar {
+				id: progress_bar
+				anchors.top: processing_icon.bottom
+				anchors.topMargin: Lyn.Theme.size["margin"].height
+				width: processing_icon.width
+				height: Lyn.Theme.size["lining"].height
+
+				value: Lyn.BackgroundTasks.progress
+				background: Item {} //No background.
+				contentItem: Rectangle {
+					width: progress_bar.visualPosition * progress_bar.width
+					height: progress_bar.height
+					color: Lyn.Theme.colour["foreground"]
+				}
+			}
 		}
 
-		ProgressBar {
-			id: progress_bar
-			anchors.top: processing_icon.bottom
-			anchors.topMargin: Lyn.Theme.size["margin"].height
-			width: processing_icon.width
-			height: Lyn.Theme.size["lining"].height
+		//Mono/stereo toggle.
+		Widgets.ImageButton {
+			height: parent.height
+			width: height
 
-			value: Lyn.BackgroundTasks.progress
-			background: Item {} //No background.
-			contentItem: Rectangle {
-				width: progress_bar.visualPosition * progress_bar.width
-				height: progress_bar.height
-				color: Lyn.Theme.colour["foreground"]
-			}
+			source: Lyn.Theme.icon[Lyn.Player.mono ? "mono" : "stereo"]
+			colour: Lyn.Theme.colour["foreground"]
+			onClicked: Lyn.Player.mono = !Lyn.Player.mono
+			ToolTip.text: Lyn.Player.mono ? "Mono" : "Stereo"
 		}
 	}
 
