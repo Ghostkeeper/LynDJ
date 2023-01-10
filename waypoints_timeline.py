@@ -78,6 +78,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		:return: The list of waypoints it represents, as list of tuples. The first element of each tuple is the
 		timestamp in seconds. The second is the level between 0 and 1.
 		"""
+		if waypoints_serialised == "":
+			return []
+
 		result = []
 		waypoints_list = waypoints_serialised.split("|")
 		for waypoint_str in waypoints_list:
