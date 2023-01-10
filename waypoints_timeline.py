@@ -190,22 +190,24 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		height = self.height()
 		svg = f"<svg version=\"1.0\" width=\"{width}\" height=\"{height}\">\n"
 
-		nodes = []
-		polyline = ""
-		for timestamp, level in self.waypoints:
-			if len(nodes) == 0:  # First node attaches to the left side with a horizontal line.
-				polyline += f"M0,{(1 - level) * height}"
-			x = width * timestamp / self.duration
-			y = (1 - level) * height
-			nodes.append(f"<circle cx=\"{x}\" cy=\"{y}\" r=\"{self.node_radius}\" />")
-			polyline += f" L{x},{y}"
-		if polyline == "":  # Without any nodes, the volume is always at the default.
-			polyline += f"M0, {height / 2}"
-		polyline += f" H{width}"
-		svg += f"<g stroke=\"#{self.colour}\" stroke-width=\"{self.line_width}\" fill=\"#{self.background_colour}\">\n"
-		svg += f"<path fill=\"none\" d=\"{polyline}\" />\n"
-		svg += "\n".join(nodes)
-		svg += "</g>\n</svg>"
+		if len(self.waypoints) > 0:
+			nodes = []
+			polyline = ""
+			for timestamp, level in self.waypoints:
+				if len(nodes) == 0:  # First node attaches to the left side with a horizontal line.
+					polyline += f"M0,{(1 - level) * height}"
+				x = width * timestamp / self.duration
+				y = (1 - level) * height
+				nodes.append(f"<circle cx=\"{x}\" cy=\"{y}\" r=\"{self.node_radius}\" />")
+				polyline += f" L{x},{y}"
+			if polyline == "":  # Without any nodes, the volume is always at the default.
+				polyline += f"M0, {height / 2}"
+			polyline += f" H{width}"
+			svg += f"<g stroke=\"#{self.colour}\" stroke-width=\"{self.line_width}\" fill=\"#{self.background_colour}\">\n"
+			svg += f"<path fill=\"none\" d=\"{polyline}\" />\n"
+			svg += "\n".join(nodes)
+			svg += "</g>\n"
+		svg += "</svg>"
 
 		self.svg = svg
 		self.renderer = PySide6.QtSvg.QSvgRenderer(svg.encode("UTF-8"))
