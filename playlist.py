@@ -240,8 +240,8 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 	def cumulative_update(self):
 		"""
 		Updates the cumulative duration timer with the currently remaining times.
-		:return:
 		"""
+		changed = False  # Track whether anything actually changed.
 		prefs = preferences.Preferences.getInstance()
 		playlist = prefs.get("playlist/playlist")
 		if player.Player.start_time is None:
@@ -251,6 +251,9 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		for track in playlist:
 			duration = track["duration"]
 			cumulative_duration += duration
-			track["cumulative_duration"] = cumulative_duration
-		prefs.changed_internally("playlist/playlist")
+			if track["cumulative_duration"] != cumulative_duration:
+				track["cumulative_duration"] = cumulative_duration
+				changed = True
+		if changed:
+			prefs.changed_internally("playlist/playlist")
 		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(playlist), 0))
