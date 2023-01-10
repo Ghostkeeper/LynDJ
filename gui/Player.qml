@@ -122,6 +122,13 @@ Rectangle {
 
 		value: Lyn.Player.volume
 		onValueChanged: Lyn.Player.volume = value
+		onPressedChanged: {
+			if(pressed) {
+				volume_timeline.start_transition();
+			} else {
+				volume_timeline.end_transition(value);
+			}
+		}
 	}
 
 	//Fourier image above the progress indicator.
@@ -137,6 +144,14 @@ Rectangle {
 
 		colour: Lyn.Theme.colour["foreground"]
 		source: Lyn.Player.currentFourier
+	}
+
+	//Waypoints timeline.
+	Lyn.WaypointsTimeline {
+		id: volume_timeline
+		anchors.fill: fourier
+		path: Lyn.Player.currentPath
+		field: "volume_waypoints"
 	}
 
 	//Progress indicator.
