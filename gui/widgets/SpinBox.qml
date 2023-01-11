@@ -26,6 +26,7 @@ SpinBox {
 		text: spin_box.textFromValue(spin_box.value, spin_box.locale)
 		font: Lyn.Theme.font["default"]
 		color: Lyn.Theme.colour["foreground"]
+		selectByMouse: true
 		horizontalAlignment: Qt.AlignHCenter
 		verticalAlignment: Qt.AlignVCenter
 		validator: spin_box.validator
