@@ -96,8 +96,10 @@ class Player(PySide6.QtCore.QObject):
 			prefs.add("player/fourier_channels", 256)  # Resolution of the samples of the fourier image (vertical).
 		if not prefs.has("player/silence"):
 			prefs.add("player/silence", 2.0)  # 2 seconds silence between songs by default.
+		if not prefs.has("player/mono"):
+			prefs.add("player/mono", False)  # Whether to play audio in mono or not.
 
-	is_playing_changed = PySide6.QtCore.Signal()
+		Player.is_mono = prefs.get("player/mono")
 
 	def is_playing_set(self, new_is_playing) -> None:
 		"""
@@ -343,6 +345,7 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		if Player.is_mono != value:
 			Player.is_mono = value
+			preferences.Preferences.getInstance().set("player/mono", value)
 			self.mono_changed.emit()
 
 	@PySide6.QtCore.Property(bool, fset=set_mono, notify=mono_changed)
