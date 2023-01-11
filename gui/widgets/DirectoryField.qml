@@ -13,7 +13,7 @@ import "." as Widgets
 
 Item {
 	id: directory_field
-	width: Lyn.Theme.size["control"].width * 2
+	width: Lyn.Theme.size["control"].width
 	height: childrenRect.height
 
 	property alias currentDirectory: directory.text

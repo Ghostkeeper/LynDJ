@@ -1,7 +1,8 @@
 {
 	"sizes": {
 		"margin": [10, 10],
-		"control": [100, 32],
+		"control": [200, 32],
+		"button": [100, 32],
 		"lining": [1, 1],
 		"border_offset": [12, 12],
 		"border_width": [40, 40],

@@ -10,8 +10,8 @@ import QtQuick.Controls 2.15
 import Lyn 1.0 as Lyn
 
 Button {
-	width: Lyn.Theme.size["control"].width
-	height: Lyn.Theme.size["control"].height
+	width: Lyn.Theme.size["button"].width
+	height: Lyn.Theme.size["button"].height
 
 	font: Lyn.Theme.font["default"]
 
