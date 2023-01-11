@@ -10,10 +10,11 @@ import time  # To sleep the thread when there is no audio to play.
 import threading  # The audio is played on a different thread.
 
 import player  # To get the playback parameters.
+import preferences
 
 audio_source = None
-chunk_size = 10  # Size of chunks to send to audio server, in ms. Larger chunks are more efficient, but cause greater delays.
 current_position = 0  # Location in the file where we are currently playing (in ms).
+prefs = preferences.Preferences.getInstance()
 
 def play(new_audio):
 	"""
@@ -70,6 +71,10 @@ def play_loop():
 	global audio_source
 	audio_server = None
 	stream = None
+
+	if not prefs.has("player/buffer_size"):
+		prefs.add("player/buffer_size", 10)  # Size of chunks to send to audio server, in ms. Larger chunks are more efficient, but cause greater delays.
+
 	try:
 		audio_server = pyaudio.PyAudio()
 		current_sample_width = 0
@@ -91,6 +96,7 @@ def play_loop():
 			if current_position >= len(audio_source):  # Playback completed. Stop taking the GIL and go into stand-by.
 				audio_source = None
 				continue
+			chunk_size = prefs.get("player/buffer_size")
 			chunk = audio_source[current_position:current_position + chunk_size]
 			chunk = filter(chunk)
 			stream.write(chunk.raw_data)

@@ -163,7 +163,7 @@ Window {
 					anchors {
 						verticalCenter: fourier_gamma.verticalCenter
 						left: parent.left
-						right: fadeout_time.left
+						right: fourier_gamma.left
 						rightMargin: Lyn.Theme.size["margin"].width
 					}
 
@@ -266,6 +266,35 @@ Window {
 					}
 
 					text: "Pause between songs"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SpinBox {
+					id: audio_buffer_size
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["player/buffer_size"]
+					from: 1
+					to: 10000
+					stepSize: 10
+					onValueModified: Lyn.Preferences.set("player/buffer_size", value)
+				}
+				Text {
+					anchors {
+						verticalCenter: audio_buffer_size.verticalCenter
+						left: parent.left
+						right: audio_buffer_size.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Audio buffer size (ms)"
 					font: Lyn.Theme.font["default"]
 					color: Lyn.Theme.colour["foreground"]
 					elide: Text.ElideRight
