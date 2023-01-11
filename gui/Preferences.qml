@@ -91,6 +91,29 @@ Window {
 				}
 			}
 
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SpinBox {
+					id: fourier_height
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["player/fourier_channels"]
+					from: 16
+					to: 1024
+					stepSize: 8
+					onValueModified: Lyn.Preferences.set("player/fourier_channels", value)
+				}
+				Text {
+					anchors.verticalCenter: fourier_height.verticalCenter
+
+					text: "Fourier frequency resolution"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+				}
+			}
+
 			Widgets.Header {
 				width: parent.width
 
