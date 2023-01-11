@@ -17,6 +17,23 @@ Rectangle {
 
 	color: Lyn.Theme.colour["primary_background"]
 
+	Image {
+		id: logo
+		anchors {
+			top: parent.top
+			topMargin: Lyn.Theme.size["margin"].height
+			left: parent.left
+			leftMargin: Lyn.Theme.size["margin"].width
+			bottom: parent.bottom
+			bottomMargin: Lyn.Theme.size["margin"].height
+		}
+		width: height
+
+		source: Lyn.Theme.icon["icon"]
+		sourceSize.width: width
+		sourceSize.height: height
+	}
+
 	//Row of buttons on the top right.
 	Row {
 		anchors {
