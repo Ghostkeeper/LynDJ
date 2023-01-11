@@ -42,7 +42,7 @@ Window {
 			Widgets.Header {
 				width: parent.width
 
-				text: "General"
+				text: "Interface"
 			}
 
 			Item {
@@ -68,6 +68,29 @@ Window {
 				}
 			}
 
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SpinBox {
+					id: fourier_width
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["player/fourier_samples"]
+					from: 16
+					to: 16384
+					stepSize: 256
+					onValueModified: Lyn.Preferences.set("player/fourier_samples", value)
+				}
+				Text {
+					anchors.verticalCenter: fourier_width.verticalCenter
+
+					text: "Fourier time resolution"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+				}
+			}
+
 			Widgets.Header {
 				width: parent.width
 
@@ -86,10 +109,7 @@ Window {
 					value: Math.round(Lyn.Preferences.preferences["player/fadeout"] * 10)
 					from: 0
 					to: 100
-
-					onValueModified: {
-						Lyn.Preferences.set("player/fadeout", value / 10)
-					}
+					onValueModified: Lyn.Preferences.set("player/fadeout", value / 10)
 
 					validator: DoubleValidator {
 						bottom: fadeout_time.from
