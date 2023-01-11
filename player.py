@@ -91,15 +91,19 @@ class Player(PySide6.QtCore.QObject):
 		if not prefs.has("player/fadeout"):
 			prefs.add("player/fadeout", 2.0)  # Fade-out for 2 seconds by default.
 		if not prefs.has("player/fourier_samples"):
-			prefs.add("player/fourier_samples", 2048)  # Number of samples of the fourier image (horizontal).
+			prefs.add("player/fourier_samples", 2048)  # Number of samples of the Fourier image (horizontal).
 		if not prefs.has("player/fourier_channels"):
-			prefs.add("player/fourier_channels", 256)  # Resolution of the samples of the fourier image (vertical).
+			prefs.add("player/fourier_channels", 256)  # Resolution of the samples of the Fourier image (vertical).
+		if not prefs.has("player/fourier_gamma"):
+			prefs.add("player/fourier_gamma", 1.5)  # Gamma correction factor for Fourier images.
 		if not prefs.has("player/silence"):
 			prefs.add("player/silence", 2.0)  # 2 seconds silence between songs by default.
 		if not prefs.has("player/mono"):
 			prefs.add("player/mono", False)  # Whether to play audio in mono or not.
 
 		Player.is_mono = prefs.get("player/mono")
+
+	is_playing_changed = PySide6.QtCore.Signal()
 
 	def is_playing_set(self, new_is_playing) -> None:
 		"""
@@ -254,7 +258,7 @@ class Player(PySide6.QtCore.QObject):
 		# Normalise so that it fits in the 8-bit grayscale channel of the image.
 		max_value = numpy.max(transformed)
 		transformed /= max_value / 255
-		transformed = numpy.power(255 * (transformed / 255), 1.5)  # Make the image a bit brighter (gamma correction factor 1.5).
+		transformed = numpy.power(255 * (transformed / 255), prefs.get("player/fourier_gamma"))  # Make the image a bit brighter (gamma correction factor 1.5).
 		normalised = transformed.astype(numpy.ubyte)
 
 		# Generate an image from it.

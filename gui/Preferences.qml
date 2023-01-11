@@ -132,6 +132,48 @@ Window {
 				}
 			}
 
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SpinBox {
+					id: fourier_gamma
+					anchors.right: parent.right
+
+					//SpinBox only supports integers, so do everything times 10 to allow 0.1 intervals.
+					value: Math.round(Lyn.Preferences.preferences["player/fourier_gamma"] * 10)
+					from: 1
+					to: 100
+					onValueModified: Lyn.Preferences.set("player/fourier_gamma", value / 10)
+
+					validator: DoubleValidator {
+						bottom: fourier_gamma.from
+						top: fourier_gamma.to
+					}
+
+					//Convert back and from fixed-point decimals for SpinBox's integer value.
+					textFromValue: function(value, locale) {
+						return (value / 10.0).toFixed(1);
+					}
+					valueFromText: function(text, locale) {
+						return parseFloat(text) * 10;
+					}
+				}
+				Text {
+					anchors {
+						verticalCenter: fourier_gamma.verticalCenter
+						left: parent.left
+						right: fadeout_time.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Fourier gamma correction"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
+
 			Widgets.Header {
 				width: parent.width
 
