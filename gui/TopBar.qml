@@ -34,8 +34,28 @@ Rectangle {
 		sourceSize.height: height
 	}
 
+	Text {
+		anchors {
+			top: parent.top
+			topMargin: Lyn.Theme.size["margin"].height
+			left: logo.right
+			leftMargin: Lyn.Theme.size["margin"].width
+			bottom: parent.bottom
+			bottomMargin: Lyn.Theme.size["margin"].height
+			right: button_row.left
+			rightMargin: Lyn.Theme.size["margin"].width
+		}
+
+		text: "LynDJ"
+		font: Lyn.Theme.font["title"]
+		color: Lyn.Theme.colour["foreground"]
+		verticalAlignment: Text.AlignVCenter
+		elide: Text.AlignRight
+	}
+
 	//Row of buttons on the top right.
 	Row {
+		id: button_row
 		anchors {
 			top: parent.top
 			topMargin: Lyn.Theme.size["margin"].height
