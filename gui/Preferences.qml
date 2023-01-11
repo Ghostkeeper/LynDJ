@@ -60,11 +60,17 @@ Window {
 					}
 				}
 				Text {
-					anchors.verticalCenter: theme_selector.verticalCenter
+					anchors {
+						verticalCenter: theme_selector.verticalCenter
+						left: parent.left
+						right: theme_selector.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
 
 					text: "Theme"
 					font: Lyn.Theme.font["default"]
 					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
 				}
 			}
 
@@ -83,11 +89,17 @@ Window {
 					onValueModified: Lyn.Preferences.set("player/fourier_samples", value)
 				}
 				Text {
-					anchors.verticalCenter: fourier_width.verticalCenter
+					anchors {
+						verticalCenter: fourier_width.verticalCenter
+						left: parent.left
+						right: fourier_width.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
 
 					text: "Fourier time resolution"
 					font: Lyn.Theme.font["default"]
 					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
 				}
 			}
 
@@ -106,11 +118,17 @@ Window {
 					onValueModified: Lyn.Preferences.set("player/fourier_channels", value)
 				}
 				Text {
-					anchors.verticalCenter: fourier_height.verticalCenter
+					anchors {
+						verticalCenter: fourier_height.verticalCenter
+						left: parent.left
+						right: fourier_height.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
 
 					text: "Fourier frequency resolution"
 					font: Lyn.Theme.font["default"]
 					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
 				}
 			}
 
@@ -148,11 +166,17 @@ Window {
 					}
 				}
 				Text {
-					anchors.verticalCenter: fadeout_time.verticalCenter
+					anchors {
+						verticalCenter: fadeout_time.verticalCenter
+						left: parent.left
+						right: fadeout_time.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
 
 					text: "Fade-out when stopping"
 					font: Lyn.Theme.font["default"]
 					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
 				}
 			}
 
@@ -187,11 +211,17 @@ Window {
 					}
 				}
 				Text {
-					anchors.verticalCenter: silence_time.verticalCenter
+					anchors {
+						verticalCenter: silence_time.verticalCenter
+						left: parent.left
+						right: silence_time.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
 
 					text: "Pause between songs"
 					font: Lyn.Theme.font["default"]
 					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
 				}
 			}
 		}
