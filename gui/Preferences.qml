@@ -174,6 +174,11 @@ Window {
 				}
 			}
 
+			Widgets.Button {
+				text: "Clear stored Fourier images"
+				onClicked: Lyn.Player.clear_fourier()
+			}
+
 			Widgets.Header {
 				width: parent.width
 

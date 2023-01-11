@@ -266,6 +266,17 @@ class Player(PySide6.QtCore.QObject):
 		result = PySide6.QtGui.QImage(normalised, num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)  # Reinterpret as pixels. Easy image!
 		return result
 
+	@PySide6.QtCore.Slot()
+	def clear_fourier(self) -> None:
+		"""
+		Clear all cached Fourier images, causing them to be regenerated upon the next restart or the next time the songs
+		get played.
+		"""
+		logging.info("Clearing all cached Fourier images.")
+		directory = os.path.join(storage.cache(), "fourier")
+		for filename in os.listdir(directory):
+			os.remove(os.path.join(directory, filename))
+
 	songChanged = PySide6.QtCore.Signal()
 
 	@PySide6.QtCore.Property(str, notify=songChanged)
