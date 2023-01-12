@@ -144,7 +144,7 @@ class Player(PySide6.QtCore.QObject):
 			self.is_playing_set(False)
 			return
 
-		next_song = current_playlist[0]["path"]
+		next_song = current_playlist[0]
 		logging.info(f"Starting playback of track: {next_song}")
 		if next_song.endswith(".flac"):
 			codec = "flac"
@@ -291,7 +291,7 @@ class Player(PySide6.QtCore.QObject):
 		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
 		if len(current_playlist) == 0:
 			return ""
-		current_path = current_playlist[0]["path"]
+		current_path = current_playlist[0]
 		return metadata.get(current_path, "fourier")
 
 	@PySide6.QtCore.Property(float, notify=songChanged)
@@ -315,7 +315,7 @@ class Player(PySide6.QtCore.QObject):
 		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
 		if len(current_playlist) == 0:
 			return ""
-		current_path = current_playlist[0]["path"]  # Don't request from the playlist, which may be outdated. Get directly from metadata.
+		current_path = current_playlist[0]  # Don't request from the playlist, which may be outdated. Get directly from metadata.
 		return metadata.get(current_path, "title")
 
 	@PySide6.QtCore.Property(str, notify=songChanged)
@@ -327,7 +327,7 @@ class Player(PySide6.QtCore.QObject):
 		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
 		if len(current_playlist) == 0:
 			return ""
-		return current_playlist[0]["path"]
+		return current_playlist[0]
 
 	volume_changed = PySide6.QtCore.Signal()
 	"""

@@ -64,6 +64,36 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		self.cumulative_update_timer.timeout.connect(self.cumulative_update)
 		self.cumulative_update_timer.start()
 
+		self.track_data = []  # The source of data for the model.
+		prefs.valuesChanged.connect(self.preferences_changed)
+		self.update()
+
+	def update(self) -> None:
+		"""
+		Fill the data in this model from the list of music track paths in the playlist.
+
+		This will request the data for the files in the given list and fill the model with data.
+		"""
+		self.track_data = []
+		for path in preferences.Preferences.getInstance().get("playlist/playlist"):
+			file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
+			if len(self.track_data) == 0:
+				file_metadata["cumulative_duration"] = file_metadata["duration"]
+				file_metadata["cumulative_endtime"] = time.time() + file_metadata["duration"]
+			else:
+				file_metadata["cumulative_duration"] = self.track_data[len(self.track_data) - 1]["cumulative_duration"] + file_metadata["duration"]
+				file_metadata["cumulative_endtime"] = self.track_data[len(self.track_data) - 1]["cumulative_endtime"] + file_metadata["duration"]
+			file_metadata["duration_seconds"] = file_metadata["duration"]
+			self.track_data.append(file_metadata)
+
+	def preferences_changed(self, key):
+		"""
+		Triggered if the preferences change, which means that this model has to update its data.
+		:param key: The preference key that changed.
+		"""
+		if key == "playlist/playlist":
+			self.update()  # The playlist changed, so update my model.
+
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
 		"""
 		Returns the number of music files in the playlist.
@@ -107,7 +137,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		if role not in self.role_to_field:
 			return None
 		field = self.role_to_field[role]
-		value = preferences.Preferences.getInstance().get("playlist/playlist")[index.row()][field]
+		value = self.track_data[index.row()][field]
 		if field == "duration" or field == "cumulative_duration":
 			# Display duration as minutes:seconds.
 			if value > 0:
@@ -152,24 +182,14 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		# If the file is already in the playlist, do nothing.
 		prefs = preferences.Preferences.getInstance()
 		playlist = prefs.get("playlist/playlist")
-		for existing_file in playlist:
-			if existing_file["path"] == path:
-				logging.debug(f"Tried adding {path} to the playlist, but it's already in the playlist.")
-				return
-
-		file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
-		if len(playlist) == 0:
-			file_metadata["cumulative_duration"] = file_metadata["duration"]
-			file_metadata["cumulative_endtime"] = time.time() + file_metadata["duration"]
-		else:
-			file_metadata["cumulative_duration"] = playlist[len(playlist) - 1]["cumulative_duration"] + file_metadata["duration"]
-			file_metadata["cumulative_endtime"] = playlist[len(playlist) - 1]["cumulative_endtime"] + file_metadata["duration"]
-		file_metadata["duration_seconds"] = file_metadata["duration"]
+		if path in playlist:
+			logging.debug(f"Tried adding {path} to the playlist, but it's already in the playlist.")
+			return
 
 		logging.info(f"Adding {path} to the playlist.")
 		self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(playlist), len(playlist))
-		playlist.append(file_metadata)
-		prefs.changed_internally("playlist/playlist")
+		playlist.append(path)
+		prefs.changed_internally("playlist/playlist")  # Trigger everything to update, including self.track_data.
 		self.endInsertRows()
 
 	@PySide6.QtCore.Slot(int)
@@ -184,21 +204,11 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			logging.error(f"Trying to remove playlist entry {index}, which is out of range.")
 			return
 
-		logging.info(f"Removing {playlist[index]['path']} from the playlist.")
+		logging.info(f"Removing {playlist[index]} from the playlist.")
 		self.beginRemoveRows(PySide6.QtCore.QModelIndex(), index, index)
 		playlist.pop(index)
 		prefs.changed_internally("playlist/playlist")
 		self.endRemoveRows()
-
-		# Update the cumulative durations in the part of the list that got changed.
-		for i in range(index, len(playlist)):
-			if i == 0:
-				playlist[0]["cumulative_duration"] = playlist[0]["duration"]
-			else:
-				playlist[i]["cumulative_duration"] = playlist[i]["duration"] + playlist[i - 1]["cumulative_duration"]
-		prefs.changed_internally("playlist/playlist")
-		self.layoutChanged.emit()  # Trigger QML to update everything, even though it only removed one.
-		self.dataChanged.emit(self.createIndex(index, 0), len(playlist))
 
 	@PySide6.QtCore.Slot(str, int)
 	def reorder(self, path, new_index) -> None:
@@ -213,12 +223,10 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		"""
 		prefs = preferences.Preferences.getInstance()
 		playlist = prefs.get("playlist/playlist")
-		for i, existing_file in enumerate(playlist):
-			if existing_file["path"] == path:
-				old_index = i
-				break
-		else:
-			return  # The file is not in the playlist.
+		try:
+			old_index = playlist.index(path)
+		except ValueError:  # File is not in the playlist.
+			return
 
 		logging.info(f"Move {path} to playlist index {new_index}")
 		qt_new_index = new_index
@@ -229,25 +237,11 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			logging.error(f"Attempt to move {path} out of range: {new_index}")
 			return
 
-		file_data = playlist[old_index]
 		playlist.pop(old_index)
-		playlist.insert(new_index, file_data)
+		playlist.insert(new_index, path)
 		prefs.changed_internally("playlist/playlist")
 
 		self.endMoveRows()
-
-		# Update the cumulative durations in the part of the list that got changed.
-		lower = min(old_index, new_index)
-		upper = max(old_index, new_index)
-		for i in range(lower, upper + 1):
-			if i == 0:
-				playlist[0]["cumulative_duration"] = playlist[0]["duration"]
-				playlist[0]["cumulative_endtime"] = time.time() + playlist[0]["duration"]
-			else:
-				playlist[i]["cumulative_duration"] = playlist[i]["duration"] + playlist[i - 1]["cumulative_duration"]
-				playlist[i]["cumulative_endtime"] = playlist[i]["duration"] + playlist[i - 1]["cumulative_endtime"]
-		prefs.changed_internally("playlist/playlist")
-		self.dataChanged.emit(self.createIndex(lower, 0), self.createIndex(upper, 0))
 
 	@PySide6.QtCore.Slot(result="float")
 	def playlist_endtime(self):
@@ -278,8 +272,6 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		"""
 		Updates the cumulative duration timer with the currently remaining times.
 		"""
-		prefs = preferences.Preferences.getInstance()
-		playlist = prefs.get("playlist/playlist")
 		cumulative_endtime = time.time()
 
 		if player.Player.start_time is None:
@@ -288,11 +280,10 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			cumulative_duration = player.Player.start_time - cumulative_endtime  # Start off with the negative current playtime.
 			cumulative_endtime = player.Player.start_time
 
-		for track in playlist:
+		for track in self.track_data:
 			duration = track["duration"]
 			cumulative_endtime += duration
 			track["cumulative_endtime"] = cumulative_endtime
 			cumulative_duration += duration
 			track["cumulative_duration"] = cumulative_duration
-		prefs.changed_internally("playlist/playlist")
-		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(playlist), 0))
+		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(self.track_data), 0))
