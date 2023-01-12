@@ -100,6 +100,8 @@ class Player(PySide6.QtCore.QObject):
 			prefs.add("player/silence", 2.0)  # 2 seconds silence between songs by default.
 		if not prefs.has("player/mono"):
 			prefs.add("player/mono", False)  # Whether to play audio in mono or not.
+		if not prefs.has("player/buffer_size"):
+			prefs.add("player/buffer_size", 10)  # Size of chunks to send to audio server, in ms. Larger chunks are more efficient, but cause greater delays.
 
 		Player.is_mono = prefs.get("player/mono")
 
