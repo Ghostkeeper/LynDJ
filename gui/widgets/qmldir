@@ -13,3 +13,4 @@ Slider         1.0 Slider.qml
 SpinBox        1.0 SpinBox.qml
 TableHeader    1.0 TableHeader.qml
 TextField      1.0 TextField.qml
+TimeSelector   1.0 TimeSelector.qml
