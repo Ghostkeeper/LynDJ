@@ -45,12 +45,13 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 
 		user_role = PySide6.QtCore.Qt.UserRole
 		self.role_to_field = {
-			user_role + 1: "path",
-			user_role + 2: "title",
-			user_role + 3: "duration",
-			user_role + 4: "bpm",
-			user_role + 5: "comment",
-			user_role + 6: "cumulative_duration"
+			user_role + 1: "path",  # Path to the file.
+			user_role + 2: "title",  # Title of the track.
+			user_role + 3: "duration",  # Estimated duration of the track (before trimming silences).
+			user_role + 4: "bpm",  # Beats per minute, but as a colour scheme.
+			user_role + 5: "comment",  # Any comment for the track.
+			user_role + 6: "cumulative_duration",  # Time until this track has completed playing.
+			user_role + 7: "cumulative_endtime"  # Timestamp of when the track has completed playing (seconds since epoch).
 		}
 
 		self.cumulative_update_timer = PySide6.QtCore.QTimer()
@@ -153,8 +154,10 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
 		if len(playlist) == 0:
 			file_metadata["cumulative_duration"] = file_metadata["duration"]
+			file_metadata["cumulative_endtime"] = time.time() + file_metadata["duration"]
 		else:
 			file_metadata["cumulative_duration"] = playlist[len(playlist) - 1]["cumulative_duration"] + file_metadata["duration"]
+			file_metadata["cumulative_endtime"] = playlist[len(playlist) - 1]["cumulative_endtime"] + file_metadata["duration"]
 
 		logging.info(f"Adding {path} to the playlist.")
 		self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(playlist), len(playlist))
@@ -232,8 +235,10 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		for i in range(lower, upper + 1):
 			if i == 0:
 				playlist[0]["cumulative_duration"] = playlist[0]["duration"]
+				playlist[0]["cumulative_endtime"] = time.time() + playlist[0]["duration"]
 			else:
 				playlist[i]["cumulative_duration"] = playlist[i]["duration"] + playlist[i - 1]["cumulative_duration"]
+				playlist[i]["cumulative_endtime"] = playlist[i]["duration"] + playlist[i - 1]["cumulative_endtime"]
 		prefs.changed_internally("playlist/playlist")
 		self.dataChanged.emit(self.createIndex(lower, 0), self.createIndex(upper, 0))
 
@@ -244,16 +249,19 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		changed = False  # Track whether anything actually changed.
 		prefs = preferences.Preferences.getInstance()
 		playlist = prefs.get("playlist/playlist")
+		cumulative_endtime = time.time()
+
 		if player.Player.start_time is None:
 			cumulative_duration = 0
 		else:
-			cumulative_duration = player.Player.start_time - time.time()  # Start off with the negative current playtime.
+			cumulative_duration = player.Player.start_time - cumulative_endtime  # Start off with the negative current playtime.
+			cumulative_endtime = player.Player.start_time
+
 		for track in playlist:
 			duration = track["duration"]
+			cumulative_endtime += duration
+			track["cumulative_endtime"] = cumulative_endtime
 			cumulative_duration += duration
-			if track["cumulative_duration"] != cumulative_duration:
-				track["cumulative_duration"] = cumulative_duration
-				changed = True
-		if changed:
-			prefs.changed_internally("playlist/playlist")
+			track["cumulative_duration"] = cumulative_duration
+		prefs.changed_internally("playlist/playlist")
 		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(playlist), 0))
