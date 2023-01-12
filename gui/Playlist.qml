@@ -1,5 +1,5 @@
 //Music player software aimed at Lindy Hop DJs.
-//Copyright (C) 2022 Ghostkeeper
+//Copyright (C) 2023 Ghostkeeper
 //This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 //This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 //You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -87,6 +87,26 @@ ListView {
 					}
 				}
 			}
+		}
+
+		//Overtime indicator.
+		Rectangle {
+			anchors {
+				top: parent.top
+				right: parent.right
+				left: duration_indicator.left
+				leftMargin: -Lyn.Theme.size["margin"].width
+			}
+			visible: playlist.model.playlist_endtime() < model.cumulative_endtime
+			height: {
+				let endtime = playlist.model.playlist_endtime();
+				let my_start = model.cumulative_endtime - model.duration_seconds;
+				if(endtime < my_start) return parent.height; //Also before start, so this complete track is over time.
+				let fraction = 1 - (endtime - my_start) / model.duration_seconds;
+				return parent.height * fraction;
+			}
+
+			color: Lyn.Theme.colour["warning"]
 		}
 
 		Text { //Title.

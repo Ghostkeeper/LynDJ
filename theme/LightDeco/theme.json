@@ -38,6 +38,7 @@
 		"active_primary": [170, 137, 60, 255],
 
 		"error": [206, 118, 115, 255],
+		"warning": [179, 115, 206, 255],
 		"success": [173, 206, 115, 255],
 		"tempo_slow": "secondary_background",
 		"tempo_medium": "background",

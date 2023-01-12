@@ -5,6 +5,7 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import copy
+import datetime  # To handle the DJ session end time.
 import logging
 import math  # To format durations.
 import PySide6.QtCore  # To expose this list to QML.
@@ -48,10 +49,11 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			user_role + 1: "path",  # Path to the file.
 			user_role + 2: "title",  # Title of the track.
 			user_role + 3: "duration",  # Estimated duration of the track (before trimming silences).
-			user_role + 4: "bpm",  # Beats per minute, but as a colour scheme.
-			user_role + 5: "comment",  # Any comment for the track.
-			user_role + 6: "cumulative_duration",  # Time until this track has completed playing.
-			user_role + 7: "cumulative_endtime"  # Timestamp of when the track has completed playing (seconds since epoch).
+			user_role + 4: "duration_seconds",  # The duration of this track, in seconds.
+			user_role + 5: "bpm",  # Beats per minute, but as a colour scheme.
+			user_role + 6: "comment",  # Any comment for the track.
+			user_role + 7: "cumulative_duration",  # Time until this track has completed playing.
+			user_role + 8: "cumulative_endtime",  # Timestamp of when the track has completed playing (seconds since epoch).
 		}
 
 		self.cumulative_update_timer = PySide6.QtCore.QTimer()
@@ -158,6 +160,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		else:
 			file_metadata["cumulative_duration"] = playlist[len(playlist) - 1]["cumulative_duration"] + file_metadata["duration"]
 			file_metadata["cumulative_endtime"] = playlist[len(playlist) - 1]["cumulative_endtime"] + file_metadata["duration"]
+		file_metadata["duration_seconds"] = file_metadata["duration"]
 
 		logging.info(f"Adding {path} to the playlist.")
 		self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(playlist), len(playlist))
@@ -242,11 +245,35 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		prefs.changed_internally("playlist/playlist")
 		self.dataChanged.emit(self.createIndex(lower, 0), self.createIndex(upper, 0))
 
+	@PySide6.QtCore.Slot(result="float")
+	def playlist_endtime(self):
+		"""
+		Get the proposed endtime of the DJ session, as configured by the user.
+		:return: The endtime in number of seconds since the Unix epoch.
+		"""
+		# Parse from the preference first.
+		endtime_str = preferences.Preferences.getInstance().get("playlist/end_time")
+		components = endtime_str.split(":")
+		set_hours = int(components[0])
+		set_minutes = int(components[1])
+
+		# Let's guess whether the proposed end time is in the future or in the past.
+		# If it's currently less than 4 hours after the end time, we'll consider it in the past.
+		# If it's more than 4 hours after the end time, we'll consider it in the future (the time on the next day).
+		now = datetime.datetime.fromtimestamp(time.time(), datetime.timezone.utc)
+		local_timezone = datetime.datetime.now().astimezone().tzinfo
+		set_datetime = datetime.datetime(now.year, now.month, now.day, set_hours, set_minutes, 0, 0, tzinfo=local_timezone)
+		if now - datetime.timedelta(seconds=4 * 3600) > set_datetime:  # Set datetime is more than 4 hours ago, so assume it's on the next day.
+			set_datetime = set_datetime + datetime.timedelta(days=1)
+		elif now + datetime.timedelta(seconds=20 * 3600) < set_datetime:  # Set date time is more than 20 hours in the future, so assume it's on the previous day.
+			set_datetime = set_datetime - datetime.timedelta(days=1)
+
+		return set_datetime.timestamp()
+
 	def cumulative_update(self):
 		"""
 		Updates the cumulative duration timer with the currently remaining times.
 		"""
-		changed = False  # Track whether anything actually changed.
 		prefs = preferences.Preferences.getInstance()
 		playlist = prefs.get("playlist/playlist")
 		cumulative_endtime = time.time()
