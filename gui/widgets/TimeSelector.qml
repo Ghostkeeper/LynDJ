@@ -51,6 +51,7 @@ Button {
 				color: Lyn.Theme.colour["foreground"]
 				horizontalAlignment: Text.AlignHCenter
 				verticalAlignment: Text.AlignVCenter
+				opacity: 1 - Math.abs((y + height / 2) - popup.height / 2) / (popup.height / 2)
 			}
 		}
 
