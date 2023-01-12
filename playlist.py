@@ -43,6 +43,9 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		prefs = preferences.Preferences.getInstance()
 		if not prefs.has("playlist/playlist"):
 			prefs.add("playlist/playlist", [])
+		prefs.add("playlist/slow_bpm", 100)
+		prefs.add("playlist/medium_bpm", 150)
+		prefs.add("playlist/fast_bpm", 220)
 
 		user_role = PySide6.QtCore.Qt.UserRole
 		self.role_to_field = {
@@ -121,9 +124,10 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			medium_rgba = [medium.red(), medium.green(), medium.blue(), medium.alpha()]
 			fast = theme_inst.colours["tempo_fast"]
 			fast_rgba = [fast.red(), fast.green(), fast.blue(), fast.alpha()]
-			slow_bpm = 100
-			medium_bpm = 150
-			fast_bpm = 220
+			prefs = preferences.Preferences.getInstance()
+			slow_bpm = prefs.get("playlist/slow_bpm")
+			medium_bpm = prefs.get("playlist/medium_bpm")
+			fast_bpm = prefs.get("playlist/fast_bpm")
 
 			if value <= 0:  # No BPM information. Return neutral tempo.
 				return medium

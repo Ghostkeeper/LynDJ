@@ -179,6 +179,90 @@ Window {
 				onClicked: Lyn.Player.clear_fourier()
 			}
 
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SpinBox {
+					id: slow_bpm
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["playlist/slow_bpm"]
+					from: 1
+					to: medium_bpm.value - 1
+					onValueModified: Lyn.Preferences.set("playlist/slow_bpm", value)
+				}
+				Text {
+					anchors {
+						verticalCenter: slow_bpm.verticalCenter
+						left: parent.left
+						right: slow_bpm.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Slow BPM"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SpinBox {
+					id: medium_bpm
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["playlist/medium_bpm"]
+					from: slow_bpm.value + 1
+					to: fast_bpm.value - 1
+					onValueModified: Lyn.Preferences.set("playlist/medium_bpm", value)
+				}
+				Text {
+					anchors {
+						verticalCenter: medium_bpm.verticalCenter
+						left: parent.left
+						right: medium_bpm.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Medium BPM"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SpinBox {
+					id: fast_bpm
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["playlist/fast_bpm"]
+					from: medium_bpm.value + 1
+					to: 1000
+					onValueModified: Lyn.Preferences.set("playlist/fast_bpm", value)
+				}
+				Text {
+					anchors {
+						verticalCenter: fast_bpm.verticalCenter
+						left: parent.left
+						right: fast_bpm.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Fast BPM"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
+
 			Widgets.Header {
 				width: parent.width
 
