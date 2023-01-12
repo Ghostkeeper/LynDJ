@@ -96,6 +96,7 @@ Button {
 		}
 
 		Tumbler {
+			id: hours_tumbler
 			anchors {
 				left: parent.left
 				top: parent.top
@@ -117,10 +118,21 @@ Button {
 			}
 			width: parent.width / 2
 
+			property int previousIndex: 0
+
 			model: ["00", "05", 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
 			delegate: tumbler_text
-
 			contentItem: tumbler_view.createObject(this)
+
+			onCurrentIndexChanged: {
+				if(currentIndex == 0 && previousIndex > 6) {
+					hours_tumbler.contentItem.incrementCurrentIndex();
+				}
+				if(currentIndex == 11 && previousIndex <= 6) {
+					hours_tumbler.contentItem.decrementCurrentIndex();
+				}
+				previousIndex = currentIndex;
+			}
 		}
 	}
 }
