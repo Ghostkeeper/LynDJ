@@ -10,10 +10,25 @@ import QtQuick.Controls 6.2
 import Lyn 1.0 as Lyn
 
 Button {
+	property string time: "" //Read-only property that indicates the currently selected time.
+
 	width: Lyn.Theme.size["control"].width
 	height: Lyn.Theme.size["control"].height
 
 	onClicked: popup.open()
+
+	//Change the currently selected time.
+	function set_time(new_time) {
+		let colon_index = new_time.indexOf(":");
+		if(colon_index == -1) { //Invalid time.
+			hours_tumbler.currentIndex = 0;
+			minutes_tumbler.currentIndex = 0;
+		}
+		let hours = new_time.substring(0, colon_index);
+		let minutes = new_time.substring(colon_index + 1);
+		hours_tumbler.currentIndex = hours;
+		minutes_tumbler.currentIndex = Math.floor(minutes / 5);
+	}
 
 	background: Rectangle {
 		color: Lyn.Theme.colour["primary"]
@@ -28,6 +43,8 @@ Button {
 		horizontalAlignment: Text.AlignHCenter
 		verticalAlignment: Text.AlignVCenter
 		elide: Text.ElideRight
+
+		onTextChanged: parent.time = hours_tumbler.model[hours_tumbler.currentIndex] + ":" + minutes_tumbler.model[minutes_tumbler.currentIndex];
 	}
 
 	Popup {
