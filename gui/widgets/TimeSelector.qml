@@ -22,7 +22,7 @@ Button {
 	}
 
 	contentItem: Text {
-		text: "Test"
+		text: hours_tumbler.model[hours_tumbler.currentIndex] + ":" + minutes_tumbler.model[minutes_tumbler.currentIndex]
 		font: Lyn.Theme.font["default"]
 		color: Lyn.Theme.colour["foreground"]
 		horizontalAlignment: Text.AlignHCenter
@@ -112,6 +112,7 @@ Button {
 		}
 
 		Tumbler {
+			id: minutes_tumbler
 			anchors {
 				right: parent.right
 				top: parent.top
