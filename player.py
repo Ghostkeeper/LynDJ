@@ -196,6 +196,7 @@ class Player(PySide6.QtCore.QObject):
 			if slice.rms > threshold_value:
 				break
 		end_trim = pos + slice_size
+		logging.debug(f"Trimmed {start_trim}ms from the start, {len(track) - end_trim}ms of silence from the end of the track.")
 
 		return track[start_trim:end_trim]
 

@@ -64,6 +64,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		PySide6.QtQml.qmlRegisterType(waypoints_timeline.WaypointsTimeline, "Lyn", 1, 0, "WaypointsTimeline")
 
 		logging.debug("Loading QML engine.")
+		os.environ["QSG_RENDER_LOOP"] = "basic"  # QTBUG-58885: Animation speeds not accurate (which makes the track progress bar inaccurate).
 		self.engine = PySide6.QtQml.QQmlApplicationEngine()
 		self.engine.quit.connect(self.quit)
 		self.engine.load("gui/MainWindow.qml")
