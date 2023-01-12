@@ -88,6 +88,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		prefs.add("window/y", 100)
 		prefs.add("window/visibility", "normal")
 		prefs.add("divider_pos", 0.5)  # As a fraction of the width of the window.
+		prefs.add("playlist/end_time", "23:00")
 
 	@PySide6.QtCore.Slot()
 	def closing(self) -> None:

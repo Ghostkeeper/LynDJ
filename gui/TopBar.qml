@@ -53,6 +53,38 @@ Rectangle {
 		elide: Text.AlignRight
 	}
 
+	Text {
+		anchors {
+			verticalCenter: end_time_selector.verticalCenter
+			right: end_time_selector.left
+			rightMargin: Lyn.Theme.size["margin"].width
+		}
+
+		text: "End time:"
+		font: Lyn.Theme.font["default"]
+		color: Lyn.Theme.colour["foreground"]
+	}
+
+	Widgets.TimeSelector {
+		id: end_time_selector
+		anchors {
+			verticalCenter: parent.verticalCenter
+			right: button_row.left
+			rightMargin: Lyn.Theme.size["margin"].width
+		}
+
+		property bool time_is_set: false //Only watch for time changes when we've already set it from the preferences.
+		Component.onCompleted: {
+			set_time(Lyn.Preferences.preferences["playlist/end_time"]);
+			time_is_set = true;
+		}
+		onTimeChanged: {
+			if(time_is_set) {
+				Lyn.Preferences.set("playlist/end_time", time);
+			}
+		}
+	}
+
 	//Row of buttons on the top right.
 	Row {
 		id: button_row
