@@ -6,8 +6,6 @@
 
 import logging
 import os  # To find the home directory, resource files and to edit environment variables in the local context.
-os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "YES"  # Before importing pygame!
-import pygame  # To initialise the sound engine.
 import PySide6.QtCore
 import PySide6.QtGui  # This is a GUI application.
 import PySide6.QtQml  # To register types with the QML engine.
@@ -48,9 +46,6 @@ class Application(PySide6.QtGui.QGuiApplication):
 
 		logging.debug("Loading metadata database.")
 		metadata.load()
-
-		logging.debug("Loading media engine.")
-		pygame.init()
 
 		logging.debug("Registering QML types.")
 		self.create_gui_preferences()
