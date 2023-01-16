@@ -44,20 +44,22 @@ class AutoDJ:
 		if len(candidates) == 0:
 			return ""  # No candidates left to add to the playlist.
 
-		# For age and style, we want variation in the playlist. Get the frequencies of each value in recent history (weighted).
+		# For age, style and energy, we want variation in the playlist. Get the frequencies of each value in recent history (weighted).
 		history = self.get_history()
 		age_histogram = collections.defaultdict(float)
 		style_histogram = collections.defaultdict(float)
+		energy_histogram = collections.defaultdict(float)
 		for i, path in enumerate(history):
 			age = metadata.get(path, "age")
 			style = metadata.get(path, "style")
+			energy = metadata.get(path, "energy")
 			weight = 1.0 / (i + 1.0)
 			if age != "":
 				age_histogram[age] += weight
 			if style != "":
 				style_histogram[style] += weight
-
-		
+			if energy != "":
+				energy_histogram[energy] += weight
 
 	def get_history(self) -> list:
 		"""
@@ -75,7 +77,7 @@ class AutoDJ:
 		paths = set(filter(metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
 		playlist = prefs.get("playlist/playlist")
 		paths -= set(playlist)  # The playlist will be the files that are most recently played by the time the suggested track plays. Add them later.
-		one_day_ago = time.time() - 20 * 24 * 3600
+		one_day_ago = time.time() - 24 * 3600
 		paths = [path for path in paths if metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
 		paths = list(sorted(paths, key=lambda path: metadata.get(path, "last_played"), reverse=True))
 		return list(reversed(playlist)) + paths
