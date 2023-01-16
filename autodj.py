@@ -4,6 +4,12 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import os  # To find the candidate tracks.
+import os.path  # To find the candidate tracks.
+
+import metadata  # To decide on the next track to play by their metadata.
+import preferences  # To get the current playlist and music directory.
+
 class AutoDJ:
 	"""
 	This class suggests the next track to play based on recently played tracks.
@@ -28,4 +34,29 @@ class AutoDJ:
 		This is the track that the automatic DJ would suggest adding next.
 		:return: The next track to add to the playlist.
 		"""
-		return ""  # TODO
+		prefs = preferences.Preferences.getInstance()
+		directory = prefs.get("browse_path")
+		candidates = set(filter(metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
+
+		candidates -= set(prefs.get("playlist/playlist"))  # Anything in the playlist is not allowed to be in there twice.
+		if len(candidates) == 0:
+			return ""  # No candidates left to add to the playlist.
+
+		history = self.get_history()
+
+	def get_history(self):
+		"""
+		Get a list of tracks, in order of when they were last played.
+
+		This history of tracks includes the history of tracks that would've been played before the suggested track, i.e.
+		all of the tracks of the playlist.
+
+		The most recently played track will be returned first in the list.
+		"""
+		prefs = preferences.Preferences.getInstance()
+		directory = prefs.get("browse_path")
+		paths = set(filter(metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
+		playlist = prefs.get("playlist/playlist")
+		paths -= set(playlist)  # The playlist will be the files that are most recently played by the time the suggested track plays. Add them later.
+		paths = list(sorted(paths, key=lambda path: metadata.get(path, "last_played"), reverse=True))
+		return list(reversed(playlist)) + paths
