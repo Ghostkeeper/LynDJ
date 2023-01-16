@@ -4,6 +4,7 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import collections  # Using defaultdict.
 import os  # To find the candidate tracks.
 import os.path  # To find the candidate tracks.
 import time  # To find tracks that were played this session (within 24 hours ago).
@@ -43,23 +44,38 @@ class AutoDJ:
 		if len(candidates) == 0:
 			return ""  # No candidates left to add to the playlist.
 
+		# For age and style, we want variation in the playlist. Get the frequencies of each value in recent history (weighted).
 		history = self.get_history()
+		age_histogram = collections.defaultdict(float)
+		style_histogram = collections.defaultdict(float)
+		for i, path in enumerate(history):
+			age = metadata.get(path, "age")
+			style = metadata.get(path, "style")
+			weight = 1.0 / (i + 1.0)
+			if age != "":
+				age_histogram[age] += weight
+			if style != "":
+				style_histogram[style] += weight
 
-	def get_history(self):
+		
+
+	def get_history(self) -> list:
 		"""
 		Get a list of tracks, in order of when they were last played.
 
 		This history of tracks includes the history of tracks that would've been played before the suggested track, i.e.
 		all of the tracks of the playlist.
 
-		The most recently played track will be returned first in the list.
+		The most recently played track will be returned first in the list. Only tracks that were played in the current
+		session (within the last 24 hours) will be returned.
+		:return: The tracks that were played in the current session, in order of when they were played.
 		"""
 		prefs = preferences.Preferences.getInstance()
 		directory = prefs.get("browse_path")
 		paths = set(filter(metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
 		playlist = prefs.get("playlist/playlist")
 		paths -= set(playlist)  # The playlist will be the files that are most recently played by the time the suggested track plays. Add them later.
-		one_day_ago = time.time() - 24 * 3600
+		one_day_ago = time.time() - 20 * 24 * 3600
 		paths = [path for path in paths if metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
 		paths = list(sorted(paths, key=lambda path: metadata.get(path, "last_played"), reverse=True))
 		return list(reversed(playlist)) + paths
