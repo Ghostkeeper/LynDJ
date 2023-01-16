@@ -84,7 +84,7 @@ class AutoDJ:
 			if bpm_difference < best_rotate_difference:
 				best_rotate = rotate_n
 				best_rotate_difference = bpm_difference
-		bpm_target = self.bpm_cadence[best_rotate]
+		bpm_target = self.bpm_cadence[(len(bpm_to_match) + best_rotate) % len(self.bpm_cadence)]
 
 		best_rating = float("-inf")
 		best_track = ""
