@@ -63,9 +63,9 @@ class AutoDJ:
 			if energy != "":
 				energy_histogram[energy] += weight
 		# If the age/style/energy is unknown, make it average.
-		age_histogram[""] = sum(age_histogram.values()) / len(age_histogram)
-		style_histogram[""] = sum(style_histogram.values()) / len(style_histogram)
-		energy_histogram[""] = sum(energy_histogram.values()) / len(energy_histogram)
+		age_histogram[""] = sum(age_histogram.values()) / len(age_histogram) if age_histogram else 0
+		style_histogram[""] = sum(style_histogram.values()) / len(style_histogram) if style_histogram else 0
+		energy_histogram[""] = sum(energy_histogram.values()) / len(energy_histogram) if energy_histogram else 0
 
 		# See where in the BPM cadence we are currently.
 		history_to_match = reversed(history[:len(self.bpm_cadence)])
