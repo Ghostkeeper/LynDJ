@@ -29,6 +29,8 @@ class AutoDJ:
 	* The energy level and BPM of the track, to match audience energy levels as configured by the user.
 	"""
 
+	bpm_cadence = [120, 150, 120, 180]
+
 	def suggested_track(self) -> str:
 		"""
 		Get the currently suggested track to append to the playlist.
@@ -64,6 +66,51 @@ class AutoDJ:
 		age_histogram[""] = sum(age_histogram.values()) / len(age_histogram)
 		style_histogram[""] = sum(style_histogram.values()) / len(style_histogram)
 		energy_histogram[""] = sum(energy_histogram.values()) / len(energy_histogram)
+
+		# See where in the BPM cadence we are currently.
+		history_to_match = reversed(history[:len(self.bpm_cadence)])
+		bpm_to_match = [metadata.get(path, "bpm") for path in history_to_match]
+		best_rotate = -1
+		best_rotate_difference = float("inf")
+		for rotate_n in range(len(self.bpm_cadence)):
+			rotated_bpm_cadence = self.bpm_cadence[rotate_n:] + self.bpm_cadence[:rotate_n]
+			bpm_difference = 0  # Let's sum the differences between the BPM of the tracks and the cadence.
+			for i, bpm in enumerate(bpm_to_match):
+				bpm_difference += abs(rotated_bpm_cadence[i] - bpm)
+			if bpm_difference < best_rotate_difference:
+				best_rotate = rotate_n
+				best_rotate_difference = bpm_difference
+		bpm_target = self.bpm_cadence[best_rotate]
+
+		best_rating = float("-inf")
+		best_track = ""
+		for path in sorted(candidates):
+			rating = 0
+
+			# Penalties for age, style and energy that have recently been played often.
+			age = metadata.get(path, "age")
+			style = metadata.get(path, "style")
+			energy = metadata.get(path, "energy")
+			age_penalty = age_histogram[age]
+			style_penalty = style_histogram[style]
+			energy_penalty = energy_histogram[energy]
+			rating -= 10 * age_penalty
+			rating -= 10 * style_penalty
+			rating -= 10 * energy_penalty
+
+			# Bonus for tracks that are played long ago.
+			long_ago = time.time() - metadata.get(path, "last_played")
+			long_ago /= 3600 * 24 * 7  # Every week ago adds 1 point to the rating.
+			rating += long_ago
+
+			# Penalties for tracks that are far from the target BPM.
+			rating -= abs(metadata.get(path, "bpm") - bpm_target) / 5  # Every 5 BPM difference costs 1 point from the rating.
+
+			if rating > best_rating:
+				best_track = path
+				best_rating = rating
+
+		return best_track
 
 	def get_history(self) -> list:
 		"""
