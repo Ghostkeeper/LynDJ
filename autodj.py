@@ -60,6 +60,10 @@ class AutoDJ:
 				style_histogram[style] += weight
 			if energy != "":
 				energy_histogram[energy] += weight
+		# If the age/style/energy is unknown, make it average.
+		age_histogram[""] = sum(age_histogram.values()) / len(age_histogram)
+		style_histogram[""] = sum(style_histogram.values()) / len(style_histogram)
+		energy_histogram[""] = sum(energy_histogram.values()) / len(energy_histogram)
 
 	def get_history(self) -> list:
 		"""
