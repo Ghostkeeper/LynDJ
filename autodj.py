@@ -42,6 +42,9 @@ class AutoDJ:
 		directory = prefs.get("browse_path")
 		candidates = set(filter(metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
 
+		# Files without BPM are special and shouldn't be suggested.
+		candidates = {path for path in candidates if metadata.get(path, "bpm") >= 0}
+
 		candidates -= set(prefs.get("playlist/playlist"))  # Anything in the playlist is not allowed to be in there twice.
 		if len(candidates) == 0:
 			return ""  # No candidates left to add to the playlist.
@@ -70,6 +73,7 @@ class AutoDJ:
 		# See where in the BPM cadence we are currently.
 		history_to_match = reversed(history[:len(self.bpm_cadence)])
 		bpm_to_match = [metadata.get(path, "bpm") for path in history_to_match]
+		bpm_to_match = [bpm if bpm >= 0 else 150 for bpm in bpm_to_match]  # If BPM is unknown, use 150.
 		best_rotate = -1
 		best_rotate_difference = float("inf")
 		for rotate_n in range(len(self.bpm_cadence)):
