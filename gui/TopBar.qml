@@ -70,6 +70,28 @@ Rectangle {
 		Text {
 			height: parent.height
 
+			text: "AutoDJ energy:"
+			font: Lyn.Theme.font["default"]
+			color: Lyn.Theme.colour["foreground"]
+			verticalAlignment: Text.AlignVCenter
+		}
+
+		Widgets.SpinBox {
+			value: Lyn.Preferences.preferences["autodj/energy"]
+			from: 0
+			to: 100
+			stepSize: 10
+			onValueModified: Lyn.Preferences.set("autodj/energy", value)
+		}
+
+		Widgets.ColourImage {
+			source: Lyn.Theme.icon["top_bar_divider"]
+			colour: Lyn.Theme.colour["lining"]
+		}
+
+		Text {
+			height: parent.height
+
 			text: "End time:"
 			font: Lyn.Theme.font["default"]
 			color: Lyn.Theme.colour["foreground"]
