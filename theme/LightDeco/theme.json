@@ -34,7 +34,7 @@
 		"translucent_foreground": [17, 14, 6, 127],
 
 		"highlight_primary": [216, 195, 145, 255],
-
+		"disabled_primary": [174, 166, 148, 255],
 		"active_primary": [170, 137, 60, 255],
 
 		"error": [206, 118, 115, 255],

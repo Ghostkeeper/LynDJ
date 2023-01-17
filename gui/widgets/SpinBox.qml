@@ -37,7 +37,7 @@ SpinBox {
 		height: parent.height
 		width: height
 
-		color: Lyn.Theme.colour[spin_box.up.pressed ? "active_primary" : (spin_box.up.hovered ? "highlight_primary" : "primary")]
+		color: Lyn.Theme.colour[spin_box.up.pressed ? "active_primary" : (spin_box.up.hovered ? "highlight_primary" : (value >= spin_box.to ? "disabled_primary" : "primary"))]
 
 		Text {
 			anchors.fill: parent
@@ -54,7 +54,7 @@ SpinBox {
 		height: parent.height
 		width: height
 
-		color: Lyn.Theme.colour[spin_box.down.pressed ? "active_primary" : (spin_box.down.hovered ? "highlight_primary" : "primary")]
+		color: Lyn.Theme.colour[spin_box.down.pressed ? "active_primary" : (spin_box.down.hovered ? "highlight_primary" : (value <= spin_box.from ? "disabled_primary" : "primary"))]
 
 		Text {
 			anchors.fill: parent
