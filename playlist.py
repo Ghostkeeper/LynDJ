@@ -204,6 +204,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		playlist.append(path)
 		prefs.changed_internally("playlist/playlist")  # Trigger everything to update, including self.track_data.
 		self.endInsertRows()
+		self.playlist_changed.emit()
 
 	@PySide6.QtCore.Slot(int)
 	def remove(self, index) -> None:
@@ -222,6 +223,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		playlist.pop(index)
 		prefs.changed_internally("playlist/playlist")
 		self.endRemoveRows()
+		self.playlist_changed.emit()
 
 	@PySide6.QtCore.Slot(str, int)
 	def reorder(self, path, new_index) -> None:
@@ -255,6 +257,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		prefs.changed_internally("playlist/playlist")
 
 		self.endMoveRows()
+		self.playlist_changed.emit()
 
 	@PySide6.QtCore.Slot(result="float")
 	def playlist_endtime(self):
@@ -280,6 +283,23 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			set_datetime = set_datetime - datetime.timedelta(days=1)
 
 		return set_datetime.timestamp()
+
+	playlist_changed = PySide6.QtCore.Signal()
+	"""
+	A signal triggered when something is changed in the playlist (added, removed or reordered).
+	"""
+
+	@PySide6.QtCore.Property(bool, notify=playlist_changed)
+	def has_suggested_track(self) -> bool:
+		"""
+		Return whether this playlist has a suggested track at the end.
+
+		If the AutoDJ is enabled and there are enough tracks in the playlist, there should pretty much always be a
+		suggested track. But it is not guaranteed.
+		"""
+		if len(self.track_data) == 0:
+			return False
+		return self.track_data[-1]["suggested"]
 
 	def cumulative_update(self):
 		"""
