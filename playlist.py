@@ -12,6 +12,7 @@ import PySide6.QtCore  # To expose this list to QML.
 import PySide6.QtGui  # To calculate display colours for song tempo.
 import time  # To determine the remaining time until songs in the playlist start/end playing.
 
+import autodj  # To suggest songs to add to the playlist.
 import metadata  # To show file metadata in the playlist table.
 import player  # To call upon the player to pre-load tracks.
 import preferences  # To store the playlist between restarts.
@@ -57,6 +58,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			user_role + 6: "comment",  # Any comment for the track.
 			user_role + 7: "cumulative_duration",  # Time until this track has completed playing.
 			user_role + 8: "cumulative_endtime",  # Timestamp of when the track has completed playing (seconds since epoch).
+			user_role + 9: "suggested",  # Whether this track is user-added, or merely suggested by the application.
 		}
 
 		self.cumulative_update_timer = PySide6.QtCore.QTimer()
@@ -75,7 +77,12 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		This will request the data for the files in the given list and fill the model with data.
 		"""
 		self.track_data = []
-		for path in preferences.Preferences.getInstance().get("playlist/playlist"):
+		paths = copy.copy(preferences.Preferences.getInstance().get("playlist/playlist"))
+		suggested_track = autodj.AutoDJ().suggested_track()
+		if suggested_track != "":
+			print("Adding", suggested_track)
+			paths.append(suggested_track)
+		for path in paths:
 			file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
 			if len(self.track_data) == 0:
 				file_metadata["cumulative_duration"] = file_metadata["duration"]
@@ -84,7 +91,10 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 				file_metadata["cumulative_duration"] = self.track_data[len(self.track_data) - 1]["cumulative_duration"] + file_metadata["duration"]
 				file_metadata["cumulative_endtime"] = self.track_data[len(self.track_data) - 1]["cumulative_endtime"] + file_metadata["duration"]
 			file_metadata["duration_seconds"] = file_metadata["duration"]
+			file_metadata["suggested"] = False  # Initially False. Set to True later for the one that is suggested.
 			self.track_data.append(file_metadata)
+		if suggested_track != "":
+			self.track_data[-1]["suggested"] = True
 
 	def preferences_changed(self, key):
 		"""
@@ -103,7 +113,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		"""
 		if parent.isValid():
 			return 0
-		return len(preferences.Preferences.getInstance().get("playlist/playlist"))
+		return len(self.track_data)
 
 	def columnCount(self, parent=PySide6.QtCore.QModelIndex()):
 		"""
