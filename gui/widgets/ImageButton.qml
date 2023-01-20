@@ -23,10 +23,12 @@ Button {
 
 	Widgets.ColourImage {
 		id: background_image
+		anchors.fill: parent
 	}
 
 	Widgets.ColourImage {
 		id: foreground_image
+		anchors.fill: parent
 	}
 
 	MouseArea { //To change the cursor and show tooltips.
