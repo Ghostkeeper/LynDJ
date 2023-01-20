@@ -181,6 +181,9 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 				return PySide6.QtGui.QColor(*[interpolation * fast_rgba[i] + (1 - interpolation) * medium_rgba[i] for i in range(4)])
 			# Above the fast tempo. Completely fast.
 			return fast
+		if field == "suggested":
+			# Return as boolean.
+			return value
 		return str(value)  # Default, just convert to string.
 
 	@PySide6.QtCore.Slot(str)

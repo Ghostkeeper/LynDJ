@@ -27,6 +27,7 @@ ListView {
 		property string path: model.path //To allow externals to see this part of the model.
 
 		color: model.bpm
+		opacity: model.suggested ? 0.5 : 1
 		z: mouse_area.drag.active ? 2 : 1
 		border.color: Lyn.Theme.colour["selection"]
 		border.width: ListView.isCurrentItem ? Lyn.Theme.size["lining"].width : 0
