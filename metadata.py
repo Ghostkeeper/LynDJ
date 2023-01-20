@@ -268,7 +268,10 @@ def change(path, key, value) -> None:
 					else:
 						save_key = key
 					if key == "bpm":
-						value = int(float(value))  # Parse any strings if they are string.
+						try:
+							value = int(float(value))  # Parse any strings if they are string.
+						except ValueError:
+							value = -1  # Couldn't parse string. Assume it's empty.
 					id3 = mutagen.easyid3.EasyID3(path)
 					id3[save_key] = str(value)
 					id3.save()
@@ -278,7 +281,10 @@ def change(path, key, value) -> None:
 				else:
 					save_key = key
 				if key == "bpm":
-					value = int(float(value))  # Parse any strings if they are string.
+					try:
+						value = int(float(value))  # Parse any strings if they are string.
+					except ValueError:
+						value = -1
 				flac = mutagen.flac.FLAC(path)
 				flac[save_key] = [str(value)]
 				flac.save()
