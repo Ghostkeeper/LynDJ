@@ -52,3 +52,5 @@ This is the first release of LynDJ. This release has the following features:
   * The progress of executing background tasks is shown with a small icon in the interface.
 * A toggle between mono and stereo.
 * A session end time can be set to remind the DJ when he's going over time and by how much.
+* The AutoDJ will suggest the next track to add to the playlist.
+  * The suggested track is shown above the playlist, and can be added with the push of a button.

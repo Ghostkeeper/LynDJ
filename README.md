@@ -13,6 +13,7 @@ Main features
 * Set an end time for your session and get a warning when that time is approaching.
 * A frequency spectrograph to visualise upcoming musical cues.
 * Toggling between mono and stereo, for use with bad speaker set-ups.
+* An Auto-DJ will suggest the next track to play.
 
 Development state
 -----------------
