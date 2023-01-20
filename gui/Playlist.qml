@@ -110,9 +110,27 @@ ListView {
 			color: Lyn.Theme.colour["warning"]
 		}
 
-		Text { //Title.
+		Widgets.ImageButton { //Add to queue if suggested by AutoDJ.
+			id: add_from_autodj
 			anchors {
 				left: parent.left
+				leftMargin: Lyn.Theme.size["margin"].width
+				top: parent.top
+				topMargin: Lyn.Theme.size["margin"].height
+				bottom: parent.bottom
+				bottomMargin: Lyn.Theme.size["margin"].height
+			}
+			width: height
+
+			visible: model.suggested
+			source: Lyn.Theme.icon["plus"]
+			colour: Lyn.Theme.colour["foreground"]
+			onClicked: Lyn.Playlist.add(model.path)
+		}
+
+		Text { //Title.
+			anchors {
+				left: add_from_autodj.visible ? add_from_autodj.right : parent.left
 				leftMargin: Lyn.Theme.size["margin"].width
 				right: duration_indicator.left
 				verticalCenter: parent.verticalCenter
