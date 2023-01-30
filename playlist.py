@@ -100,7 +100,14 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		Triggered if the preferences change, which means that this model has to update its data.
 		:param key: The preference key that changed.
 		"""
-		if key == "playlist/playlist" or key == "autodj/energy":
+		if key in {
+			"playlist/playlist",
+			"autodj/energy",
+			"autodj/age_variation",
+			"autodj/style_variation",
+			"autodj/energy_variation",
+			"autodj/bpm_cadence"
+		}:
 			self.update()  # The playlist changed, so update my model.
 
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
