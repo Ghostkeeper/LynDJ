@@ -91,6 +91,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		prefs.add("autodj/bpm_cadence", "120,150,120,180")
 		prefs.add("autodj/bpm_precision", 0.2)
 		prefs.add("autodj/energy_slider_power", 0.5)
+		prefs.add("autodj/last_played_influence", 1.0)
 
 	@PySide6.QtCore.Slot()
 	def closing(self) -> None:

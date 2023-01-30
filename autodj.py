@@ -97,6 +97,8 @@ class AutoDJ:
 		autodj_style_variation = prefs.get("autodj/style_variation")
 		autodj_energy_variation = prefs.get("autodj/energy_variation")
 		autodj_bpm_precision = prefs.get("autodj/bpm_precision")
+		autodj_slider_power = prefs.get("autodj/energy_slider_power")
+		autodj_last_played_influence = prefs.get("autodj/last_played_influence")
 		best_rating = float("-inf")
 		best_track = ""
 		for path in sorted(candidates):
@@ -118,12 +120,13 @@ class AutoDJ:
 			rating -= autodj_age_variation * age_penalty
 			rating -= autodj_style_variation * style_penalty
 			rating -= autodj_energy_variation * energy_penalty
-			rating -= 0.2 * prefs.get("autodj/energy_slider_power") * numeric_energy_penalty
+			rating -= 0.2 * autodj_slider_power * numeric_energy_penalty
 
 			# Bonus for tracks that are played long ago.
-			long_ago = time.time() - metadata.get(path, "last_played")
-			long_ago /= 3600 * 24 * 7  # Every week ago adds 1 point to the rating.
-			rating += long_ago
+			if autodj_last_played_influence > 0:
+				long_ago = time.time() - metadata.get(path, "last_played")
+				long_ago /= 3600 * 24 * 7 * autodj_last_played_influence
+				rating += long_ago
 
 			# Penalties for tracks that are far from the target BPM.
 			rating -= abs(metadata.get(path, "bpm") - bpm_target) * autodj_bpm_precision

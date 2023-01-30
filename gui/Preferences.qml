@@ -559,6 +559,34 @@ Window {
 					elide: Text.ElideRight
 				}
 			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SliderHorizontal {
+					id: autodj_last_played_influence
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["autodj/last_played_influence"]
+					from: 0
+					to: 2
+					onMoved: Lyn.Preferences.set("autodj/last_played_influence", value)
+				}
+				Text {
+					anchors {
+						verticalCenter: autodj_last_played_influence.verticalCenter
+						left: parent.left
+						right: autodj_last_played_influence.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Prefer rarely played tracks"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
 		}
 	}
 }
