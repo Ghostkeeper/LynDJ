@@ -30,6 +30,11 @@ class AutoDJ:
 	"""
 
 	bpm_cadence = [120, 150, 120, 180]
+	energy_to_numeric = {
+		"low": 0,
+		"medium": 50,
+		"high": 100
+	}
 
 	def suggested_track(self) -> str:
 		"""
@@ -85,6 +90,8 @@ class AutoDJ:
 				best_rotate = rotate_n
 				best_rotate_difference = bpm_difference
 		bpm_target = self.bpm_cadence[(len(bpm_to_match) + best_rotate) % len(self.bpm_cadence)]
+		autodj_energy = prefs.get("autodj/energy")
+		bpm_target += autodj_energy - 50
 
 		best_rating = float("-inf")
 		best_track = ""
@@ -95,12 +102,19 @@ class AutoDJ:
 			age = metadata.get(path, "age")
 			style = metadata.get(path, "style")
 			energy = metadata.get(path, "energy")
+			try:
+				numeric_energy = self.energy_to_numeric[energy.lower()]
+			except KeyError:
+				numeric_energy = 50  # Default.
+
 			age_penalty = age_histogram[age]
 			style_penalty = style_histogram[style]
 			energy_penalty = energy_histogram[energy]
+			numeric_energy_penalty = abs(numeric_energy - autodj_energy)
 			rating -= 10 * age_penalty
 			rating -= 10 * style_penalty
 			rating -= 10 * energy_penalty
+			rating -= 0.25 * numeric_energy_penalty
 
 			# Bonus for tracks that are played long ago.
 			long_ago = time.time() - metadata.get(path, "last_played")
