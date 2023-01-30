@@ -76,12 +76,11 @@ Rectangle {
 			verticalAlignment: Text.AlignVCenter
 		}
 
-		Widgets.SpinBox {
+		Widgets.SliderHorizontal {
 			value: Lyn.Preferences.preferences["autodj/energy"]
 			from: 0
 			to: 100
-			stepSize: 10
-			onValueModified: Lyn.Preferences.set("autodj/energy", value)
+			onMoved: Lyn.Preferences.set("autodj/energy", value)
 		}
 
 		Widgets.ColourImage {
