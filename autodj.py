@@ -78,7 +78,7 @@ class AutoDJ:
 		autodj_bpm_cadence = [int(item) for item in prefs.get("autodj/bpm_cadence").strip(",").split(",")]
 		history_to_match = reversed(history[:len(autodj_bpm_cadence)])
 		bpm_to_match = [metadata.get(path, "bpm") for path in history_to_match]
-		bpm_to_match = [bpm if bpm >= 0 else 150 for bpm in bpm_to_match]  # If BPM is unknown, use 150.
+		bpm_to_match = [bpm if bpm >= 0 else prefs.get("playlist/medium_bpm") for bpm in bpm_to_match]  # If BPM is unknown, use medium BPM.
 		best_rotate = -1
 		best_rotate_difference = float("inf")
 		for rotate_n in range(len(autodj_bpm_cadence)):
