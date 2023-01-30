@@ -22,6 +22,9 @@ Window {
 		id: content
 		anchors.fill: parent
 
+		rightPadding: Lyn.Theme.size["margin"].width + (ScrollBar.vertical.visible ? ScrollBar.vertical.width : 0)
+		contentHeight: contentColumn.height + Lyn.Theme.size["margin"].height * 2
+
 		ScrollBar.vertical: Widgets.ScrollBar {
 			anchors.top: parent.top
 			anchors.right: parent.right
@@ -29,13 +32,14 @@ Window {
 		}
 
 		Column {
+			id: contentColumn
 			anchors {
 				top: parent.top
 				topMargin: Lyn.Theme.size["margin"].height
 				left: parent.left
 				leftMargin: Lyn.Theme.size["margin"].width
 			}
-			width: preferences_window.width - Lyn.Theme.size["margin"].width * 2
+			width: preferences_window.width - Lyn.Theme.size["margin"].width - content.rightPadding
 
 			spacing: Lyn.Theme.size["margin"].height
 
