@@ -76,11 +76,23 @@ Rectangle {
 			verticalAlignment: Text.AlignVCenter
 		}
 
-		Widgets.SliderHorizontal {
-			value: Lyn.Preferences.preferences["autodj/energy"]
-			from: 0
-			to: 100
-			onMoved: Lyn.Preferences.set("autodj/energy", value)
+		Row { //For the AutoDJ energy slider.
+			Widgets.ColourImage {
+				source: Lyn.Theme.icon["low_energy"]
+				colour: Lyn.Theme.colour["foreground"]
+			}
+
+			Widgets.SliderHorizontal {
+				value: Lyn.Preferences.preferences["autodj/energy"]
+				from: 0
+				to: 100
+				onMoved: Lyn.Preferences.set("autodj/energy", value)
+			}
+
+			Widgets.ColourImage {
+				source: Lyn.Theme.icon["high_energy"]
+				colour: Lyn.Theme.colour["foreground"]
+			}
 		}
 
 		Widgets.ColourImage {
