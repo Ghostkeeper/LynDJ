@@ -118,6 +118,8 @@ class Player(PySide6.QtCore.QObject):
 			logging.info(f"Stopping playback.")
 			fading = Player.current_track.fade(to_gain=-120, start=playback.current_position, duration=round(preferences.Preferences.getInstance().get("player/fadeout") * 1000))
 			playback.swap(fading)
+			if (time.time() - Player.start_time) / self.currentDuration > 0.5:  # Count it as "played" if we're over halfway through the track.
+				metadata.change(preferences.Preferences.getInstance().get("playlist/playlist")[0], "last_played", time.time())
 			Player.current_track = None
 			Player.control_track.stop()
 			Player.control_track = None
