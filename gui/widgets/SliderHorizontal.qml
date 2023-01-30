@@ -22,8 +22,8 @@ Slider {
 	from: 0
 	to: 1
 	orientation: Qt.Horizontal
-	leftPadding: background_left.height / 2
-	rightPadding: background_right.height / 2
+	leftPadding: background_left.width / 2
+	rightPadding: background_right.width / 2
 
 	//Don't use the official background since the background may contain no IDs.
 	background: Item {}
