@@ -91,7 +91,7 @@ class AutoDJ:
 				best_rotate_difference = bpm_difference
 		bpm_target = self.bpm_cadence[(len(bpm_to_match) + best_rotate) % len(self.bpm_cadence)]
 		autodj_energy = prefs.get("autodj/energy")
-		bpm_target += autodj_energy - 50
+		bpm_target += (autodj_energy - 50) * 0.5
 
 		best_rating = float("-inf")
 		best_track = ""
@@ -114,7 +114,7 @@ class AutoDJ:
 			rating -= 10 * age_penalty
 			rating -= 10 * style_penalty
 			rating -= 10 * energy_penalty
-			rating -= 0.25 * numeric_energy_penalty
+			rating -= 0.1 * numeric_energy_penalty
 
 			# Bonus for tracks that are played long ago.
 			long_ago = time.time() - metadata.get(path, "last_played")
