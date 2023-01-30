@@ -93,6 +93,9 @@ class AutoDJ:
 		autodj_energy = prefs.get("autodj/energy")
 		bpm_target += (autodj_energy - 50) * 0.5
 
+		autodj_age_variation = prefs.get("autodj/age_variation")
+		autodj_style_variation = prefs.get("autodj/style_variation")
+		autodj_energy_variation = prefs.get("autodj/energy_variation")
 		best_rating = float("-inf")
 		best_track = ""
 		for path in sorted(candidates):
@@ -111,9 +114,9 @@ class AutoDJ:
 			style_penalty = style_histogram[style]
 			energy_penalty = energy_histogram[energy]
 			numeric_energy_penalty = abs(numeric_energy - autodj_energy)
-			rating -= 10 * age_penalty
-			rating -= 10 * style_penalty
-			rating -= 10 * energy_penalty
+			rating -= autodj_age_variation * age_penalty
+			rating -= autodj_style_variation * style_penalty
+			rating -= autodj_energy_variation * energy_penalty
 			rating -= 0.1 * numeric_energy_penalty
 
 			# Bonus for tracks that are played long ago.

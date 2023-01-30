@@ -85,6 +85,9 @@ class Application(PySide6.QtGui.QGuiApplication):
 		prefs.add("divider_pos", 0.5)  # As a fraction of the width of the window.
 		prefs.add("playlist/end_time", "23:00")
 		prefs.add("autodj/energy", 50)
+		prefs.add("autodj/age_variation", 10)
+		prefs.add("autodj/style_variation", 10)
+		prefs.add("autodj/energy_variation", 10)
 
 	@PySide6.QtCore.Slot()
 	def closing(self) -> None:

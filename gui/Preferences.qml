@@ -384,6 +384,96 @@ Window {
 					elide: Text.ElideRight
 				}
 			}
+
+			Widgets.Header {
+				width: parent.width
+
+				text: "AutoDJ"
+			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SliderHorizontal {
+					id: autodj_age_variation
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["autodj/age_variation"]
+					from: 0
+					to: 25
+					onMoved: Lyn.Preferences.set("autodj/age_variation", value)
+				}
+				Text {
+					anchors {
+						verticalCenter: autodj_age_variation.verticalCenter
+						left: parent.left
+						right: autodj_age_variation.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Age variation"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SliderHorizontal {
+					id: autodj_style_variation
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["autodj/style_variation"]
+					from: 0
+					to: 25
+					onMoved: Lyn.Preferences.set("autodj/style_variation", value)
+				}
+				Text {
+					anchors {
+						verticalCenter: autodj_style_variation.verticalCenter
+						left: parent.left
+						right: autodj_style_variation.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Style variation"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SliderHorizontal {
+					id: autodj_energy_variation
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["autodj/energy_variation"]
+					from: 0
+					to: 25
+					onMoved: Lyn.Preferences.set("autodj/energy_variation", value)
+				}
+				Text {
+					anchors {
+						verticalCenter: autodj_energy_variation.verticalCenter
+						left: parent.left
+						right: autodj_energy_variation.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Energy variation"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
 		}
 	}
 }
