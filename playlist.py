@@ -76,24 +76,40 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 
 		This will request the data for the files in the given list and fill the model with data.
 		"""
-		self.track_data = []
-		paths = copy.copy(preferences.Preferences.getInstance().get("playlist/playlist"))
-		suggested_track = autodj.AutoDJ().suggested_track()
-		if suggested_track != "":
-			paths.append(suggested_track)
+		new_track_data = []
+		prefs = preferences.Preferences.getInstance()
+		paths = copy.copy(prefs.get("playlist/playlist"))
+		suggested_track = ""
+		if prefs.get("autodj/enabled"):
+			suggested_track = autodj.AutoDJ().suggested_track()
+			if suggested_track != "":
+				paths.append(suggested_track)
 		for path in paths:
 			file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
-			if len(self.track_data) == 0:
+			if len(new_track_data) == 0:
 				file_metadata["cumulative_duration"] = file_metadata["duration"]
 				file_metadata["cumulative_endtime"] = time.time() + file_metadata["duration"]
 			else:
-				file_metadata["cumulative_duration"] = self.track_data[len(self.track_data) - 1]["cumulative_duration"] + file_metadata["duration"]
-				file_metadata["cumulative_endtime"] = self.track_data[len(self.track_data) - 1]["cumulative_endtime"] + file_metadata["duration"]
+				file_metadata["cumulative_duration"] = new_track_data[len(new_track_data) - 1]["cumulative_duration"] + file_metadata["duration"]
+				file_metadata["cumulative_endtime"] = new_track_data[len(new_track_data) - 1]["cumulative_endtime"] + file_metadata["duration"]
 			file_metadata["duration_seconds"] = file_metadata["duration"]
 			file_metadata["suggested"] = False  # Initially False. Set to True later for the one that is suggested.
-			self.track_data.append(file_metadata)
+			new_track_data.append(file_metadata)
 		if suggested_track != "":
-			self.track_data[-1]["suggested"] = True
+			new_track_data[-1]["suggested"] = True
+
+		# Send correct updates to Qt.
+		if len(new_track_data) < len(self.track_data):
+			self.beginRemoveRows(PySide6.QtCore.QModelIndex(), len(new_track_data), len(self.track_data))
+			self.track_data = new_track_data
+			self.endRemoveRows()
+		elif len(new_track_data) > len(self.track_data):
+			self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(self.track_data), len(new_track_data) - 1)
+			self.track_data = new_track_data
+			self.endInsertRows()
+		else:
+			self.track_data = new_track_data
+		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(self.track_data), 0))
 
 	def preferences_changed(self, key):
 		"""
@@ -102,6 +118,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		"""
 		if key in {
 			"playlist/playlist",
+			"autodj/enabled",
 			"autodj/energy",
 			"autodj/age_variation",
 			"autodj/style_variation",
@@ -266,6 +283,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		prefs.changed_internally("playlist/playlist")
 
 		self.endMoveRows()
+		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(self.track_data), 0))
 		self.playlist_changed.emit()
 
 	@PySide6.QtCore.Slot(result="float")
@@ -307,6 +325,8 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		suggested track. But it is not guaranteed.
 		"""
 		if len(self.track_data) == 0:
+			return False
+		if not preferences.Preferences.getInstance().get("autodj/enabled"):
 			return False
 		return self.track_data[-1]["suggested"]
 

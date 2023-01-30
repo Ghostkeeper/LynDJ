@@ -399,6 +399,32 @@ Window {
 				width: parent.width
 				height: childrenRect.height
 
+				Widgets.CheckBox {
+					id: autodj_enabled
+					anchors.right: parent.right
+
+					checkState: Lyn.Preferences.preferences["autodj/enabled"] ? Qt.Checked : Qt.Unchecked
+					onClicked: Lyn.Preferences.set("autodj/enabled", checked)
+				}
+				Text {
+					anchors {
+						verticalCenter: autodj_enabled.verticalCenter
+						left: parent.left
+						right: autodj_enabled.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Age variation"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
 				Widgets.SliderHorizontal {
 					id: autodj_age_variation
 					anchors.right: parent.right

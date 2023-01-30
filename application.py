@@ -84,6 +84,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		prefs.add("window/visibility", "normal")
 		prefs.add("divider_pos", 0.5)  # As a fraction of the width of the window.
 		prefs.add("playlist/end_time", "23:00")
+		prefs.add("autodj/enabled", True)
 		prefs.add("autodj/energy", 50)
 		prefs.add("autodj/age_variation", 10)
 		prefs.add("autodj/style_variation", 10)
