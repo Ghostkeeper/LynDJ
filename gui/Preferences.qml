@@ -503,6 +503,34 @@ Window {
 					elide: Text.ElideRight
 				}
 			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SliderHorizontal {
+					id: autodj_energy_slider_power
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["autodj/energy_slider_power"]
+					from: 0
+					to: 2
+					onMoved: Lyn.Preferences.set("autodj/energy_slider_power", value)
+				}
+				Text {
+					anchors {
+						verticalCenter: autodj_energy_slider_power.verticalCenter
+						left: parent.left
+						right: autodj_energy_slider_power.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Energy slider power"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
 		}
 	}
 }
