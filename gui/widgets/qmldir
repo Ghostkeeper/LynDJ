@@ -1,16 +1,17 @@
 module Widgets
 
-Button         1.0 Button.qml
-ColourImage    1.0 ColourImage.qml
-ColumnResizer  1.0 ColumnResizer.qml
-DirectoryField 1.0 DirectoryField.qml
-DropDown       1.0 DropDown.qml
-Header         1.0 Header.qml
-ImageButton    1.0 ImageButton.qml
-ScreenImage    1.0 ScreenImage.qml
-ScrollBar      1.0 ScrollBar.qml
-Slider         1.0 Slider.qml
-SpinBox        1.0 SpinBox.qml
-TableHeader    1.0 TableHeader.qml
-TextField      1.0 TextField.qml
-TimeSelector   1.0 TimeSelector.qml
+Button           1.0 Button.qml
+ColourImage      1.0 ColourImage.qml
+ColumnResizer    1.0 ColumnResizer.qml
+DirectoryField   1.0 DirectoryField.qml
+DropDown         1.0 DropDown.qml
+Header           1.0 Header.qml
+ImageButton      1.0 ImageButton.qml
+ScreenImage      1.0 ScreenImage.qml
+ScrollBar        1.0 ScrollBar.qml
+Slider           1.0 Slider.qml
+SliderHorizontal 1.0 SliderHorizontal.qml
+SpinBox          1.0 SpinBox.qml
+TableHeader      1.0 TableHeader.qml
+TextField        1.0 TextField.qml
+TimeSelector     1.0 TimeSelector.qml
