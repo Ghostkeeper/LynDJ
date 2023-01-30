@@ -80,7 +80,6 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		paths = copy.copy(preferences.Preferences.getInstance().get("playlist/playlist"))
 		suggested_track = autodj.AutoDJ().suggested_track()
 		if suggested_track != "":
-			print("Adding", suggested_track)
 			paths.append(suggested_track)
 		for path in paths:
 			file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
