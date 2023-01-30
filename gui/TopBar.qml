@@ -70,6 +70,7 @@ Rectangle {
 		Text {
 			height: parent.height
 
+			visible: Lyn.Preferences.preferences["autodj/enabled"]
 			text: "AutoDJ energy:"
 			font: Lyn.Theme.font["default"]
 			color: Lyn.Theme.colour["foreground"]
@@ -77,6 +78,8 @@ Rectangle {
 		}
 
 		Row { //For the AutoDJ energy slider.
+			visible: Lyn.Preferences.preferences["autodj/enabled"]
+
 			Widgets.ColourImage {
 				source: Lyn.Theme.icon["low_energy"]
 				colour: Lyn.Theme.colour["foreground"]
@@ -96,6 +99,7 @@ Rectangle {
 		}
 
 		Widgets.ColourImage {
+			visible: Lyn.Preferences.preferences["autodj/enabled"]
 			source: Lyn.Theme.icon["top_bar_divider"]
 			colour: Lyn.Theme.colour["lining"]
 		}
