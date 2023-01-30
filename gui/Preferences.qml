@@ -474,6 +474,35 @@ Window {
 					elide: Text.ElideRight
 				}
 			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.TextField {
+					id: autodj_bpm_cadence
+					anchors.right: parent.right
+
+					text: Lyn.Preferences.preferences["autodj/bpm_cadence"]
+					validator: RegularExpressionValidator {
+						regularExpression: /[0-9]+(,[0-9]+)*/
+					}
+					onTextEdited: Lyn.Preferences.set("autodj/bpm_cadence", text)
+				}
+				Text {
+					anchors {
+						verticalCenter: autodj_bpm_cadence.verticalCenter
+						left: parent.left
+						right: autodj_bpm_cadence.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "BPM cadence"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
 		}
 	}
 }

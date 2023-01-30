@@ -29,7 +29,6 @@ class AutoDJ:
 	* The energy level and BPM of the track, to match audience energy levels as configured by the user.
 	"""
 
-	bpm_cadence = [120, 150, 120, 180]
 	energy_to_numeric = {
 		"low": 0,
 		"medium": 50,
@@ -76,20 +75,21 @@ class AutoDJ:
 		energy_histogram[""] = sum(energy_histogram.values()) / len(energy_histogram) if energy_histogram else 0
 
 		# See where in the BPM cadence we are currently.
-		history_to_match = reversed(history[:len(self.bpm_cadence)])
+		autodj_bpm_cadence = [int(item) for item in prefs.get("autodj/bpm_cadence").strip(",").split(",")]
+		history_to_match = reversed(history[:len(autodj_bpm_cadence)])
 		bpm_to_match = [metadata.get(path, "bpm") for path in history_to_match]
 		bpm_to_match = [bpm if bpm >= 0 else 150 for bpm in bpm_to_match]  # If BPM is unknown, use 150.
 		best_rotate = -1
 		best_rotate_difference = float("inf")
-		for rotate_n in range(len(self.bpm_cadence)):
-			rotated_bpm_cadence = self.bpm_cadence[rotate_n:] + self.bpm_cadence[:rotate_n]
+		for rotate_n in range(len(autodj_bpm_cadence)):
+			rotated_bpm_cadence = autodj_bpm_cadence[rotate_n:] + autodj_bpm_cadence[:rotate_n]
 			bpm_difference = 0  # Let's sum the differences between the BPM of the tracks and the cadence.
 			for i, bpm in enumerate(bpm_to_match):
 				bpm_difference += abs(rotated_bpm_cadence[i] - bpm)
 			if bpm_difference < best_rotate_difference:
 				best_rotate = rotate_n
 				best_rotate_difference = bpm_difference
-		bpm_target = self.bpm_cadence[(len(bpm_to_match) + best_rotate) % len(self.bpm_cadence)]
+		bpm_target = autodj_bpm_cadence[(len(bpm_to_match) + best_rotate) % len(autodj_bpm_cadence)]
 		autodj_energy = prefs.get("autodj/energy")
 		bpm_target += (autodj_energy - 50) * 0.5
 

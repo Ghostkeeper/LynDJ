@@ -88,6 +88,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		prefs.add("autodj/age_variation", 10)
 		prefs.add("autodj/style_variation", 10)
 		prefs.add("autodj/energy_variation", 10)
+		prefs.add("autodj/bpm_cadence", "120,150,120,180")
 
 	@PySide6.QtCore.Slot()
 	def closing(self) -> None:
