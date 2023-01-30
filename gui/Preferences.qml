@@ -414,7 +414,7 @@ Window {
 						rightMargin: Lyn.Theme.size["margin"].width
 					}
 
-					text: "Age variation"
+					text: "Enabled"
 					font: Lyn.Theme.font["default"]
 					color: Lyn.Theme.colour["foreground"]
 					elide: Text.ElideRight
