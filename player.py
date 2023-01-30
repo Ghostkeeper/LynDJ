@@ -14,7 +14,7 @@ import pydub.playback  # The playback module of Pydub.
 import PySide6.QtCore  # Exposing the player to QML.
 import PySide6.QtGui  # For the QImage to display the Fourier transform.
 import scipy.fft  # For the Fourier transform.
-import time  # To track playtime, and last played time.
+import time  # To track playtime.
 import uuid  # To generate filenames for the Fourier transform cache.
 
 import metadata  # To find or generate the Fourier transform image.
@@ -168,8 +168,6 @@ class Player(PySide6.QtCore.QObject):
 		Player.start_time = time.time()
 		playback.play(Player.current_track)
 		Player.control_track.play()
-
-		metadata.change(next_song, "last_played", time.time())
 
 	def trim_silence(self, track):
 		"""

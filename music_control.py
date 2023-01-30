@@ -6,6 +6,7 @@
 
 import logging
 import PySide6.QtCore  # For QTimers to execute code after a certain amount of time.
+import time  # To update the last played time.
 
 import metadata  # To get the events for a track.
 import playlist  # To remove the track from the playlist when it finishes playing.
@@ -98,4 +99,5 @@ class MusicControl:
 		logging.debug(f"Event for {self.path}: Song ends")
 		# Remove the previous track from the playlist.
 		playlist.Playlist.getInstance().remove(0)
+		metadata.change(self.path, "last_played", time.time())
 		self.player.play_next()
