@@ -107,6 +107,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			"autodj/style_variation",
 			"autodj/energy_variation",
 			"autodj/bpm_cadence",
+			"autodj/bpm_precision",
 			"autodj/energy_slider_power"
 		}:
 			self.update()  # The playlist changed, so update my model.

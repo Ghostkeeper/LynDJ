@@ -96,6 +96,7 @@ class AutoDJ:
 		autodj_age_variation = prefs.get("autodj/age_variation")
 		autodj_style_variation = prefs.get("autodj/style_variation")
 		autodj_energy_variation = prefs.get("autodj/energy_variation")
+		autodj_bpm_precision = prefs.get("autodj/bpm_precision")
 		best_rating = float("-inf")
 		best_track = ""
 		for path in sorted(candidates):
@@ -125,7 +126,7 @@ class AutoDJ:
 			rating += long_ago
 
 			# Penalties for tracks that are far from the target BPM.
-			rating -= abs(metadata.get(path, "bpm") - bpm_target) / 5  # Every 5 BPM difference costs 1 point from the rating.
+			rating -= abs(metadata.get(path, "bpm") - bpm_target) * autodj_bpm_precision
 
 			if rating > best_rating:
 				best_track = path

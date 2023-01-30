@@ -509,6 +509,34 @@ Window {
 				height: childrenRect.height
 
 				Widgets.SliderHorizontal {
+					id: autodj_bpm_precision
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["autodj/bpm_precision"]
+					from: 0
+					to: 0.5
+					onMoved: Lyn.Preferences.set("autodj/bpm_precision", value)
+				}
+				Text {
+					anchors {
+						verticalCenter: autodj_bpm_precision.verticalCenter
+						left: parent.left
+						right: autodj_bpm_precision.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "BPM cadence precision"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SliderHorizontal {
 					id: autodj_energy_slider_power
 					anchors.right: parent.right
 
