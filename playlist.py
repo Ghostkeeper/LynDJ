@@ -98,17 +98,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		if suggested_track != "":
 			new_track_data[-1]["suggested"] = True
 
-		# Send correct updates to Qt.
-		if len(new_track_data) < len(self.track_data):
-			self.beginRemoveRows(PySide6.QtCore.QModelIndex(), len(new_track_data), len(self.track_data))
-			self.track_data = new_track_data
-			self.endRemoveRows()
-		elif len(new_track_data) > len(self.track_data):
-			self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(self.track_data), len(new_track_data) - 1)
-			self.track_data = new_track_data
-			self.endInsertRows()
-		else:
-			self.track_data = new_track_data
+		self.track_data = new_track_data
 		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(self.track_data), 0))
 
 	def preferences_changed(self, key):
