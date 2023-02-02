@@ -12,6 +12,7 @@ import PySide6.QtGui  # To calculate display colours for song tempo.
 import time  # To determine the remaining time until songs in the playlist start/end playing.
 
 import metadata  # To show file metadata in the playlist table.
+import player  # To trigger updates after the song changes.
 import preferences  # To store the playlist between restarts.
 import theme  # To get the colours for the BPM indication.
 
@@ -47,6 +48,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 			user_role + 5: "comment",  # Any comment for the track.
 		}
 
+		player.Player.get_instance().songChanged.connect(self.update)  # Update the history when the current song changes.
 		self.track_data = []  # The source of data for the model.
 		self.update()
 
