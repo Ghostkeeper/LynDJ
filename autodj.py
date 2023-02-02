@@ -5,6 +5,7 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import collections  # Using defaultdict.
+import logging
 import os  # To find the candidate tracks.
 import os.path  # To find the candidate tracks.
 import time  # To find tracks that were played this session (within 24 hours ago).
@@ -135,6 +136,7 @@ class AutoDJ:
 				best_track = path
 				best_rating = rating
 
+		logging.debug(f"The AutoDJ suggests track: {best_track}")
 		return best_track
 
 	def get_history(self) -> list:
