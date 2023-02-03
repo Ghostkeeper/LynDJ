@@ -23,7 +23,7 @@ Installation
 ------------
 There are several ways to install this application onto your computer. This outlines your options, from easy to hard. Each option includes instructions for various platforms. If your platform is not listed, please select the most similar platform (e.g. for Arch Linux, installation is probably similar to Ubuntu).
 
-<detail>
+<details>
 	<summary>From source</summary>
 	Ubuntu 22.04
 	------------
@@ -44,4 +44,4 @@ There are several ways to install this application onto your computer. This outl
 	```
 	python3 lyndj.py
 	```
-</detail>
+</details>
