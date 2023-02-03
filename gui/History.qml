@@ -12,7 +12,7 @@ import "./widgets" as Widgets
 
 ListView {
 	id: history
-	height: Math.min(300, contentHeight)
+	implicitHeight: Math.min(parent.height / 2, contentHeight)
 
 	clip: true
 	ScrollBar.vertical: Widgets.ScrollBar {}
@@ -70,6 +70,28 @@ ListView {
 
 			text: model.duration
 			font: Lyn.Theme.font["default"]
+		}
+	}
+
+	headerPositioning: ListView.OverlayHeader
+	header: Rectangle {
+		anchors {
+			left: parent.left
+			right: parent.right
+		}
+		height: childrenRect.height
+
+		color: Lyn.Theme.colour["background"]
+		z: 4
+
+		Widgets.ColourImage {
+			anchors {
+				left: parent.left
+				right: parent.right
+			}
+
+			colour: Lyn.Theme.colour["lining"]
+			source: Lyn.Theme.icon["horizontal_divider"]
 		}
 	}
 }
