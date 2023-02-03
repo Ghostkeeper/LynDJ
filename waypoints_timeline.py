@@ -194,6 +194,8 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		"""
 		if player.Player.current_track is not None:
 			self.duration = len(player.Player.current_track) / 1000.0
+		elif self.current_path == "":
+			self.duration = 0
 		else:
 			self.duration = metadata.get(self.current_path, "duration")
 
