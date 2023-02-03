@@ -156,6 +156,6 @@ class AutoDJ:
 		playlist = prefs.get("playlist/playlist")
 		paths -= set(playlist)  # The playlist will be the files that are most recently played by the time the suggested track plays. Add them later.
 		one_day_ago = time.time() - 24 * 3600
-		paths = [path for path in paths if lyndj.metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
+		paths = [path for path in paths if lyndj.metadata.has(path) and lyndj.metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
 		paths = list(sorted(paths, key=lambda path: lyndj.metadata.get(path, "last_played"), reverse=True))
 		return list(reversed(playlist)) + paths
