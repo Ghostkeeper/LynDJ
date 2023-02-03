@@ -64,7 +64,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 		directory = prefs.get("browse_path")
 		paths = set(filter(lyndj.metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
 		one_day_ago = time.time() - 24 * 3600
-		paths = [path for path in paths if lyndj.metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
+		paths = [path for path in paths if lyndj.metadata.has(path) and lyndj.metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
 		paths = list(sorted(paths, key=lambda path: lyndj.metadata.get(path, "last_played"), reverse=True))
 
 		for path in paths:
