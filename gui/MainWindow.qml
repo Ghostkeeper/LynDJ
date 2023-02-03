@@ -101,7 +101,7 @@ ApplicationWindow {
 			id: playlist
 			anchors {
 				top: parent.top
-				bottom: parent.bottom
+				bottom: history.top
 				left: vertical_divider.right
 				right: parent.right
 				rightMargin: Lyn.Theme.size["margin"].width
@@ -110,6 +110,56 @@ ApplicationWindow {
 				if(currentItem) {
 					file_browser.selectByPath(currentItem.path);
 				}
+			}
+		}
+
+		Gui.History {
+			id: history
+			anchors {
+				bottom: parent.bottom
+				left: vertical_divider.right
+				right: parent.right
+				rightMargin: Lyn.Theme.size["margin"].width
+			}
+			height: 0
+
+			onImplicitHeightChanged: {
+				if(height > 0) {
+					height = implicitHeight;
+				}
+			}
+
+			Behavior on height {
+				PropertyAnimation {
+					duration: 500
+					easing.type: Easing.InOutQuad
+				}
+			}
+		}
+
+		Rectangle {
+			anchors {
+				horizontalCenter: playlist.horizontalCenter
+				bottom: history.top
+				bottomMargin: -Lyn.Theme.size["border_offset"].height
+			}
+			width: childrenRect.width
+			height: childrenRect.height
+
+			color: Lyn.Theme.colour["background"]
+
+			Widgets.ImageButton {
+				source: Lyn.Theme.icon[history.height === 0 ? "expando_up" : "expando_down"]
+				colour: Lyn.Theme.colour["lining"]
+				onClicked: {
+					if(history.height === history.implicitHeight) {
+						history.height = 0;
+					} else {
+						history.height = history.implicitHeight;
+					}
+				}
+				ToolTip.text: history.height === 0 ? "Show history" : "Hide history"
+				ToolTip.delay: 500
 			}
 		}
 
