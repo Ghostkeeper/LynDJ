@@ -232,7 +232,7 @@ class Player(PySide6.QtCore.QObject):
 		# Get some metadata about this sound. We need the number of (stereo) channels and the bit depth.
 		sound = sound.set_channels(1)  # Mix to mono.
 		bit_depth = sound.sample_width * 8
-		waveform_dtype = numpy.byte if bit_depth == 8 else numpy.short if bit_depth == 16 else numpy.int
+		waveform_dtype = numpy.byte if bit_depth == 8 else numpy.short if bit_depth == 16 else int
 
 		# Get the waveform and transform it into frequency space.
 		waveform = sound.get_array_of_samples()
@@ -251,7 +251,7 @@ class Player(PySide6.QtCore.QObject):
 		split_points = numpy.logspace(1, math.log10(chunk_size), num_channels).astype(numpy.int32)  # We'll display a certain number of frequencies as vertical pixels. They are logarithmically spaced on the frequency spectrum.
 		split_points = split_points[:-1]  # The last one is not a split point, but the end. No need to split there.
 
-		transformed = numpy.zeros((num_chunks, num_channels), dtype=numpy.float)  # Result array for the transformed chunks.
+		transformed = numpy.zeros((num_chunks, num_channels), dtype=float)  # Result array for the transformed chunks.
 		for i, chunk in enumerate(chunks):
 			fourier = scipy.fft.rfft(chunk)
 			fourier = numpy.abs(fourier[0:len(fourier) // 2])  # Ignore the top 50% of the image which repeats due to Nyquist.
