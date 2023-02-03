@@ -80,10 +80,18 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		prefs = preferences.Preferences.getInstance()
 		paths = copy.copy(prefs.get("playlist/playlist"))
 		suggested_track = ""
+		added_double_suggested = False
 		if prefs.get("autodj/enabled"):
 			suggested_track = autodj.AutoDJ().suggested_track()
 			if suggested_track != "":
 				paths.append(suggested_track)
+				if len(paths) == 1:  # If this is the only track in the playlist, actually go and add it to the playlist for real.
+					prefs.get("playlist/playlist").append(suggested_track)
+					# And then give a new suggestion.
+					suggested_track = autodj.AutoDJ().suggested_track()
+					if suggested_track != "":
+						added_double_suggested = True
+						paths.append(suggested_track)
 		for path in paths:
 			file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
 			if len(new_track_data) == 0:
@@ -98,7 +106,11 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		if suggested_track != "":
 			new_track_data[-1]["suggested"] = True
 
+		if added_double_suggested:
+			self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(new_track_data), len(new_track_data))
 		self.track_data = new_track_data
+		if added_double_suggested:
+			self.endInsertRows()
 		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(self.track_data), 0))
 
 	def preferences_changed(self, key):
