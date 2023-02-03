@@ -98,6 +98,6 @@ class MusicControl:
 		"""
 		logging.debug(f"Event for {self.path}: Song ends")
 		# Remove the previous track from the playlist.
+		metadata.change(self.path, "last_played", time.time())  # Update last played first so that AutoDJ adds a correct new song when we remove it from the playlist.
 		playlist.Playlist.getInstance().remove(0)
-		metadata.change(self.path, "last_played", time.time())
 		self.player.play_next()
