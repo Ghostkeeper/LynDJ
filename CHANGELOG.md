@@ -54,3 +54,7 @@ This is the first release of LynDJ. This release has the following features:
 * A session end time can be set to remind the DJ when he's going over time and by how much.
 * The AutoDJ will suggest the next track to add to the playlist.
   * The suggested track is shown above the playlist, and can be added with the push of a button.
+  * A slider adjusts the energy level of the AutoDJ.
+  * A bunch of parameters can be changed to adjust the suggestions of the AutoDJ.
+* A history of the most recently played tracks.
+  * The history is located beneath the playlist and can be folded out and in.
