@@ -139,6 +139,15 @@ store_timer.setSingleShot(True)
 store_timer.setInterval(250)
 store_timer.timeout.connect(store)
 
+def has(path):
+	"""
+	Get whether we have any metadata entry about a file.
+
+	If we don't have any metadata, getting metadata would raise a ``KeyError``.
+	:param path: The path to test for.
+	:return: ``True`` if we have a metadata entry about the file, or ``False`` if we don't.
+	"""
+
 def get(path, field):
 	"""
 	Get a metadata field from the cache about a certain file.

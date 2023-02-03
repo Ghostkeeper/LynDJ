@@ -48,7 +48,7 @@ class AutoDJ:
 		candidates = set(filter(lyndj.metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
 
 		# Files without BPM are special and shouldn't be suggested.
-		candidates = {path for path in candidates if lyndj.metadata.get(path, "bpm") >= 0}
+		candidates = {path for path in candidates if lyndj.metadata.has(path) and lyndj.metadata.get(path, "bpm") >= 0}
 
 		candidates -= set(prefs.get("playlist/playlist"))  # Anything in the playlist is not allowed to be in there twice.
 		if len(candidates) == 0:
