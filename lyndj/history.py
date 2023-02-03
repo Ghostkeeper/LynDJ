@@ -11,10 +11,10 @@ import PySide6.QtCore  # To expose this list to QML.
 import PySide6.QtGui  # To calculate display colours for song tempo.
 import time  # To determine the remaining time until songs in the playlist start/end playing.
 
-import metadata  # To show file metadata in the playlist table.
-import player  # To trigger updates after the song changes.
-import preferences  # To store the playlist between restarts.
-import theme  # To get the colours for the BPM indication.
+import lyndj.metadata  # To show file metadata in the playlist table.
+import lyndj.player  # To trigger updates after the song changes.
+import lyndj.preferences  # To store the playlist between restarts.
+import lyndj.theme  # To get the colours for the BPM indication.
 
 class History(PySide6.QtCore.QAbstractListModel):
 	"""
@@ -48,7 +48,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 			user_role + 5: "comment",  # Any comment for the track.
 		}
 
-		player.Player.get_instance().songChanged.connect(self.update)  # Update the history when the current song changes.
+		lyndj.player.Player.get_instance().songChanged.connect(self.update)  # Update the history when the current song changes.
 		self.track_data = []  # The source of data for the model.
 		self.update()
 
@@ -60,15 +60,15 @@ class History(PySide6.QtCore.QAbstractListModel):
 		"""
 		new_track_data = []
 
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		directory = prefs.get("browse_path")
-		paths = set(filter(metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
+		paths = set(filter(lyndj.metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
 		one_day_ago = time.time() - 24 * 3600
-		paths = [path for path in paths if metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
-		paths = list(sorted(paths, key=lambda path: metadata.get(path, "last_played"), reverse=True))
+		paths = [path for path in paths if lyndj.metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
+		paths = list(sorted(paths, key=lambda path: lyndj.metadata.get(path, "last_played"), reverse=True))
 
 		for path in paths:
-			file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
+			file_metadata = copy.copy(lyndj.metadata.metadata[path])  # Make a copy that we can add information to.
 			new_track_data.append(file_metadata)
 
 		# Send correct updates to Qt.
@@ -137,14 +137,14 @@ class History(PySide6.QtCore.QAbstractListModel):
 				return "0:00"
 		if field == "bpm":
 			# Display tempo as a colour!
-			theme_inst = theme.Theme.getInstance()
+			theme_inst = lyndj.theme.Theme.getInstance()
 			slow = theme_inst.colours["tempo_slow"]
 			slow_rgba = [slow.red(), slow.green(), slow.blue(), slow.alpha()]
 			medium = theme_inst.colours["tempo_medium"]
 			medium_rgba = [medium.red(), medium.green(), medium.blue(), medium.alpha()]
 			fast = theme_inst.colours["tempo_fast"]
 			fast_rgba = [fast.red(), fast.green(), fast.blue(), fast.alpha()]
-			prefs = preferences.Preferences.getInstance()
+			prefs = lyndj.preferences.Preferences.getInstance()
 			slow_bpm = prefs.get("playlist/slow_bpm")
 			medium_bpm = prefs.get("playlist/medium_bpm")
 			fast_bpm = prefs.get("playlist/fast_bpm")

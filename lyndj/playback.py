@@ -9,8 +9,8 @@ import pydub.utils  # For volume effects.
 import time  # To sleep the thread when there is no audio to play.
 import threading  # The audio is played on a different thread.
 
-import player  # To get the playback parameters.
-import preferences
+import lyndj.player  # To get the playback parameters.
+import lyndj.preferences
 
 audio_source = None
 current_position = 0  # Location in the file where we are currently playing (in ms).
@@ -46,12 +46,12 @@ def filter(chunk):
 	:return: A filtered chunk of audio.
 	"""
 	# Apply player volume.
-	volume = player.Player.main_volume
+	volume = lyndj.player.Player.main_volume
 	gain = pydub.utils.ratio_to_db(volume)
 	chunk = chunk + gain
 
 	# Convert to mono, if necessary.
-	if player.Player.is_mono and chunk.channels == 2:
+	if lyndj.player.Player.is_mono and chunk.channels == 2:
 		channels = chunk.split_to_mono()
 		new = channels[0].overlay(channels[1]) - 4  # -4dB because we're doubling the sound, so we must halve the amplitude first.
 		chunk = pydub.AudioSegment.from_mono_audiosegments(new, new)
@@ -92,7 +92,7 @@ def play_loop():
 			if current_position >= len(audio_source):  # Playback completed. Stop taking the GIL and go into stand-by.
 				audio_source = None
 				continue
-			chunk_size = preferences.Preferences.getInstance().get("player/buffer_size")
+			chunk_size = lyndj.preferences.Preferences.getInstance().get("player/buffer_size")
 			chunk = audio_source[current_position:current_position + chunk_size]
 			chunk = filter(chunk)
 			stream.write(chunk.raw_data)

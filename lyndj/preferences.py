@@ -13,7 +13,7 @@ import PySide6.QtCore  # To allow preferences to be reached from QML.
 import PySide6.QtQml  # To register the type as singleton in QML.
 import typing
 
-import storage  # To know where to store the preferences file.
+import lyndj.storage  # To know where to store the preferences file.
 
 QML_IMPORT_NAME = "Lyn"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -58,7 +58,7 @@ class Preferences(PySide6.QtCore.QObject):
 		self.save_timer.setInterval(250)  # After a preference changed, after 250ms, it'll auto-save.
 		self.save_timer.timeout.connect(self.save)
 
-		storage.ensure_exists()
+		lyndj.storage.ensure_exists()
 		self.ensure_exists()
 
 		self.defaults = {}
@@ -175,7 +175,7 @@ class Preferences(PySide6.QtCore.QObject):
 		Get the path to the preferences file on this computer.
 		:return: A file path to a JSON file where the preferences are stored.
 		"""
-		return os.path.join(storage.config(), "preferences.json")
+		return os.path.join(lyndj.storage.config(), "preferences.json")
 
 	valuesChanged = PySide6.QtCore.Signal(str)
 	"""

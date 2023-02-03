@@ -18,7 +18,7 @@ import threading  # To store the database after a certain amount of time.
 import time  # To store the database after a certain amount of time.
 import sqlite3  # To cache metadata on disk.
 
-import storage  # To know where to store the database.
+import lyndj.storage  # To know where to store the database.
 
 metadata = {}
 """
@@ -34,7 +34,7 @@ def load():
 
 	All of the metadata in the database file will get stored in the ``metadata`` dict.
 	"""
-	db_file = os.path.join(storage.data(), "metadata.db")
+	db_file = os.path.join(lyndj.storage.data(), "metadata.db")
 	if not os.path.exists(db_file):
 		return  # No metadata to read.
 	connection = sqlite3.connect(db_file)
@@ -102,7 +102,7 @@ def store():
 	"""
 	Serialises the metadata on disk in a database file.
 	"""
-	db_file = os.path.join(storage.data(), "metadata.db")
+	db_file = os.path.join(lyndj.storage.data(), "metadata.db")
 	if not os.path.exists(db_file):
 		# Create the database anew.
 		logging.info("Creating metadata database.")

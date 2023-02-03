@@ -9,7 +9,7 @@ import queue  # A task queue.
 import threading  # To run tasks in a background thread.
 import time  # To sleep the background thread regularly.
 
-import player  # To test if music is playing. Some tasks may not execute while music is playing.
+import lyndj.player  # To test if music is playing. Some tasks may not execute while music is playing.
 
 class BackgroundTasks(PySide6.QtCore.QObject):
 	"""
@@ -73,7 +73,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 				task, description, allow_during_playback = self.tasks.get(block=False)
 			except queue.Empty:
 				continue  # Just check again 1 iteration later.
-			if not allow_during_playback and player.Player.get_instance().isPlaying:
+			if not allow_during_playback and lyndj.player.Player.get_instance().isPlaying:
 				self.tasks.put((task, description, allow_during_playback))  # Put it back at the end of the queue.
 				continue
 			if self.current_description != description:

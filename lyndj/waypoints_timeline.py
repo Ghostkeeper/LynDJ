@@ -10,9 +10,9 @@ import PySide6.QtQuick  # This class extends QQuickPaintedItem.
 import PySide6.QtSvg  # To render the graph.
 import time  # To generate timestamps for the graph.
 
-import metadata  # To get the waypoints of a song.
-import player  # To get the current play time.
-import theme  # To get the colours to draw the graph in.
+import lyndj.metadata  # To get the waypoints of a song.
+import lyndj.player  # To get the current play time.
+import lyndj.theme  # To get the colours to draw the graph in.
 
 def colour_to_hex(colour) -> str:
 	"""
@@ -121,13 +121,13 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.duration = 0  # We need to know the duration of the song in order to draw the timestamps in the correct place.
 
 		# When we are playing a song, we have a more accurate duration (stripped from silence).
-		player.Player.get_instance().is_playing_changed.connect(self.update_duration)
+		lyndj.player.Player.get_instance().is_playing_changed.connect(self.update_duration)
 
 		# If a transition is currently being made, store the start time of that transition until we can add the complete transition.
 		self.ongoing_transition_start_time = None
 
-		self.colour = colour_to_hex(theme.Theme.getInstance().colours["foreground"])
-		self.background_colour = colour_to_hex(theme.Theme.getInstance().colours["background"])
+		self.colour = colour_to_hex(lyndj.theme.Theme.getInstance().colours["foreground"])
+		self.background_colour = colour_to_hex(lyndj.theme.Theme.getInstance().colours["background"])
 
 		# When resizing the image, we must re-render.
 		self.widthChanged.connect(self.generate_graph)
@@ -146,7 +146,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		"""
 		self.current_path = new_path
 		try:
-			self.waypoints = self.parse_waypoints(metadata.get(new_path, self.current_field))  # Update the waypoints to represent the new path.
+			self.waypoints = self.parse_waypoints(lyndj.metadata.get(new_path, self.current_field))  # Update the waypoints to represent the new path.
 		except KeyError:  # Path doesn't exist. Happens at init when path is still empty string.
 			self.waypoints = []
 		self.update_duration()
@@ -169,7 +169,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		"""
 		self.current_field = new_field
 		try:
-			self.waypoints = self.parse_waypoints(metadata.get(self.current_path, new_field))  # Update the waypoints to represent the new path.
+			self.waypoints = self.parse_waypoints(lyndj.metadata.get(self.current_path, new_field))  # Update the waypoints to represent the new path.
 		except KeyError:  # Field doesn't exist. Happens at init when path is still empty string.
 			self.waypoints = []
 		self.generate_graph()
@@ -192,12 +192,12 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		If a song is playing, it'll use the duration of that song.
 		If no song is playing, it'll get the duration from the metadata of the current path.
 		"""
-		if player.Player.current_track is not None:
-			self.duration = len(player.Player.current_track) / 1000.0
+		if lyndj.player.Player.current_track is not None:
+			self.duration = len(lyndj.player.Player.current_track) / 1000.0
 		elif self.current_path == "":
 			self.duration = 0
 		else:
-			self.duration = metadata.get(self.current_path, "duration")
+			self.duration = lyndj.metadata.get(self.current_path, "duration")
 
 	def generate_graph(self) -> None:
 		"""
@@ -300,7 +300,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.waypoints.insert(pos_start + 1, (time_end, level_end))
 
 		# Store this information and re-render.
-		metadata.change(self.current_path, self.current_field, self.serialise_waypoints(self.waypoints))
+		lyndj.metadata.change(self.current_path, self.current_field, self.serialise_waypoints(self.waypoints))
 		self.generate_graph()
 		self.update()
 
@@ -312,9 +312,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		This stores the start time and start value of the transition.
 		:param start_time: The time when the transition started.
 		"""
-		if player.Player.start_time is None:
+		if lyndj.player.Player.start_time is None:
 			return  # No song is currently playing.
-		current_time = time.time() - player.Player.start_time
+		current_time = time.time() - lyndj.player.Player.start_time
 		logging.debug(f"Starting transition at {current_time}")
 		self.ongoing_transition_start_time = current_time
 
@@ -327,12 +327,12 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		:param end_time: The time when the transition ends.
 		:param end_level: The level at which the transition ends.
 		"""
-		if player.Player.start_time is None:
+		if lyndj.player.Player.start_time is None:
 			return  # No song is currently playing.
 		if self.ongoing_transition_start_time is None:
 			logging.error("Trying to end a transition before starting it.")
 			return
-		current_time = time.time() - player.Player.start_time
+		current_time = time.time() - lyndj.player.Player.start_time
 		logging.debug(f"Ending transition from {self.ongoing_transition_start_time} to {current_time}, level {end_level}.")
 		self.add_transition(self.ongoing_transition_start_time, current_time, end_level)
 		self.ongoing_transition_start_time = None  # Reset this one for the next transition.

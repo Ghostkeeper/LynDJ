@@ -11,11 +11,11 @@ import os.path  # To list file paths in the music directory.
 import PySide6.QtCore  # To expose this table to QML.
 import time  # To display the last played time relative to the current time.
 
-import background_tasks
-import metadata  # To get information about the files in the music directory.
-import player  # To cache Fourier images of the tracks in this directory.
-import preferences  # To store the sorting order.
-import sorting  # To invert a sorting order.
+import lyndj.background_tasks
+import lyndj.metadata  # To get information about the files in the music directory.
+import lyndj.player  # To cache Fourier images of the tracks in this directory.
+import lyndj.preferences  # To store the sorting order.
+import lyndj.sorting  # To invert a sorting order.
 
 class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 	"""
@@ -32,7 +32,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		self.column_fields = ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy"]
 
 		self._directory = ""
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		if not prefs.has("directory/sort_order"):
 			prefs.add("directory/sort_order", ["bpm", "last_played", "age", "style", "energy", "title", "duration", "author", "comment"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
 		if not prefs.has("directory/sort_direction"):
@@ -140,7 +140,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		logging.info(f"Sorting music directory by {column}, {'descending' if descending_order else 'ascending'}")
 		if type(column) is int:
 			column = self.column_fields[column]
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		sort_field = prefs.get("directory/sort_order")
 		sort_direction = prefs.get("directory/sort_direction")
 		current_index = sort_field.index(column)  # Remove the old place in the sorting priority.
@@ -158,7 +158,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		"""
 		Re-sort the table according to the current sorting priority list.
 		"""
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		sort_field = prefs.get("directory/sort_order")
 		sort_direction = prefs.get("directory/sort_direction")
 		def sort_key(entry):
@@ -173,7 +173,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 				if type(value) == str:
 					value = value.lower()
 				if sort_direction[i]:
-					value = sorting.ReverseOrder(value)
+					value = lyndj.sorting.ReverseOrder(value)
 				key.append(value)
 			return key
 
@@ -191,9 +191,9 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		if not os.path.exists(new_directory):  # User is probably still typing.
 			return
 
-		metadata.add_directory(new_directory)  # Make sure we have the metadata cached of all files in this new directory.
-		files = set(filter(metadata.is_music_file, [os.path.join(new_directory, filename) for filename in os.listdir(new_directory)]))
-		new_music = [metadata.metadata[path] for path in files]  # Prepare the music itself, so that the switch to the user appears as quickly as possible.
+		lyndj.metadata.add_directory(new_directory)  # Make sure we have the metadata cached of all files in this new directory.
+		files = set(filter(lyndj.metadata.is_music_file, [os.path.join(new_directory, filename) for filename in os.listdir(new_directory)]))
+		new_music = [lyndj.metadata.metadata[path] for path in files]  # Prepare the music itself, so that the switch to the user appears as quickly as possible.
 
 		# Remove all old data from the table. We're assuming that since the directory changed, all files will be different.
 		self.beginRemoveRows(PySide6.QtCore.QModelIndex(), 0, len(self.music) - 1)
@@ -210,10 +210,10 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 
 		# Add background tasks for caching Fourier images.
 		def cache_fourier(path):
-			player.Player.get_instance().load_and_generate_fourier(path)
-		tasks = background_tasks.BackgroundTasks.get_instance()
+			lyndj.player.Player.get_instance().load_and_generate_fourier(path)
+		tasks = lyndj.background_tasks.BackgroundTasks.get_instance()
 		for path in files:
-			fourier_file = metadata.get(path, "fourier")
+			fourier_file = lyndj.metadata.get(path, "fourier")
 			if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
 				tasks.add(lambda p=path: cache_fourier(p), "Generating spectrograph", allow_during_playback=False)
 
@@ -235,7 +235,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		* 0: The field is not sorted (not the highest priority anyway).
 		* -1: The field is sorted in descending order.
 		"""
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		if prefs.get("directory/sort_order")[0] != field:  # Not the highest priority sort.
 			return 0
 		if prefs.get("directory/sort_direction")[0]:  # Descending.
@@ -277,7 +277,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		:param key: The metadata entry to change.
 		:param value: The new value for this metadata entry.
 		"""
-		metadata.change(path, key, value)
+		lyndj.metadata.change(path, key, value)
 		# Looking up where in the table the data changed is much more expensive than just triggering an update of the entire column.
 		column = self.column_fields.index(key)
 		self.dataChanged.emit(self.createIndex(0, column), self.createIndex(len(self.music) - 1, column))

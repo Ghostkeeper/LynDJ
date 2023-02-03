@@ -17,11 +17,11 @@ import scipy.fft  # For the Fourier transform.
 import time  # To track playtime.
 import uuid  # To generate filenames for the Fourier transform cache.
 
-import metadata  # To find or generate the Fourier transform image.
-import music_control  # To control the currently playing track.
-import playback  # To actually play the music.
-import preferences  # To get the playlist.
-import storage  # To cache Fourier transform images.
+import lyndj.metadata  # To find or generate the Fourier transform image.
+import lyndj.music_control  # To control the currently playing track.
+import lyndj.playback  # To actually play the music.
+import lyndj.preferences  # To get the playlist.
+import lyndj.storage  # To cache Fourier transform images.
 
 class Player(PySide6.QtCore.QObject):
 	"""
@@ -87,7 +87,7 @@ class Player(PySide6.QtCore.QObject):
 		:param parent: A parent Qt Object that this object is a child of.
 		"""
 		super().__init__(parent)
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		if not prefs.has("player/fadeout"):
 			prefs.add("player/fadeout", 2.0)  # Fade-out for 2 seconds by default.
 		if not prefs.has("player/fourier_samples"):
@@ -116,10 +116,10 @@ class Player(PySide6.QtCore.QObject):
 			self.play_next()
 		elif Player.current_track is not None and not new_is_playing:
 			logging.info(f"Stopping playback.")
-			fading = Player.current_track.fade(to_gain=-120, start=playback.current_position, duration=round(preferences.Preferences.getInstance().get("player/fadeout") * 1000))
-			playback.swap(fading)
+			fading = Player.current_track.fade(to_gain=-120, start=lyndj.playback.current_position, duration=round(lyndj.preferences.Preferences.getInstance().get("player/fadeout") * 1000))
+			lyndj.playback.swap(fading)
 			if (time.time() - Player.start_time) / self.currentDuration > 0.5:  # Count it as "played" if we're over halfway through the track.
-				metadata.change(preferences.Preferences.getInstance().get("playlist/playlist")[0], "last_played", time.time())
+				lyndj.metadata.change(lyndj.preferences.Preferences.getInstance().get("playlist/playlist")[0], "last_played", time.time())
 			Player.current_track = None
 			Player.control_track.stop()
 			Player.control_track = None
@@ -141,7 +141,7 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		Play the next song in the playlist.
 		"""
-		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
+		current_playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
 		if len(current_playlist) == 0:  # Nothing left in the playlist.
 			self.is_playing_set(False)
 			return
@@ -154,21 +154,21 @@ class Player(PySide6.QtCore.QObject):
 			codec = None
 		track = pydub.AudioSegment.from_file(next_song, codec=codec)
 		Player.current_track = self.trim_silence(track)
-		Player.control_track = music_control.MusicControl(next_song, Player.current_track, self)
+		Player.control_track = lyndj.music_control.MusicControl(next_song, Player.current_track, self)
 
-		fourier_file = metadata.get(next_song, "fourier")
+		fourier_file = lyndj.metadata.get(next_song, "fourier")
 		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
 			fourier = self.generate_fourier(Player.current_track, next_song)
 			filename = os.path.splitext(os.path.basename(next_song))[0] + uuid.uuid4().hex[:8] + ".png"  # File's filename, but with an 8-character random string to prevent collisions.
-			filepath = os.path.join(storage.cache(), "fourier", filename)
+			filepath = os.path.join(lyndj.storage.cache(), "fourier", filename)
 			fourier.save(filepath)
-			metadata.change(next_song, "fourier", filepath)
+			lyndj.metadata.change(next_song, "fourier", filepath)
 
 		self.set_volume(0.5)  # Back to default for the next song.
 
 		self.songChanged.emit()  # We loaded up a new song.
 		Player.start_time = time.time()
-		playback.play(Player.current_track)
+		lyndj.playback.play(Player.current_track)
 		Player.control_track.play()
 
 	def trim_silence(self, track):
@@ -211,15 +211,15 @@ class Player(PySide6.QtCore.QObject):
 		:param path: The path to the file we're generating the Fourier transform for.
 		"""
 		logging.debug(f"Caching Fourier image for {path}")
-		fourier_file = metadata.get(path, "fourier")
+		fourier_file = lyndj.metadata.get(path, "fourier")
 		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
 			segment = pydub.AudioSegment.from_file(path)
 			segment = self.trim_silence(segment)
 			fourier = self.generate_fourier(segment, path)
 			filename = os.path.splitext(os.path.basename(path))[0] + uuid.uuid4().hex[:8] + ".png"  # File's filename, but with an 8-character random string to prevent collisions.
-			filepath = os.path.join(storage.cache(), "fourier", filename)
+			filepath = os.path.join(lyndj.storage.cache(), "fourier", filename)
 			fourier.save(filepath)
-			metadata.change(path, "fourier", filepath)
+			lyndj.metadata.change(path, "fourier", filepath)
 
 	def generate_fourier(self, sound, path):
 		"""
@@ -238,7 +238,7 @@ class Player(PySide6.QtCore.QObject):
 		waveform = sound.get_array_of_samples()
 		num_samples = math.floor(len(waveform) / sound.sample_width)
 		waveform = waveform[:num_samples * sound.sample_width]
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		num_chunks = prefs.get("player/fourier_samples")
 		num_channels = prefs.get("player/fourier_channels")
 		if len(waveform) == 0:  # We were unable to read the audio file.
@@ -276,7 +276,7 @@ class Player(PySide6.QtCore.QObject):
 		get played.
 		"""
 		logging.info("Clearing all cached Fourier images.")
-		directory = os.path.join(storage.cache(), "fourier")
+		directory = os.path.join(lyndj.storage.cache(), "fourier")
 		for filename in os.listdir(directory):
 			os.remove(os.path.join(directory, filename))
 
@@ -288,11 +288,11 @@ class Player(PySide6.QtCore.QObject):
 		Get the path to the currently playing song's Fourier image.
 		:return: A path to an image.
 		"""
-		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
+		current_playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
 		if len(current_playlist) == 0:
 			return ""
 		current_path = current_playlist[0]
-		return metadata.get(current_path, "fourier")
+		return lyndj.metadata.get(current_path, "fourier")
 
 	@PySide6.QtCore.Property(float, notify=songChanged)
 	def currentDuration(self) -> float:
@@ -312,11 +312,11 @@ class Player(PySide6.QtCore.QObject):
 		Get the title of the current song.
 		:return: The title of the currently playing song.
 		"""
-		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
+		current_playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
 		if len(current_playlist) == 0:
 			return ""
 		current_path = current_playlist[0]  # Don't request from the playlist, which may be outdated. Get directly from metadata.
-		return metadata.get(current_path, "title")
+		return lyndj.metadata.get(current_path, "title")
 
 	@PySide6.QtCore.Property(str, notify=songChanged)
 	def currentPath(self) -> str:
@@ -324,7 +324,7 @@ class Player(PySide6.QtCore.QObject):
 		Get the path to the current song.
 		:return: The path of the currently playing song.
 		"""
-		current_playlist = preferences.Preferences.getInstance().get("playlist/playlist")
+		current_playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
 		if len(current_playlist) == 0:
 			return ""
 		return current_playlist[0]
@@ -363,7 +363,7 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		if Player.is_mono != value:
 			Player.is_mono = value
-			preferences.Preferences.getInstance().set("player/mono", value)
+			lyndj.preferences.Preferences.getInstance().set("player/mono", value)
 			self.mono_changed.emit()
 
 	@PySide6.QtCore.Property(bool, fset=set_mono, notify=mono_changed)

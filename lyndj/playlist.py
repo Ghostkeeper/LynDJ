@@ -12,11 +12,11 @@ import PySide6.QtCore  # To expose this list to QML.
 import PySide6.QtGui  # To calculate display colours for song tempo.
 import time  # To determine the remaining time until songs in the playlist start/end playing.
 
-import autodj  # To suggest songs to add to the playlist.
-import metadata  # To show file metadata in the playlist table.
-import player  # To call upon the player to pre-load tracks.
-import preferences  # To store the playlist between restarts.
-import theme  # To get the colours for the BPM indication.
+import lyndj.autodj  # To suggest songs to add to the playlist.
+import lyndj.metadata  # To show file metadata in the playlist table.
+import lyndj.player  # To call upon the player to pre-load tracks.
+import lyndj.preferences  # To store the playlist between restarts.
+import lyndj.theme  # To get the colours for the BPM indication.
 
 class Playlist(PySide6.QtCore.QAbstractListModel):
 	"""
@@ -41,7 +41,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		if not prefs.has("playlist/playlist"):
 			prefs.add("playlist/playlist", [])
 		prefs.add("playlist/slow_bpm", 100)
@@ -77,23 +77,23 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		This will request the data for the files in the given list and fill the model with data.
 		"""
 		new_track_data = []
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		paths = copy.copy(prefs.get("playlist/playlist"))
 		suggested_track = ""
 		added_double_suggested = False
 		if prefs.get("autodj/enabled"):
-			suggested_track = autodj.AutoDJ().suggested_track()
+			suggested_track = lyndj.autodj.AutoDJ().suggested_track()
 			if suggested_track != "":
 				paths.append(suggested_track)
 				if len(paths) == 1:  # If this is the only track in the playlist, actually go and add it to the playlist for real.
 					prefs.get("playlist/playlist").append(suggested_track)
 					# And then give a new suggestion.
-					suggested_track = autodj.AutoDJ().suggested_track()
+					suggested_track = lyndj.autodj.AutoDJ().suggested_track()
 					if suggested_track != "":
 						added_double_suggested = True
 						paths.append(suggested_track)
 		for path in paths:
-			file_metadata = copy.copy(metadata.metadata[path])  # Make a copy that we can add information to.
+			file_metadata = copy.copy(lyndj.metadata.metadata[path])  # Make a copy that we can add information to.
 			if len(new_track_data) == 0:
 				file_metadata["cumulative_duration"] = file_metadata["duration"]
 				file_metadata["cumulative_endtime"] = time.time() + file_metadata["duration"]
@@ -185,14 +185,14 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 				return "0:00"
 		if field == "bpm":
 			# Display tempo as a colour!
-			theme_inst = theme.Theme.getInstance()
+			theme_inst = lyndj.theme.Theme.getInstance()
 			slow = theme_inst.colours["tempo_slow"]
 			slow_rgba = [slow.red(), slow.green(), slow.blue(), slow.alpha()]
 			medium = theme_inst.colours["tempo_medium"]
 			medium_rgba = [medium.red(), medium.green(), medium.blue(), medium.alpha()]
 			fast = theme_inst.colours["tempo_fast"]
 			fast_rgba = [fast.red(), fast.green(), fast.blue(), fast.alpha()]
-			prefs = preferences.Preferences.getInstance()
+			prefs = lyndj.preferences.Preferences.getInstance()
 			slow_bpm = prefs.get("playlist/slow_bpm")
 			medium_bpm = prefs.get("playlist/medium_bpm")
 			fast_bpm = prefs.get("playlist/fast_bpm")
@@ -221,7 +221,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		:param path: The path to the file to add.
 		"""
 		# If the file is already in the playlist, do nothing.
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		playlist = prefs.get("playlist/playlist")
 		if path in playlist:
 			logging.debug(f"Tried adding {path} to the playlist, but it's already in the playlist.")
@@ -240,7 +240,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		Remove a certain file from the playlist.
 		:param index: The position of the file to remove.
 		"""
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		playlist = prefs.get("playlist/playlist")
 		if index < 0 or index >= len(playlist):
 			logging.error(f"Trying to remove playlist entry {index}, which is out of range.")
@@ -264,7 +264,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		:param path: The path of the file to reorder.
 		:param new_index: The new position of the file.
 		"""
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		playlist = prefs.get("playlist/playlist")
 		try:
 			old_index = playlist.index(path)
@@ -295,7 +295,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		:return: The endtime in number of seconds since the Unix epoch.
 		"""
 		# Parse from the preference first.
-		endtime_str = preferences.Preferences.getInstance().get("playlist/end_time")
+		endtime_str = lyndj.preferences.Preferences.getInstance().get("playlist/end_time")
 		components = endtime_str.split(":")
 		set_hours = int(components[0])
 		set_minutes = int(components[1])
@@ -328,7 +328,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		"""
 		if len(self.track_data) == 0:
 			return False
-		if not preferences.Preferences.getInstance().get("autodj/enabled"):
+		if not lyndj.preferences.Preferences.getInstance().get("autodj/enabled"):
 			return False
 		return self.track_data[-1]["suggested"]
 
@@ -338,11 +338,11 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		"""
 		cumulative_endtime = time.time()
 
-		if player.Player.start_time is None:
+		if lyndj.player.Player.start_time is None:
 			cumulative_duration = 0
 		else:
-			cumulative_duration = player.Player.start_time - cumulative_endtime  # Start off with the negative current playtime.
-			cumulative_endtime = player.Player.start_time
+			cumulative_duration = lyndj.player.Player.start_time - cumulative_endtime  # Start off with the negative current playtime.
+			cumulative_endtime = lyndj.player.Player.start_time
 
 		for track in self.track_data:
 			duration = track["duration"]

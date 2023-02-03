@@ -8,10 +8,10 @@ import logging
 import PySide6.QtCore  # For QTimers to execute code after a certain amount of time.
 import time  # To update the last played time.
 
-import metadata  # To get the events for a track.
-import playlist  # To remove the track from the playlist when it finishes playing.
-import preferences  # For some playback preferences.
-import waypoints_timeline  # To parse waypoints.
+import lyndj.metadata  # To get the events for a track.
+import lyndj.playlist  # To remove the track from the playlist when it finishes playing.
+import lyndj.preferences  # For some playback preferences.
+import lyndj.waypoints_timeline  # To parse waypoints.
 
 class MusicControl:
 	"""
@@ -34,7 +34,7 @@ class MusicControl:
 		self.sound = sound
 		self.player = player
 
-		pause_between_songs = preferences.Preferences.getInstance().get("player/silence") * 1000
+		pause_between_songs = lyndj.preferences.Preferences.getInstance().get("player/silence") * 1000
 
 		# Create a list of events for this track.
 		self.events = []
@@ -48,8 +48,8 @@ class MusicControl:
 		self.events.append(song_end_timer)
 
 		# Volume transitions.
-		volume_waypoints = metadata.get(path, "volume_waypoints")
-		volume_waypoints = waypoints_timeline.WaypointsTimeline.parse_waypoints(volume_waypoints)
+		volume_waypoints = lyndj.metadata.get(path, "volume_waypoints")
+		volume_waypoints = lyndj.waypoints_timeline.WaypointsTimeline.parse_waypoints(volume_waypoints)
 		if len(volume_waypoints) > 0:
 			volume = 0.5
 			pos = -1
@@ -98,6 +98,6 @@ class MusicControl:
 		"""
 		logging.debug(f"Event for {self.path}: Song ends")
 		# Remove the previous track from the playlist.
-		metadata.change(self.path, "last_played", time.time())  # Update last played first so that AutoDJ adds a correct new song when we remove it from the playlist.
-		playlist.Playlist.getInstance().remove(0)
+		lyndj.metadata.change(self.path, "last_played", time.time())  # Update last played first so that AutoDJ adds a correct new song when we remove it from the playlist.
+		lyndj.playlist.Playlist.getInstance().remove(0)
 		self.player.play_next()

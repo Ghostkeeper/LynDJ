@@ -11,8 +11,8 @@ import PySide6.QtCore  # To allow QML to get the theme data, and to export sizes
 import PySide6.QtGui  # To export colours.
 import typing
 
-import preferences  # To get which theme to load.
-import storage  # To find the theme directory.
+import lyndj.preferences  # To get which theme to load.
+import lyndj.storage  # To find the theme directory.
 
 class Theme(PySide6.QtCore.QObject):
 	"""
@@ -41,7 +41,7 @@ class Theme(PySide6.QtCore.QObject):
 	def __init__(self):
 		super().__init__(None)
 
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		prefs.add("theme", "LightDeco")
 		prefs.valuesChanged.connect(self.change_theme)
 
@@ -97,8 +97,8 @@ class Theme(PySide6.QtCore.QObject):
 		:param trigger_change: Whether to notify the GUI that the theme changed. This should not be done for the initial
 		load of the theme, to prevent essentially loading the GUI twice.
 		"""
-		theme_name = preferences.Preferences.getInstance().get("theme")
-		theme_directory = os.path.join(storage.source(), "theme", theme_name)
+		theme_name = lyndj.preferences.Preferences.getInstance().get("theme")
+		theme_directory = os.path.join(lyndj.storage.source(), "theme", theme_name)
 		logging.info(f"Loading theme from: {theme_directory}")
 
 		theme_file = os.path.join(theme_directory, "theme.json")
@@ -146,4 +146,4 @@ class Theme(PySide6.QtCore.QObject):
 		Get the list of the available themes to choose from.
 		:return: A list of theme names.
 		"""
-		return os.listdir(os.path.join(storage.source(), "theme"))
+		return os.listdir(os.path.join(lyndj.storage.source(), "theme"))

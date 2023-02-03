@@ -10,8 +10,8 @@ import os  # To find the candidate tracks.
 import os.path  # To find the candidate tracks.
 import time  # To find tracks that were played this session (within 24 hours ago).
 
-import metadata  # To decide on the next track to play by their metadata.
-import preferences  # To get the current playlist and music directory.
+import lyndj.metadata  # To decide on the next track to play by their metadata.
+import lyndj.preferences  # To get the current playlist and music directory.
 
 class AutoDJ:
 	"""
@@ -43,12 +43,12 @@ class AutoDJ:
 		This is the track that the automatic DJ would suggest adding next.
 		:return: The next track to add to the playlist.
 		"""
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		directory = prefs.get("browse_path")
-		candidates = set(filter(metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
+		candidates = set(filter(lyndj.metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
 
 		# Files without BPM are special and shouldn't be suggested.
-		candidates = {path for path in candidates if metadata.get(path, "bpm") >= 0}
+		candidates = {path for path in candidates if lyndj.metadata.get(path, "bpm") >= 0}
 
 		candidates -= set(prefs.get("playlist/playlist"))  # Anything in the playlist is not allowed to be in there twice.
 		if len(candidates) == 0:
@@ -60,9 +60,9 @@ class AutoDJ:
 		style_histogram = collections.defaultdict(float)
 		energy_histogram = collections.defaultdict(float)
 		for i, path in enumerate(history):
-			age = metadata.get(path, "age")
-			style = metadata.get(path, "style")
-			energy = metadata.get(path, "energy")
+			age = lyndj.metadata.get(path, "age")
+			style = lyndj.metadata.get(path, "style")
+			energy = lyndj.metadata.get(path, "energy")
 			weight = 1.0 / (i + 1.0)
 			if age != "":
 				age_histogram[age] += weight
@@ -78,7 +78,7 @@ class AutoDJ:
 		# See where in the BPM cadence we are currently.
 		autodj_bpm_cadence = [int(item) for item in prefs.get("autodj/bpm_cadence").strip(",").split(",")]
 		history_to_match = reversed(history[:len(autodj_bpm_cadence)])
-		bpm_to_match = [metadata.get(path, "bpm") for path in history_to_match]
+		bpm_to_match = [lyndj.metadata.get(path, "bpm") for path in history_to_match]
 		bpm_to_match = [bpm if bpm >= 0 else prefs.get("playlist/medium_bpm") for bpm in bpm_to_match]  # If BPM is unknown, use medium BPM.
 		best_rotate = -1
 		best_rotate_difference = float("inf")
@@ -106,9 +106,9 @@ class AutoDJ:
 			rating = 0
 
 			# Penalties for age, style and energy that have recently been played often.
-			age = metadata.get(path, "age")
-			style = metadata.get(path, "style")
-			energy = metadata.get(path, "energy")
+			age = lyndj.metadata.get(path, "age")
+			style = lyndj.metadata.get(path, "style")
+			energy = lyndj.metadata.get(path, "energy")
 			try:
 				numeric_energy = self.energy_to_numeric[energy.lower()]
 			except KeyError:
@@ -125,12 +125,12 @@ class AutoDJ:
 
 			# Bonus for tracks that are played long ago.
 			if autodj_last_played_influence > 0:
-				long_ago = time.time() - metadata.get(path, "last_played")
+				long_ago = time.time() - lyndj.metadata.get(path, "last_played")
 				long_ago /= 3600 * 24 * 7 * autodj_last_played_influence
 				rating += long_ago
 
 			# Penalties for tracks that are far from the target BPM.
-			rating -= abs(metadata.get(path, "bpm") - bpm_target) * autodj_bpm_precision
+			rating -= abs(lyndj.metadata.get(path, "bpm") - bpm_target) * autodj_bpm_precision
 
 			if rating > best_rating:
 				best_track = path
@@ -150,12 +150,12 @@ class AutoDJ:
 		session (within the last 24 hours) will be returned.
 		:return: The tracks that were played in the current session, in order of when they were played.
 		"""
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		directory = prefs.get("browse_path")
-		paths = set(filter(metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
+		paths = set(filter(lyndj.metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
 		playlist = prefs.get("playlist/playlist")
 		paths -= set(playlist)  # The playlist will be the files that are most recently played by the time the suggested track plays. Add them later.
 		one_day_ago = time.time() - 24 * 3600
-		paths = [path for path in paths if metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
-		paths = list(sorted(paths, key=lambda path: metadata.get(path, "last_played"), reverse=True))
+		paths = [path for path in paths if lyndj.metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
+		paths = list(sorted(paths, key=lambda path: lyndj.metadata.get(path, "last_played"), reverse=True))
 		return list(reversed(playlist)) + paths

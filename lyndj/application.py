@@ -10,16 +10,16 @@ import PySide6.QtCore
 import PySide6.QtGui  # This is a GUI application.
 import PySide6.QtQml  # To register types with the QML engine.
 
-import background_tasks  # To register this with QML.
-import history  # To register this with QML.
-import metadata  # Loading metadata on start-up.
-import music_directory  # To register this with QML.
-import player  # To register this with QML.
-import playlist  # To register this with QML.
-import preferences  # To register this with QML and define some preferences.
-import storage  # To find the window icon.
-import theme  # To register this with QML.
-import waypoints_timeline  # To register this with QML.
+import lyndj.background_tasks  # To register this with QML.
+import lyndj.history  # To register this with QML.
+import lyndj.metadata  # Loading metadata on start-up.
+import lyndj.music_directory  # To register this with QML.
+import lyndj.player  # To register this with QML.
+import lyndj.playlist  # To register this with QML.
+import lyndj.preferences  # To register this with QML and define some preferences.
+import lyndj.storage  # To find the window icon.
+import lyndj.theme  # To register this with QML.
+import lyndj.waypoints_timeline  # To register this with QML.
 
 class Application(PySide6.QtGui.QGuiApplication):
 	"""
@@ -37,7 +37,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		super().__init__(argv)
 
 		# TODO: Move creation of browse path preference to path browser class.
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		music_locations = PySide6.QtCore.QStandardPaths.standardLocations(PySide6.QtCore.QStandardPaths.StandardLocation.MusicLocation)
 		if music_locations:
 			browse_path = music_locations[0]
@@ -46,19 +46,19 @@ class Application(PySide6.QtGui.QGuiApplication):
 		prefs.add("browse_path", browse_path)
 
 		logging.debug("Loading metadata database.")
-		metadata.load()
+		lyndj.metadata.load()
 
 		logging.debug("Registering QML types.")
 		self.create_gui_preferences()
-		PySide6.QtQml.qmlRegisterSingletonInstance(preferences.Preferences, "Lyn", 1, 0, "Preferences", preferences.Preferences.getInstance())
-		PySide6.QtQml.qmlRegisterSingletonInstance(theme.Theme, "Lyn", 1, 0, "Theme", theme.Theme.getInstance())
-		PySide6.QtQml.qmlRegisterSingletonInstance(playlist.Playlist, "Lyn", 1, 0, "Playlist", playlist.Playlist.getInstance())
-		PySide6.QtQml.qmlRegisterSingletonInstance(history.History, "Lyn", 1, 0, "History", history.History.getInstance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.preferences.Preferences, "Lyn", 1, 0, "Preferences", lyndj.preferences.Preferences.getInstance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.theme.Theme, "Lyn", 1, 0, "Theme", lyndj.theme.Theme.getInstance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.playlist.Playlist, "Lyn", 1, 0, "Playlist", lyndj.playlist.Playlist.getInstance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.history.History, "Lyn", 1, 0, "History", lyndj.history.History.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(Application, "Lyn", 1, 0, "Application", self)
-		PySide6.QtQml.qmlRegisterSingletonInstance(player.Player, "Lyn", 1, 0, "Player", player.Player.get_instance())
-		PySide6.QtQml.qmlRegisterSingletonInstance(background_tasks.BackgroundTasks, "Lyn", 1, 0, "BackgroundTasks", background_tasks.BackgroundTasks.get_instance())
-		PySide6.QtQml.qmlRegisterType(music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
-		PySide6.QtQml.qmlRegisterType(waypoints_timeline.WaypointsTimeline, "Lyn", 1, 0, "WaypointsTimeline")
+		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.player.Player, "Lyn", 1, 0, "Player", lyndj.player.Player.get_instance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.background_tasks.BackgroundTasks, "Lyn", 1, 0, "BackgroundTasks", lyndj.background_tasks.BackgroundTasks.get_instance())
+		PySide6.QtQml.qmlRegisterType(lyndj.music_directory.MusicDirectory, "Lyn", 1, 0, "MusicDirectory")
+		PySide6.QtQml.qmlRegisterType(lyndj.waypoints_timeline.WaypointsTimeline, "Lyn", 1, 0, "WaypointsTimeline")
 
 		logging.debug("Loading QML engine.")
 		os.environ["QSG_RENDER_LOOP"] = "basic"  # QTBUG-58885: Animation speeds not accurate (which makes the track progress bar inaccurate).
@@ -67,7 +67,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		self.engine.load("gui/MainWindow.qml")
 
 		# Icon needs to be added AFTER the main window is loaded.
-		self.setWindowIcon(PySide6.QtGui.QIcon(os.path.join(storage.source(), "icon.svg")))
+		self.setWindowIcon(PySide6.QtGui.QIcon(os.path.join(lyndj.storage.source(), "icon.svg")))
 
 		logging.info("Start-up complete.")
 
@@ -78,7 +78,7 @@ class Application(PySide6.QtGui.QGuiApplication):
 		The QML can't create new preferences. While the scope of the GUI would claim these preferences for themselves,
 		it can't be defined there. We should define them here instead.
 		"""
-		prefs = preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.getInstance()
 		prefs.add("window/width", 1280)
 		prefs.add("window/height", 720)
 		prefs.add("window/x", 100)
@@ -101,5 +101,5 @@ class Application(PySide6.QtGui.QGuiApplication):
 		"""
 		Triggered when the main window is closed.
 		"""
-		metadata.store()  # Write any last changes to disk.
-		player.Player.control_thread = None
+		lyndj.metadata.store()  # Write any last changes to disk.
+		lyndj.player.Player.control_thread = None
