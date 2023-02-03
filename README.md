@@ -25,8 +25,10 @@ There are several ways to install this application onto your computer. This outl
 
 <details>
 	<summary>From source</summary>
+
 	Ubuntu 22.04
 	------------
+
 	1. Install system dependencies. To do this, open a terminal (Ctrl+Alt+T) and type the following:
 	```
 	sudo apt install python3-pip git portaudio19-dev ffmpeg
