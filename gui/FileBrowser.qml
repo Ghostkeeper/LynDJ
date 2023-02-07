@@ -25,8 +25,8 @@ Item {
 			top: parent.top
 		}
 
-		Component.onCompleted: currentDirectory = Lyn.Preferences.preferences["browse_path"]
-		onCurrentDirectoryChanged: Lyn.Preferences.set("browse_path", currentDirectory)
+		Component.onCompleted: currentDirectory = Lyn.Preferences.preferences["directory/browse_path"]
+		onCurrentDirectoryChanged: Lyn.Preferences.set("directory/browse_path", currentDirectory)
 	}
 	Gui.AllMusic {
 		id: all_music

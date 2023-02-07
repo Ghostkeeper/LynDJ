@@ -8,7 +8,7 @@ import logging
 import math  # To format track duration.
 import os  # To list files in the music directory.
 import os.path  # To list file paths in the music directory.
-import PySide6.QtCore  # To expose this table to QML.
+import PySide6.QtCore  # To expose this table to QML, and get the standard music directory.
 import time  # To display the last played time relative to the current time.
 
 import lyndj.background_tasks
@@ -33,6 +33,13 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 
 		self._directory = ""
 		prefs = lyndj.preferences.Preferences.getInstance()
+		music_locations = PySide6.QtCore.QStandardPaths.standardLocations(PySide6.QtCore.QStandardPaths.StandardLocation.MusicLocation)
+		if music_locations:
+			browse_path = music_locations[0]
+		else:
+			browse_path = os.path.expanduser("~/")
+		if not prefs.has("directory/browse_path"):
+			prefs.add("directory/browse_path", browse_path)
 		if not prefs.has("directory/sort_order"):
 			prefs.add("directory/sort_order", ["bpm", "last_played", "age", "style", "energy", "title", "duration", "author", "comment"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
 		if not prefs.has("directory/sort_direction"):

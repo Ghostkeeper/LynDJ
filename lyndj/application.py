@@ -36,15 +36,6 @@ class Application(PySide6.QtGui.QGuiApplication):
 		logging.info("Starting application.")
 		super().__init__(argv)
 
-		# TODO: Move creation of browse path preference to path browser class.
-		prefs = lyndj.preferences.Preferences.getInstance()
-		music_locations = PySide6.QtCore.QStandardPaths.standardLocations(PySide6.QtCore.QStandardPaths.StandardLocation.MusicLocation)
-		if music_locations:
-			browse_path = music_locations[0]
-		else:
-			browse_path = os.path.expanduser("~/")
-		prefs.add("browse_path", browse_path)
-
 		logging.debug("Loading metadata database.")
 		lyndj.metadata.load()
 

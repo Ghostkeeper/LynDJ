@@ -165,7 +165,7 @@ Item {
 		model: Lyn.MusicDirectory {
 			id: music_directory
 
-			directory: Lyn.Preferences.preferences["browse_path"]
+			directory: Lyn.Preferences.preferences["directory/browse_path"]
 		}
 		delegate: Rectangle {
 			implicitWidth: 200 //Will be overridden by the column width provider.

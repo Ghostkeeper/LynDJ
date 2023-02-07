@@ -44,7 +44,9 @@ class AutoDJ:
 		:return: The next track to add to the playlist.
 		"""
 		prefs = lyndj.preferences.Preferences.getInstance()
-		directory = prefs.get("browse_path")
+		if not prefs.has("directory/browse_path"):
+			return ""
+		directory = prefs.get("directory/browse_path")
 		candidates = set(filter(lyndj.metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
 
 		# Files without BPM are special and shouldn't be suggested.
@@ -151,7 +153,7 @@ class AutoDJ:
 		:return: The tracks that were played in the current session, in order of when they were played.
 		"""
 		prefs = lyndj.preferences.Preferences.getInstance()
-		directory = prefs.get("browse_path")
+		directory = prefs.get("directory/browse_path")
 		paths = set(filter(lyndj.metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
 		playlist = prefs.get("playlist/playlist")
 		paths -= set(playlist)  # The playlist will be the files that are most recently played by the time the suggested track plays. Add them later.
