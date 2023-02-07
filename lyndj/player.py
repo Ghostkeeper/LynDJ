@@ -6,6 +6,7 @@
 
 import logging
 import math  # Transformations on the Fourier transform.
+import miniaudio  # To decode audio files.
 import numpy  # For the Fourier transform in Scipy.
 import os.path  # To cache Fourier transform images.
 import pydub  # The media player we're using to play music.
@@ -148,11 +149,9 @@ class Player(PySide6.QtCore.QObject):
 
 		next_song = current_playlist[0]
 		logging.info(f"Starting playback of track: {next_song}")
-		if next_song.endswith(".flac"):
-			codec = "flac"
-		else:
-			codec = None
-		track = pydub.AudioSegment.from_file(next_song, codec=codec)
+
+		decoded = miniaudio.decode_file(next_song)
+		track = pydub.AudioSegment(data=bytes(decoded.samples), sample_width=decoded.sample_width, frame_rate=decoded.sample_rate, channels=decoded.nchannels)
 		Player.current_track = self.trim_silence(track)
 		Player.control_track = lyndj.music_control.MusicControl(next_song, Player.current_track, self)
 
@@ -213,7 +212,8 @@ class Player(PySide6.QtCore.QObject):
 		logging.debug(f"Caching Fourier image for {path}")
 		fourier_file = lyndj.metadata.get(path, "fourier")
 		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
-			segment = pydub.AudioSegment.from_file(path)
+			decoded = miniaudio.decode_file(fourier_file)
+			segment = pydub.AudioSegment(data=bytes(decoded.samples), sample_width=decoded.sample_width, frame_rate=decoded.sample_rate, channels=decoded.nchannels)
 			segment = self.trim_silence(segment)
 			fourier = self.generate_fourier(segment, path)
 			filename = os.path.splitext(os.path.basename(path))[0] + uuid.uuid4().hex[:8] + ".png"  # File's filename, but with an 8-character random string to prevent collisions.

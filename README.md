@@ -24,14 +24,10 @@ Installation
 There are several ways to install this application onto your computer. This outlines your options, from easy to hard. Each option includes instructions for various platforms. If your platform is not listed, please select the most similar platform (e.g. for Arch Linux, installation is probably similar to Ubuntu).
 
 <details>
-<summary>From source</summary>
-
-Ubuntu 22.04
-------------
-
+<summary>From source: Ubuntu 22.04</summary>
 1. Install system dependencies. To do this, open a terminal (Ctrl+Alt+T) and type the following:
 ```
-sudo apt install python3-pip git portaudio19-dev ffmpeg
+sudo apt install python3-pip git portaudio19-dev
 ```
 2. Download the source code of LynDJ.
 ```
