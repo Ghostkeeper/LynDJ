@@ -14,6 +14,7 @@ Button {
 	height: Lyn.Theme.size["button"].height
 
 	font: Lyn.Theme.font["default"]
+	flat: true
 	ToolTip.text: text
 	ToolTip.visible: label.truncated && hovered
 

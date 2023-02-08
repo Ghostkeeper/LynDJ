@@ -15,6 +15,7 @@ Button {
 	width: Lyn.Theme.size["control"].width
 	height: Lyn.Theme.size["control"].height
 
+	flat: true
 	onClicked: popup.open()
 
 	//Change the currently selected time.
