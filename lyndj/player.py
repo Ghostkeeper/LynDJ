@@ -282,17 +282,18 @@ class Player(PySide6.QtCore.QObject):
 
 	songChanged = PySide6.QtCore.Signal()
 
-	@PySide6.QtCore.Property(str, notify=songChanged)
-	def currentFourier(self) -> str:
+	@PySide6.QtCore.Property(PySide6.QtCore.QUrl, notify=songChanged)
+	def currentFourier(self) -> PySide6.QtCore.QUrl:
 		"""
 		Get the path to the currently playing song's Fourier image.
 		:return: A path to an image.
 		"""
 		current_playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
 		if len(current_playlist) == 0:
-			return ""
+			return PySide6.QtCore.QUrl()
 		current_path = current_playlist[0]
-		return lyndj.metadata.get(current_path, "fourier")
+		fourier_path = lyndj.metadata.get(current_path, "fourier")
+		return PySide6.QtCore.QUrl.fromLocalFile(fourier_path)
 
 	@PySide6.QtCore.Property(float, notify=songChanged)
 	def currentDuration(self) -> float:
