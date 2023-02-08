@@ -145,6 +145,7 @@ def has(path):
 	:param path: The path to test for.
 	:return: ``True`` if we have a metadata entry about the file, or ``False`` if we don't.
 	"""
+	return path in metadata
 
 def get(path, field):
 	"""
