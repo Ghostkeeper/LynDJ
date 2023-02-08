@@ -93,6 +93,8 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 						added_double_suggested = True
 						paths.append(suggested_track)
 		for path in paths:
+			if not lyndj.metadata.has(path):
+				lyndj.metadata.add_file(path)
 			file_metadata = copy.copy(lyndj.metadata.metadata[path])  # Make a copy that we can add information to.
 			if len(new_track_data) == 0:
 				file_metadata["cumulative_duration"] = file_metadata["duration"]
