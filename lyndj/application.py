@@ -36,6 +36,10 @@ class Application(PySide6.QtWidgets.QApplication):
 		"""
 		logging.info("Starting application.")
 		super().__init__(argv)
+		self.setApplicationName("LynDJ")
+		self.setApplicationDisplayName("LynDJ")
+		self.setApplicationVersion("1.0.0")
+		self.setOrganizationName("Ghostkeeper")
 
 		logging.debug("Loading metadata database.")
 		lyndj.metadata.load()
