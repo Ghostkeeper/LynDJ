@@ -212,7 +212,7 @@ class Player(PySide6.QtCore.QObject):
 		logging.debug(f"Caching Fourier image for {path}")
 		fourier_file = lyndj.metadata.get(path, "fourier")
 		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
-			decoded = miniaudio.decode_file(fourier_file)
+			decoded = miniaudio.decode_file(path)
 			segment = pydub.AudioSegment(data=bytes(decoded.samples), sample_width=decoded.sample_width, frame_rate=decoded.sample_rate, channels=decoded.nchannels)
 			segment = self.trim_silence(segment)
 			fourier = self.generate_fourier(segment, path)
