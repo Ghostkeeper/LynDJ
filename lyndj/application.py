@@ -7,8 +7,9 @@
 import logging
 import os  # To find the home directory, resource files and to edit environment variables in the local context.
 import PySide6.QtCore
-import PySide6.QtGui  # This is a GUI application.
+import PySide6.QtGui  # To give the application an icon.
 import PySide6.QtQml  # To register types with the QML engine.
+import PySide6.QtWidgets  # This is an application.
 
 import lyndj.background_tasks  # To register this with QML.
 import lyndj.history  # To register this with QML.
@@ -21,7 +22,7 @@ import lyndj.storage  # To find the window icon.
 import lyndj.theme  # To register this with QML.
 import lyndj.waypoints_timeline  # To register this with QML.
 
-class Application(PySide6.QtGui.QGuiApplication):
+class Application(PySide6.QtWidgets.QApplication):
 	"""
 	The Qt application that runs the whole thing.
 
