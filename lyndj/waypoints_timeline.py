@@ -168,10 +168,10 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		:param new_field: The new field to display.
 		"""
 		self.current_field = new_field
-		try:
-			self.waypoints = self.parse_waypoints(lyndj.metadata.get(self.current_path, new_field))  # Update the waypoints to represent the new path.
-		except KeyError:  # Field doesn't exist. Happens at init when path is still empty string.
+		if self.current_path == "":
 			self.waypoints = []
+		else:
+			self.waypoints = self.parse_waypoints(lyndj.metadata.get(self.current_path, new_field))  # Update the waypoints to represent the new path.
 		self.generate_graph()
 
 	@PySide6.QtCore.Property(str, fset=set_field, notify=field_changed)
