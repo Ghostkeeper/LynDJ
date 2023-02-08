@@ -130,7 +130,8 @@ class Theme(PySide6.QtCore.QObject):
 			if ext != ".svg":
 				continue  # Only load SVGs as icons.
 			icon_path = os.path.join(theme_directory, icon_file)
-			self.icons[icon_name] = icon_path
+			icon_url = PySide6.QtCore.QUrl.fromLocalFile(icon_path)
+			self.icons[icon_name] = icon_url
 
 	@PySide6.QtCore.Property("QVariantMap", notify=themeChanged)
 	def size(self) -> typing.Dict[str, PySide6.QtCore.QSizeF]:
