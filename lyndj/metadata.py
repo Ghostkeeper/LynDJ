@@ -13,7 +13,6 @@ import mutagen.mp3
 import mutagen.ogg
 import mutagen.wave
 import os.path  # To know where to store the database.
-import PySide6.QtCore  # For a timer to write the database.
 import threading  # To store the database after a certain amount of time.
 import time  # To store the database after a certain amount of time.
 import sqlite3  # To cache metadata on disk.
@@ -28,6 +27,11 @@ The single source of truth for the currently known metadata.
 
 To quickly access metadata for certain files, look into this dictionary. The keys of the dictionary are absolute paths
 to music files. The values are dictionaries of metadata key-values.
+"""
+
+metadata_lock = threading.Lock()
+"""
+While the metadata dictionary is modified or iterated over, this lock has to be obtained.
 """
 
 def load():
@@ -62,7 +66,8 @@ def load():
 			"treble_waypoints": treble_waypoints,
 			"cachetime": cachetime
 		}
-	metadata.update(new_metadata)
+	with metadata_lock:
+		metadata.update(new_metadata)
 
 # When we change the database, save the database to disk after a short delay.
 # If there's multiple changes in short succession, those will be combined into a single write.
@@ -132,9 +137,10 @@ def store():
 		connection = sqlite3.connect(db_file)
 
 	local_metadata = metadata  # Cache locally for performance.
-	for path, entry in local_metadata.items():
-		connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"]))
+	with metadata_lock:
+		for path, entry in local_metadata.items():
+			connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"]))
 	connection.commit()
 
 def has(path):
@@ -155,6 +161,8 @@ def get(path, field):
 	:return: The value of the metadata entry for that field. Will be ``None`` if there is no cached information about
 	that field.
 	"""
+	if path not in metadata:
+		add_file(path)
 	return metadata[path][field]
 
 def add(path, entry):
@@ -163,7 +171,8 @@ def add(path, entry):
 	:param path: The path to the file that the metadata is for.
 	:param entry: A dictionary containing metadata.
 	"""
-	metadata[path] = entry
+	with metadata_lock:
+		metadata[path] = entry
 	trigger_store()
 
 def add_file(path):
