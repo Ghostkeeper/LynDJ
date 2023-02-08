@@ -137,11 +137,6 @@ def store():
 			(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"]))
 	connection.commit()
 
-store_timer = PySide6.QtCore.QTimer()
-store_timer.setSingleShot(True)
-store_timer.setInterval(250)
-store_timer.timeout.connect(store)
-
 def has(path):
 	"""
 	Get whether we have any metadata entry about a file.
