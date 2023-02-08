@@ -247,10 +247,10 @@ def add_file(path):
 		"style": style,
 		"energy": energy,
 		"fourier": "",
-		"volume_waypoints": "",
-		"bass_waypoints": "",
-		"mids_waypoints": "",
-		"treble_waypoints": "",
+		"volume_waypoints": volume_waypoints,
+		"bass_waypoints": bass_waypoints,
+		"mids_waypoints": mids_waypoints,
+		"treble_waypoints": treble_waypoints,
 		"cachetime": last_modified
 	})
 
