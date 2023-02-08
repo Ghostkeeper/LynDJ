@@ -21,10 +21,11 @@ This project is in alpha testing at the moment. It is in regular use by the deve
 
 Installation
 ------------
-There are several ways to install this application onto your computer. This outlines your options, from easy to hard. Each option includes instructions for various platforms. If your platform is not listed, please select the most similar platform (e.g. for Arch Linux, installation is probably similar to Ubuntu).
+There are several ways to install this application onto your computer. This outlines your options, from easy to hard. Each option includes instructions for various platforms. If your platform is not listed, please select the most similar platform (e.g. for Arch Linux, installation is probably similar to Ubuntu). Note that the instructions are written for a clean installation of the operating system. You might already have some of the prerequisites installed.
 
 <details>
 <summary>From source: Ubuntu 22.04</summary>
+
 1. Install system dependencies. To do this, open a terminal (Ctrl+Alt+T) and type the following:
 ```
 sudo apt install python3-pip git portaudio19-dev
@@ -41,5 +42,24 @@ python3 -m pip install -r requirements.txt
 4. You can now run the application from the terminal inside of this directory, by executing:
 ```
 python3 lyndj.py
+```
+</details>
+<details>
+<summary>From source: Windows 10</summary>
+
+1. Install Python. Visit [python.org](https://www.python.org/) and download the latest version of Python for Windows, using the installer. Run the installer to install Python. It is suggested to check the option "Add python.exe to PATH".
+2. Install Visual Studio Build Tools. Visit [its download page](https://visualstudio.microsoft.com/visual-cpp-build-tools/) and download the build tools. Run the installer. Select the "Desktop development with C++" package. Once installation is completed, you can close the installer.
+3. Install Git. Visit [git-scm.com](https://git-scm.com/download/win) and download the latest version of Git for Windows. Run the installer to install Git. At the last screen of the installer, check that you wish to launch the Git terminal.
+4. Open a Git terminal. Navigate to a directory where you want to download LynDJ to, and download LynDJ, by typing the following:
+```
+git clone https://github.com/Ghostkeeper/LynDJ
+```
+5. Open a normal terminal as well (press Windows key, then type cmd). Navigate to the LynDJ folder that was just created by Git. Install LynDJ's dependencies by executing:
+```
+python -m pip install -r requirements.txt
+```
+6. You can now run the application from the terminal inside of this folder, by executing:
+```
+python lyndj.py
 ```
 </details>
