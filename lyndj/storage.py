@@ -7,16 +7,24 @@
 import logging
 import os  # To get OS-specific paths.
 import os.path  # To construct new paths.
+import platform  # To store things in a different location depending on the operating system.
 
 def config() -> str:
 	"""
 	Get the location where configuration files should be stored.
 	:return: A path to a directory where the configuration of the application is stored.
 	"""
-	try:
-		path = os.environ["XDG_CONFIG_HOME"]  # XDG standard storage location.
-	except KeyError:
-		path = os.path.expanduser("~/.config")  # Most Linux machines.
+	system = platform.system()
+	if system == "Windows":
+		try:
+			path = os.environ["APPDATA"]
+		except KeyError:
+			path = os.path.join(os.path.expanduser("~"), "AppData", "Roaming")
+	else:  # Linux or unknown.
+		try:
+			path = os.environ["XDG_CONFIG_HOME"]  # XDG standard storage location.
+		except KeyError:
+			path = os.path.join(os.path.expanduser("~"), ".config")  # Most Linux machines.
 	return os.path.join(path, "lyndj")
 
 def cache() -> str:
@@ -24,10 +32,17 @@ def cache() -> str:
 	Get the location where cache files should be stored.
 	:return: A path to a directory where the cache of the application is stored.
 	"""
-	try:
-		path = os.environ["XDG_CACHE_HOME"]  # XDG standard storage location.
-	except KeyError:
-		path = os.path.expanduser("~/.cache")  # Most Linux machines.
+	system = platform.system()
+	if system == "Windows":
+		try:
+			path = os.environ["APPDATA"]
+		except KeyError:
+			path = os.path.join(os.path.expanduser("~"), "AppData", "Local")
+	else:  # Linux or unknown.
+		try:
+			path = os.environ["XDG_CACHE_HOME"]  # XDG standard storage location.
+		except KeyError:
+			path = os.path.join(os.path.expanduser("~"), ".cache")  # Most Linux machines.
 	return os.path.join(path, "lyndj")
 
 def data() -> str:
@@ -35,10 +50,17 @@ def data() -> str:
 	Get the location where data files should be stored.
 	:return: A path to a directory where data for the application is stored.
 	"""
-	try:
-		path = os.environ["XDG_DATA_HOME"]  # XDG standard storage location.
-	except KeyError:
-		path =os.path.expanduser("~/.local/share")  # Most Linux machines.
+	system = platform.system()
+	if system == "Windows":
+		try:
+			path = os.environ["LOCALAPPDATA"]
+		except KeyError:
+			path = os.path.join(os.path.expanduser("~"), "AppData", "Roaming")
+	else:  # Linux or unknown.
+		try:
+			path = os.environ["XDG_DATA_HOME"]  # XDG standard storage location.
+		except KeyError:
+			path = os.path.join(os.path.expanduser("~"), ".local", "share")  # Most Linux machines.
 	return os.path.join(path, "lyndj")
 
 def ensure_exists() -> None:
@@ -67,4 +89,4 @@ def source() -> str:
 	Get the location of the source code or installation folder.
 	:return: A path to the directory where the application is installed.
 	"""
-	return os.getcwd()
+	return os.getcwd()  # lyndj.py sets the CWD to its directory at start-up.
