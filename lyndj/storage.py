@@ -20,6 +20,8 @@ def config() -> str:
 			path = os.environ["APPDATA"]
 		except KeyError:
 			path = os.path.join(os.path.expanduser("~"), "AppData", "Roaming")
+	elif system == "Darwin":
+		path = os.path.join(os.path.expanduser("~"), "Library", "Preferences")
 	else:  # Linux or unknown.
 		try:
 			path = os.environ["XDG_CONFIG_HOME"]  # XDG standard storage location.
@@ -35,9 +37,11 @@ def cache() -> str:
 	system = platform.system()
 	if system == "Windows":
 		try:
-			path = os.environ["APPDATA"]
+			path = os.environ["LOCALAPPDATA"]
 		except KeyError:
 			path = os.path.join(os.path.expanduser("~"), "AppData", "Local")
+	elif system == "Darwin":
+		path = os.path.join(os.path.expanduser("~"), "Library", "Caches")
 	else:  # Linux or unknown.
 		try:
 			path = os.environ["XDG_CACHE_HOME"]  # XDG standard storage location.
@@ -53,9 +57,11 @@ def data() -> str:
 	system = platform.system()
 	if system == "Windows":
 		try:
-			path = os.environ["LOCALAPPDATA"]
+			path = os.environ["APPDATA"]
 		except KeyError:
 			path = os.path.join(os.path.expanduser("~"), "AppData", "Roaming")
+	elif system == "Darwin":
+		path = os.path.join(os.path.expanduser("~"), "Library", "Application Support")
 	else:  # Linux or unknown.
 		try:
 			path = os.environ["XDG_DATA_HOME"]  # XDG standard storage location.
