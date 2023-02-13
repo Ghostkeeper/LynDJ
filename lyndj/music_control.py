@@ -98,5 +98,5 @@ class MusicControl:
 		logging.debug(f"Event for {self.path}: Song ends")
 		# Remove the previous track from the playlist.
 		self.player.song_finished.emit(self.path)
-		lyndj.playlist.Playlist.getInstance().remove(0)
+		lyndj.playlist.Playlist.get_instance().remove(0)
 		self.player.play_next()
