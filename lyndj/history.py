@@ -56,8 +56,8 @@ class History(PySide6.QtCore.QAbstractListModel):
 		if not lyndj.metadata.has(path):
 			lyndj.metadata.add_file(path)
 
-		self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(self.track_data), len(self.track_data))
-		self.track_data.append(lyndj.metadata.metadata[path])
+		self.beginInsertRows(PySide6.QtCore.QModelIndex(), 0, 0)
+		self.track_data.insert(0, lyndj.metadata.metadata[path])
 		self.endInsertRows()
 
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
