@@ -36,6 +36,9 @@ class AutoDJ:
 		"medium": 50,
 		"high": 100
 	}
+	"""
+	Convert the energy level in track metadata to a numeric value, between 0 and 100.
+	"""
 
 	def suggested_track(self) -> str:
 		"""
