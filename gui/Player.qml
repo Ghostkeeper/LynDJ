@@ -79,11 +79,11 @@ Rectangle {
 			top: parent.top
 		}
 
-		backgroundSource: Lyn.Theme.icon[Lyn.Player.isPlaying ? "stop_background" : "play_background"]
+		backgroundSource: Lyn.Theme.icon[Lyn.Player.is_playing ? "stop_background" : "play_background"]
 		backgroundColour: Lyn.Theme.colour["lining"]
-		source: Lyn.Theme.icon[Lyn.Player.isPlaying ? "stop_foreground" : "play_foreground"]
+		source: Lyn.Theme.icon[Lyn.Player.is_playing ? "stop_foreground" : "play_foreground"]
 		colour: Lyn.Theme.colour[hovered ? "highlight_foreground" : "foreground"]
-		onClicked: Lyn.Player.isPlaying = !Lyn.Player.isPlaying
+		onClicked: Lyn.Player.is_playing = !Lyn.Player.is_playing
 	}
 
 	Widgets.ColourImage {
@@ -130,7 +130,7 @@ Rectangle {
 		}
 
 		colour: Lyn.Theme.colour["foreground"]
-		source: Lyn.Player.currentFourier
+		source: Lyn.Player.current_fourier
 	}
 
 	//Waypoints timeline.
@@ -165,17 +165,17 @@ Rectangle {
 				id: progress_animation
 				from: 0
 				to: progress_indicator.width
-				duration: Lyn.Player.currentDuration * 1000
-				running: Lyn.Player.isPlaying
+				duration: Lyn.Player.current_duration * 1000
+				running: Lyn.Player.is_playing
 
 				readonly property var __: Connections { //NumberAnimation cannot have child elements. Store this in a property. It still works.
 					target: Lyn.Player
-					function onSongChanged() {
+					function onSong_changed() {
 						progress_animation.restart();
 					}
-					function onIsPlayingChanged() {
+					function onIs_playingChanged() {
 						progress_animation.restart();
-						progress_animation.running = Lyn.Player.isPlaying;
+						progress_animation.running = Lyn.Player.is_playing;
 					}
 				}
 			}
@@ -184,7 +184,7 @@ Rectangle {
 			id: progress_hook
 			anchors.horizontalCenter: progress_bar.right
 
-			visible: Lyn.Player.isPlaying
+			visible: Lyn.Player.is_playing
 			colour: Lyn.Theme.colour["foreground"]
 			source: Lyn.Theme.icon["progress_end"]
 		}
@@ -197,7 +197,7 @@ Rectangle {
 			width: 2
 			height: fourier.height
 
-			visible: Lyn.Player.isPlaying
+			visible: Lyn.Player.is_playing
 			color: Lyn.Theme.colour["translucent_foreground"]
 		}
 	}
@@ -210,6 +210,6 @@ Rectangle {
 		}
 
 		font: Lyn.Theme.font["title"]
-		text: Lyn.Player.currentTitle
+		text: Lyn.Player.current_title
 	}
 }

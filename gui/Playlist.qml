@@ -40,10 +40,10 @@ ListView {
 			ToolTip.visible: containsMouse && !drag.active
 			ToolTip.text: model.title + "<br />" + model.comment
 			ToolTip.delay: 500
-			drag.target: ((index == 0 && Lyn.Player.isPlaying) || model.suggested) ? null : parent  //The currently playing item cannot be dragged, nor suggested tracks.
+			drag.target: ((index == 0 && Lyn.Player.is_playing) || model.suggested) ? null : parent  //The currently playing item cannot be dragged, nor suggested tracks.
 			drag.axis: Drag.YAxis
 			drag.minimumY: -playlist.contentHeight + (Lyn.Playlist.has_suggested_track ? parent.height : 0) //If there is a suggested track, you can't drag above it.
-			drag.maximumY: -parent.height - (Lyn.Player.isPlaying ? parent.height : 0)  //If playing, you can't drag items below the currently playing item.
+			drag.maximumY: -parent.height - (Lyn.Player.is_playing ? parent.height : 0)  //If playing, you can't drag items below the currently playing item.
 			drag.threshold: parent.height / 8
 
 			onReleased: {

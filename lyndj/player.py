@@ -121,7 +121,7 @@ class Player(PySide6.QtCore.QObject):
 			logging.info(f"Stopping playback.")
 			fading = Player.current_track.fade(to_gain=-120, start=lyndj.playback.current_position, duration=round(lyndj.preferences.Preferences.getInstance().get("player/fadeout") * 1000))
 			lyndj.playback.swap(fading)
-			if (time.time() - Player.start_time) / self.currentDuration > 0.5:  # Count it as "played" if we're over halfway through the track.
+			if (time.time() - Player.start_time) / self.current_duration > 0.5:  # Count it as "played" if we're over halfway through the track.
 				self.song_finished.emit(lyndj.preferences.Preferences.getInstance().get("playlist/playlist")[0])
 			Player.current_track = None
 			Player.control_track.stop()
@@ -130,7 +130,7 @@ class Player(PySide6.QtCore.QObject):
 		self.is_playing_changed.emit()
 
 	@PySide6.QtCore.Property(bool, fset=is_playing_set, notify=is_playing_changed)
-	def isPlaying(self) -> bool:
+	def is_playing(self) -> bool:
 		"""
 		Get whether the music is currently playing, or should be playing.
 
@@ -167,7 +167,7 @@ class Player(PySide6.QtCore.QObject):
 
 		self.set_volume(0.5)  # Back to default for the next song.
 
-		self.songChanged.emit()  # We loaded up a new song.
+		self.song_changed.emit()  # We loaded up a new song.
 		Player.start_time = time.time()
 		lyndj.playback.play(Player.current_track)
 		Player.control_track.play()
@@ -296,10 +296,10 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		lyndj.metadata.change(path, "last_played", time.time())
 
-	songChanged = PySide6.QtCore.Signal()
+	song_changed = PySide6.QtCore.Signal()
 
-	@PySide6.QtCore.Property(PySide6.QtCore.QUrl, notify=songChanged)
-	def currentFourier(self) -> PySide6.QtCore.QUrl:
+	@PySide6.QtCore.Property(PySide6.QtCore.QUrl, notify=song_changed)
+	def current_fourier(self) -> PySide6.QtCore.QUrl:
 		"""
 		Get the path to the currently playing song's Fourier image.
 		:return: A path to an image.
@@ -311,8 +311,8 @@ class Player(PySide6.QtCore.QObject):
 		fourier_path = lyndj.metadata.get(current_path, "fourier")
 		return PySide6.QtCore.QUrl.fromLocalFile(fourier_path)
 
-	@PySide6.QtCore.Property(float, notify=songChanged)
-	def currentDuration(self) -> float:
+	@PySide6.QtCore.Property(float, notify=song_changed)
+	def current_duration(self) -> float:
 		"""
 		Get the duration of the current song, in seconds.
 
@@ -323,8 +323,8 @@ class Player(PySide6.QtCore.QObject):
 			return 0
 		return len(Player.current_track) / 1000.0
 
-	@PySide6.QtCore.Property(str, notify=songChanged)
-	def currentTitle(self) -> str:
+	@PySide6.QtCore.Property(str, notify=song_changed)
+	def current_title(self) -> str:
 		"""
 		Get the title of the current song.
 		:return: The title of the currently playing song.
@@ -335,7 +335,7 @@ class Player(PySide6.QtCore.QObject):
 		current_path = current_playlist[0]  # Don't request from the playlist, which may be outdated. Get directly from metadata.
 		return lyndj.metadata.get(current_path, "title")
 
-	@PySide6.QtCore.Property(str, notify=songChanged)
+	@PySide6.QtCore.Property(str, notify=song_changed)
 	def currentPath(self) -> str:
 		"""
 		Get the path to the current song.

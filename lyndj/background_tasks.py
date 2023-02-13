@@ -73,7 +73,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 				task, description, allow_during_playback = self.tasks.get(block=False)
 			except queue.Empty:
 				continue  # Just check again 1 iteration later.
-			if not allow_during_playback and lyndj.player.Player.get_instance().isPlaying:
+			if not allow_during_playback and lyndj.player.Player.get_instance().is_playing:
 				self.tasks.put((task, description, allow_during_playback))  # Put it back at the end of the queue.
 				continue
 			if self._current_description != description:
