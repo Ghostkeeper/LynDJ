@@ -121,6 +121,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		:param key: The preference key that changed.
 		"""
 		if key in {
+			"directory/browse_path",
 			"playlist/playlist",
 			"autodj/enabled",
 			"autodj/energy",
