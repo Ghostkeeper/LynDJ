@@ -156,6 +156,6 @@ class AutoDJ:
 		session will be returned.
 		:return: The tracks that were played in the current session, in order of when they were played.
 		"""
-		history = [track["path"] for track in lyndj.history.History.getInstance().track_data]
+		history = [track["path"] for track in lyndj.history.History.get_instance().track_data]
 		playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
 		return list(reversed(playlist)) + history

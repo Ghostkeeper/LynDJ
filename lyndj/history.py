@@ -24,7 +24,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 	instance = None
 
 	@classmethod
-	def getInstance(cls):
+	def get_instance(cls):
 		"""
 		Gets the singleton instance. If no instance was made yet, it will be instantiated here.
 		:return: The single instance of this class.

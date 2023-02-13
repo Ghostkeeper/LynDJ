@@ -49,7 +49,7 @@ class Application(PySide6.QtWidgets.QApplication):
 		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.preferences.Preferences, "Lyn", 1, 0, "Preferences", lyndj.preferences.Preferences.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.theme.Theme, "Lyn", 1, 0, "Theme", lyndj.theme.Theme.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.playlist.Playlist, "Lyn", 1, 0, "Playlist", lyndj.playlist.Playlist.getInstance())
-		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.history.History, "Lyn", 1, 0, "History", lyndj.history.History.getInstance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.history.History, "Lyn", 1, 0, "History", lyndj.history.History.get_instance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(Application, "Lyn", 1, 0, "Application", self)
 		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.player.Player, "Lyn", 1, 0, "Player", lyndj.player.Player.get_instance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.background_tasks.BackgroundTasks, "Lyn", 1, 0, "BackgroundTasks", lyndj.background_tasks.BackgroundTasks.get_instance())
