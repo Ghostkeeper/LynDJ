@@ -8,6 +8,7 @@ import PySide6.QtCore  # Exposing this object to QML to see its progress.
 import queue  # A task queue.
 import threading  # To run tasks in a background thread.
 import time  # To sleep the background thread regularly.
+import typing
 
 import lyndj.player  # To test if music is playing. Some tasks may not execute while music is playing.
 
@@ -21,13 +22,13 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 	Some tasks can be ran whenever. Some tasks are only allowed to be started while the music is not playing.
 	"""
 
-	instance = None
+	instance: typing.Optional["BackgroundTasks"] = None
 	"""
 	This class is a singleton. This stores the one instance that is allowed to exist.
 	"""
 
 	@classmethod
-	def get_instance(cls):
+	def get_instance(cls) -> "BackgroundTasks":
 		"""
 		Get the single instance of this class, or create it if it wasn't created yet.
 		:return: The instance of this class.
@@ -36,7 +37,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 			cls.instance = BackgroundTasks()
 		return cls.instance
 
-	def __init__(self, parent=None):
+	def __init__(self, parent: typing.Optional[PySide6.QtCore.QObject]=None) -> None:
 		"""
 		Construct the task runner.
 
@@ -50,7 +51,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		self._current_description = ""
 		self.runner_thread.start()
 
-	def add(self, task, description, allow_during_playback=True):
+	def add(self, task: typing.Callable[[], None], description: str, allow_during_playback: bool=True) -> None:
 		"""
 		Add a task to be executed in the background.
 		:param task: A callable object, which executes the task to be done in the background.
@@ -61,7 +62,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		self.tasks.put((task, description, allow_during_playback))
 		self.progress_changed.emit()
 
-	def worker(self):
+	def worker(self) -> None:
 		"""
 		Continuously checks if there are background tasks to be done, and if so, does those tasks.
 
@@ -92,7 +93,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 	"""
 
 	@PySide6.QtCore.Property(float, notify=progress_changed)
-	def progress(self):
+	def progress(self) -> float:
 		"""
 		Get the current process as a fraction between 0 and 1.
 
@@ -107,7 +108,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		return self._num_done / (self._num_done + self.tasks.qsize())
 
 	@PySide6.QtCore.Property(int, notify=progress_changed)
-	def num_done(self):
+	def num_done(self) -> int:
 		"""
 		Get the amount of tasks that have been completed since the last time the queue was empty.
 		:return: The amount of tasks done.
@@ -115,7 +116,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		return self._num_done
 
 	@PySide6.QtCore.Property(int, notify=progress_changed)
-	def num_total(self):
+	def num_total(self) -> int:
 		"""
 		Get the amount of tasks that are queued since the last time the queue was empty.
 		:return: The amount of tasks to do plus the amount of tasks done.
@@ -123,7 +124,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		return self._num_done + self.tasks.qsize()
 
 	@PySide6.QtCore.Property(str, notify=progress_changed)
-	def current_description(self):
+	def current_description(self) -> str:
 		"""
 		Get a human-readable description of the currently running task.
 		:return: A description of the currently running task.

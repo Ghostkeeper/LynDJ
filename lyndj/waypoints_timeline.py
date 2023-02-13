@@ -9,12 +9,16 @@ import PySide6.QtCore  # For custom properties.
 import PySide6.QtQuick  # This class extends QQuickPaintedItem.
 import PySide6.QtSvg  # To render the graph.
 import time  # To generate timestamps for the graph.
+import typing
 
 import lyndj.metadata  # To get the waypoints of a song.
 import lyndj.player  # To get the current play time.
 import lyndj.theme  # To get the colours to draw the graph in.
 
-def colour_to_hex(colour) -> str:
+if typing.TYPE_CHECKING:
+	import PySide6.QtGui
+
+def colour_to_hex(colour: "PySide6.QtGui.QColor") -> str:
 	"""
 	Converts a QColor colour to a hex string that can be inserted in SVG code.
 
@@ -62,7 +66,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 	"""
 
 	@classmethod
-	def parse_waypoints(cls, waypoints_serialised) -> list:
+	def parse_waypoints(cls, waypoints_serialised: str) -> typing.List[typing.Tuple[float, float]]:
 		"""
 		Parses a waypoints string to produce the waypoints it represents.
 
@@ -98,7 +102,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		return result
 
 	@classmethod
-	def serialise_waypoints(cls, waypoints):
+	def serialise_waypoints(cls, waypoints: typing.List[typing.Tuple[float, float]]) -> str:
 		"""
 		Serialise the waypoints to a string, so that it can be stored in a database.
 
@@ -108,7 +112,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		"""
 		return "|".join([";".join([str(part) for part in waypoint]) for waypoint in waypoints])
 
-	def __init__(self, parent=None) -> None:
+	def __init__(self, parent: typing.Optional[PySide6.QtCore.QObject]=None) -> None:
 		"""
 		Creates a timeline element that shows and interacts with the waypoints for a certain property of songs.
 		:param parent: The parent QML element to store this element under.
@@ -142,7 +146,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 	Triggered when the path changes of the file to display the waypoints for.
 	"""
 
-	def set_path(self, new_path) -> None:
+	def set_path(self, new_path: str) -> None:
 		"""
 		Change the current path.
 		:param new_path: The new path to store the waypoints of.
@@ -168,7 +172,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 	Triggered when the field changes to display for the file.
 	"""
 
-	def set_field(self, new_field) -> None:
+	def set_field(self, new_field: str) -> None:
 		"""
 		Change the current metadata field to display.
 		:param new_field: The new field to display.
@@ -236,7 +240,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.renderer = PySide6.QtSvg.QSvgRenderer(svg.encode("UTF-8"))
 		self.update()
 
-	def paint(self, painter) -> None:
+	def paint(self, painter: "PySide6.QtGui.QPainter") -> None:
 		"""
 		Renders the visualisation to the screen.
 		:param painter: A painter object that can paint to the screen.
@@ -244,7 +248,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		if self.renderer:
 			self.renderer.render(painter)  # Simply forward to the renderer.
 
-	def add_transition(self, time_start, time_end, level_end) -> None:
+	def add_transition(self, time_start: float, time_end: float, level_end: float) -> None:
 		"""
 		Inserts a transition to the waypoints of this song.
 
@@ -325,7 +329,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.ongoing_transition_start_time = current_time
 
 	@PySide6.QtCore.Slot(float)
-	def end_transition(self, end_level):
+	def end_transition(self, end_level: float) -> None:
 		"""
 		Triggered when a transition is ended by the user.
 

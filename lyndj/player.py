@@ -16,6 +16,7 @@ import PySide6.QtCore  # Exposing the player to QML.
 import PySide6.QtGui  # For the QImage to display the Fourier transform.
 import scipy.fft  # For the Fourier transform.
 import time  # To track playtime.
+import typing
 import uuid  # To generate filenames for the Fourier transform cache.
 
 import lyndj.metadata  # To find or generate the Fourier transform image.
@@ -34,26 +35,26 @@ class Player(PySide6.QtCore.QObject):
 	from there.
 	"""
 
-	instance = None
+	instance: typing.Optional["Player"] = None
 	"""
 	This class is a singleton. This stores the one instance that is allowed to exist.
 	"""
 
-	current_track = None
+	current_track: typing.Optional["pydub.AudioSegment"] = None
 	"""
 	If a song is playing, this holds the currently playing track.
 
 	If no song is playing, this is ``None``.
 	"""
 
-	control_track = None
+	control_track: typing.Optional[lyndj.music_control.MusicControl] = None
 	"""
 	If a song is playing, this holds an object that controls playback of the current track.
 
 	This object controls volume, equalizer, and so on for the current track.
 	"""
 
-	start_time = None
+	start_time: typing.Optional[float] = None
 	"""
 	The time when the current track started playing. This can be used to determine the current playtime.
 
@@ -73,7 +74,7 @@ class Player(PySide6.QtCore.QObject):
 	"""
 
 	@classmethod
-	def get_instance(cls):
+	def get_instance(cls) -> "Player":
 		"""
 		Get the single instance of this class, or create it if it wasn't created yet.
 		:return: The instance of this class.
@@ -82,7 +83,7 @@ class Player(PySide6.QtCore.QObject):
 			cls.instance = Player()
 		return cls.instance
 
-	def __init__(self, parent=None) -> None:
+	def __init__(self, parent: typing.Optional[PySide6.QtCore.QObject]=None) -> None:
 		"""
 		Ensures that a few global things are properly initialised before using this class.
 		:param parent: A parent Qt Object that this object is a child of.
@@ -113,7 +114,7 @@ class Player(PySide6.QtCore.QObject):
 	Triggered when the music is started or stopped.
 	"""
 
-	def is_playing_set(self, new_is_playing) -> None:
+	def is_playing_set(self, new_is_playing: bool) -> None:
 		"""
 		Start or stop the music.
 		:param new_is_playing: Whether the music should be playing or not.
@@ -143,7 +144,7 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		return self.current_track is not None
 
-	def play_next(self):
+	def play_next(self) -> None:
 		"""
 		Play the next song in the playlist.
 		"""
@@ -175,7 +176,7 @@ class Player(PySide6.QtCore.QObject):
 		lyndj.playback.play(Player.current_track)
 		Player.control_track.play()
 
-	def trim_silence(self, track):
+	def trim_silence(self, track: pydub.AudioSegment) -> pydub.AudioSegment:
 		"""
 		Trims silence from the start and end of a track.
 		:param track: A track to trim.
@@ -204,7 +205,7 @@ class Player(PySide6.QtCore.QObject):
 
 		return track[start_trim:end_trim]
 
-	def load_and_generate_fourier(self, path):
+	def load_and_generate_fourier(self, path: str) -> None:
 		"""
 		Load a sound waveform and generate a Fourier image with it.
 
@@ -226,7 +227,7 @@ class Player(PySide6.QtCore.QObject):
 			fourier.save(filepath)
 			lyndj.metadata.change(path, "fourier", filepath)
 
-	def generate_fourier(self, sound, path):
+	def generate_fourier(self, sound: pydub.AudioSegment, path: str) -> PySide6.QtGui.QImage:
 		"""
 		Generate an image of the Fourier transform of a track.
 		:param sound: A sound sample to generate the Fourier transform from.
@@ -292,7 +293,7 @@ class Player(PySide6.QtCore.QObject):
 	The parameter is the path to the song that had completed playing.
 	"""
 
-	def mark_song_played(self, path) -> None:
+	def mark_song_played(self, path: str) -> None:
 		"""
 		Mark that the current song was recently played.
 		:param path: The path to the song that was played.
@@ -357,7 +358,7 @@ class Player(PySide6.QtCore.QObject):
 	Triggered when something changes the playback volume of the current song.
 	"""
 
-	def set_volume(self, value) -> None:
+	def set_volume(self, value: float) -> None:
 		"""
 		Changes the master volume to play music at.
 		:param value: The new volume, between 0 and 1.
@@ -379,7 +380,7 @@ class Player(PySide6.QtCore.QObject):
 	Triggered when something changes between mono and stereo.
 	"""
 
-	def set_mono(self, value) -> None:
+	def set_mono(self, value: bool) -> None:
 		"""
 		Changes the mono toggle.
 		:param value: The new value, whether to play mono (True) or stereo (False).

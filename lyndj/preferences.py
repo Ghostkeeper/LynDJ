@@ -26,13 +26,13 @@ class Preferences(PySide6.QtCore.QObject):
 	Stores application preferences and makes sure they get reloaded.
 	"""
 
-	_instance = None
+	_instance: typing.Optional["Preferences"] = None
 	"""
 	This class is a singleton. This is the one instance.
 	"""
 
 	@classmethod
-	def get_instance(cls, _engine=None, _script=None) -> "Preferences":
+	def get_instance(cls, _engine: typing.Optional[PySide6.QtQml.QQmlApplicationEngine]=None, _script: typing.Optional[PySide6.QtQml.QQmlFile]=None) -> "Preferences":
 		"""
 		Gets an instance of the preferences class.
 
@@ -66,7 +66,7 @@ class Preferences(PySide6.QtCore.QObject):
 		self.load()
 
 	@PySide6.QtCore.Slot(str, "QVariant")
-	def add(self, key, default) -> None:
+	def add(self, key: str, default: typing.Any) -> None:
 		"""
 		Add a new preference entry.
 		:param key: The identifier for the preference.
@@ -89,7 +89,7 @@ class Preferences(PySide6.QtCore.QObject):
 			with open(filepath, "w") as f:
 				f.write("{}")  # No overrides to start with.
 
-	def get(self, key) -> typing.Union[str, int, float, list, dict]:
+	def get(self, key: str) -> typing.Union[str, int, float, list, dict]:
 		"""
 		Get the current value of a preference.
 		:param key: The preference to get the value of.
@@ -97,7 +97,7 @@ class Preferences(PySide6.QtCore.QObject):
 		"""
 		return self.values[key]  # Get by reference! Otherwise you can't change lists and dicts stored in the preferences.
 
-	def has(self, key) -> bool:
+	def has(self, key: str) -> bool:
 		"""
 		Tests whether a preference with a given key exists.
 		:param key: The preference to test for.
@@ -135,7 +135,7 @@ class Preferences(PySide6.QtCore.QObject):
 			json.dump(changed, f, indent="\t")
 
 	@PySide6.QtCore.Slot(str, "QVariant")
-	def set(self, key, value) -> None:
+	def set(self, key: str, value: typing.Any) -> None:
 		"""
 		Change the current value of a preference.
 		:param key: The preference to set.
@@ -147,7 +147,7 @@ class Preferences(PySide6.QtCore.QObject):
 		self.valuesChanged.emit(key)
 
 	@PySide6.QtCore.Slot(str, int, "QVariant")
-	def set_element(self, key, index, value) -> None:
+	def set_element(self, key: str, index: typing.Union[int, str], value: typing.Any) -> None:
 		"""
 		Change an element in a list-type or dict-type preference.
 		:param key: The preference to change an element of.
@@ -158,13 +158,13 @@ class Preferences(PySide6.QtCore.QObject):
 		self.values[key][index] = value
 		self.changed_internally(key)
 
-	def changed_internally(self, key) -> None:
+	def changed_internally(self, key: typing.Union[int, str]) -> None:
 		"""
 		Trigger an update of things listening to the preferences, after something changed internally in an object saved
 		in the preferences.
 
 		This should be used, for instance, if an element of a dict has changed, or if appending or removing from a list.
-		:param _key: The element that changed. This is not used for now.
+		:param key: The element that changed. This is not used for now.
 		"""
 		logging.debug(f"Changing preference {key} internally.")
 		self.save_timer.start()
@@ -183,7 +183,7 @@ class Preferences(PySide6.QtCore.QObject):
 	"""
 
 	@PySide6.QtCore.Property("QVariantMap", notify=valuesChanged)
-	def preferences(self) -> typing.Dict[str, typing.Union[str, int, float, list, dict]]:
+	def preferences(self) -> typing.Dict[str, typing.Any]:
 		"""
 		Get a dictionary of all the current preferences.
 		:return: All current preference values.

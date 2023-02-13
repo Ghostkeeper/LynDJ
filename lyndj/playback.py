@@ -12,11 +12,15 @@ import pyaudio  # Used to play audio.
 import pydub.utils  # For volume effects.
 import time  # To sleep the thread when there is no audio to play.
 import threading  # The audio is played on a different thread.
+import typing
 
 import lyndj.player  # To get the playback parameters.
 import lyndj.preferences
 
-audio_source = None
+if typing.TYPE_CHECKING:
+	import pydub
+
+audio_source: typing.Optional["pydub.AudioSegment"] = None
 """
 The audio track that is currently being played.
 """
@@ -26,7 +30,7 @@ current_position = 0
 The location in the file where we are currently playing (in ms).
 """
 
-def play(new_audio):
+def play(new_audio: "pydub.AudioSegment") -> None:
 	"""
 	Start the playback of a new audio source.
 	:param new_audio: The new audio source to play.
@@ -36,7 +40,7 @@ def play(new_audio):
 	global current_position
 	current_position = 0  # Start from the start.
 
-def swap(new_audio):
+def swap(new_audio: "pydub.AudioSegment") -> None:
 	"""
 	Swap out an audio source for another without changing the playback position.
 	:param new_audio: The new audio source to play.
@@ -44,7 +48,7 @@ def swap(new_audio):
 	global audio_source
 	audio_source = new_audio
 
-def filter(chunk):
+def filter(chunk: "pydub.AudioSegment") -> "pydub.AudioSegment":
 	"""
 	Apply effects to a chunk of audio.
 
@@ -69,7 +73,7 @@ def filter(chunk):
 
 	return chunk
 
-def play_loop():
+def play_loop() -> None:
 	"""
 	Main loop of the playback server.
 

@@ -9,6 +9,7 @@ import logging
 import os  # To find the candidate tracks.
 import os.path  # To find the candidate tracks.
 import time  # To find tracks that were played this session (within 24 hours ago).
+import typing
 
 import lyndj.history  # To decide on new tracks to play based on recently played tracks.
 import lyndj.metadata  # To decide on the next track to play by their metadata.
@@ -31,7 +32,7 @@ class AutoDJ:
 	* The energy level and BPM of the track, to match audience energy levels as configured by the user.
 	"""
 
-	energy_to_numeric = {
+	energy_to_numeric: typing.Dict[str, int] = {
 		"low": 0,
 		"medium": 50,
 		"high": 100
@@ -145,7 +146,7 @@ class AutoDJ:
 		logging.debug(f"The AutoDJ suggests track: {best_track}")
 		return best_track
 
-	def get_history(self) -> list:
+	def get_history(self) -> typing.List[str]:
 		"""
 		Get a list of tracks, in order of when they were last played.
 

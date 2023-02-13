@@ -10,6 +10,7 @@ import PySide6.QtCore
 import PySide6.QtGui  # To give the application an icon.
 import PySide6.QtQml  # To register types with the QML engine.
 import PySide6.QtWidgets  # This is an application.
+import typing
 
 import lyndj.background_tasks  # To register this with QML.
 import lyndj.history  # To register this with QML.
@@ -29,7 +30,7 @@ class Application(PySide6.QtWidgets.QApplication):
 	This provides a QML engine and keeps it running until the application quits.
 	"""
 
-	def __init__(self, argv):
+	def __init__(self, argv: typing.List[str]) -> None:
 		"""
 		Starts the application.
 		:param argv: Command-line parameters provided to the application. Qt understands some of these.
@@ -67,7 +68,7 @@ class Application(PySide6.QtWidgets.QApplication):
 
 		logging.info("Start-up complete.")
 
-	def create_gui_preferences(self):
+	def create_gui_preferences(self) -> None:
 		"""
 		Creates preferences that are used in the GUI.
 

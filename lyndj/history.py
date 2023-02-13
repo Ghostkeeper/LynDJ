@@ -7,6 +7,7 @@
 import math  # To format durations.
 import PySide6.QtCore  # To expose this list to QML.
 import PySide6.QtGui  # To calculate display colours for song tempo.
+import typing
 
 import lyndj.metadata  # To show file metadata in the playlist table.
 import lyndj.player  # To trigger updates after the song changes.
@@ -21,13 +22,13 @@ class History(PySide6.QtCore.QAbstractListModel):
 	display.
 	"""
 
-	instance = None
+	instance: typing.Optional["History"] = None
 	"""
 	This class is a singleton. This stores the one instance that is allowed to exist.
 	"""
 
 	@classmethod
-	def get_instance(cls):
+	def get_instance(cls) -> "History":
 		"""
 		Gets the singleton instance. If no instance was made yet, it will be instantiated here.
 		:return: The single instance of this class.
@@ -36,7 +37,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 			cls.instance = History()
 		return cls.instance
 
-	def __init__(self, parent=None):
+	def __init__(self, parent: typing.Optional[PySide6.QtCore.QObject]=None) -> None:
 		"""
 		Constructs the History instance.
 		:param parent: If this instance is created in a QML scene, this is the parent QML element.
@@ -52,10 +53,10 @@ class History(PySide6.QtCore.QAbstractListModel):
 			user_role + 5: "comment",  # Any comment for the track.
 		}
 
-		self.track_data = []  # The source of data for the model.
+		self.track_data: typing.List[typing.Dict[str, typing.Any]] = []  # The source of data for the model.
 		lyndj.player.Player.get_instance().song_finished.connect(self.add)  # Update the history when a song finished playing.
 
-	def add(self, path) -> None:
+	def add(self, path: str) -> None:
 		"""
 		Add a track to the history.
 		:param path: The path of the track to add to the history.
@@ -67,7 +68,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 		self.track_data.insert(0, lyndj.metadata.metadata[path])
 		self.endInsertRows()
 
-	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
+	def rowCount(self, parent: typing.Optional[PySide6.QtCore.QModelIndex]=PySide6.QtCore.QModelIndex()) -> int:
 		"""
 		Returns the number of music files in the playlist.
 		:param parent: The parent to display the child entries under. This is a plain list, so no parent should be
@@ -78,7 +79,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 			return 0
 		return len(self.track_data)
 
-	def columnCount(self, parent=PySide6.QtCore.QModelIndex()):
+	def columnCount(self, parent: typing.Optional[PySide6.QtCore.QModelIndex]=PySide6.QtCore.QModelIndex()) -> int:
 		"""
 		Returns the number of metadata entries we're displaying in the table.
 		:param parent: The parent to display the child entries under. This is a plain table, so no parent should be
@@ -89,7 +90,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 			return 0
 		return 1
 
-	def roleNames(self):
+	def roleNames(self) -> typing.Dict[int, bytes]:
 		"""
 		Gets the names of the roles as exposed to QML.
 
@@ -98,7 +99,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 		"""
 		return {role: field.encode("utf-8") for role, field in self.role_to_field.items()}
 
-	def data(self, index, role=PySide6.QtCore.Qt.DisplayRole):
+	def data(self, index: PySide6.QtCore.QModelIndex, role: int=PySide6.QtCore.Qt.DisplayRole) -> typing.Any:
 		"""
 		Returns one field of the data in the list.
 		:param index: The row of the entry to return the data from.

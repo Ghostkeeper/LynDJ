@@ -11,6 +11,7 @@ import math  # To format durations.
 import PySide6.QtCore  # To expose this list to QML.
 import PySide6.QtGui  # To calculate display colours for song tempo.
 import time  # To determine the remaining time until songs in the playlist start/end playing.
+import typing
 
 import lyndj.autodj  # To suggest songs to add to the playlist.
 import lyndj.metadata  # To show file metadata in the playlist table.
@@ -26,13 +27,13 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 	player is taking tracks from.
 	"""
 
-	instance = None
+	instance: typing.Optional["Playlist"] = None
 	"""
 	This class is a singleton. This stores the one instance that is allowed to exist.
 	"""
 
 	@classmethod
-	def get_instance(cls):
+	def get_instance(cls) -> "Playlist":
 		"""
 		Gets the singleton instance. If no instance was made yet, it will be instantiated here.
 		:return: The single instance of this class.
@@ -41,7 +42,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			cls.instance = Playlist()
 		return cls.instance
 
-	def __init__(self, parent=None):
+	def __init__(self, parent: typing.Optional[PySide6.QtCore.QObject]=None) -> None:
 		"""
 		Construct the instance of this class.
 		:param parent: If this instance is created in a QML scene, the parent QML element.
@@ -129,7 +130,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			self.endRemoveRows()
 		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(self.track_data), 0))
 
-	def preferences_changed(self, key):
+	def preferences_changed(self, key: str) -> None:
 		"""
 		Triggered if the preferences change, which means that this model has to update its data.
 		:param key: The preference key that changed.
@@ -149,7 +150,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		}:
 			self.update()  # The playlist changed, so update my model.
 
-	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
+	def rowCount(self, parent: typing.Optional[PySide6.QtCore.QModelIndex]=PySide6.QtCore.QModelIndex()) -> int:
 		"""
 		Returns the number of music files in the playlist.
 		:param parent: The parent to display the child entries under. This is a plain list, so no parent should be
@@ -160,7 +161,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			return 0
 		return len(self.track_data)
 
-	def columnCount(self, parent=PySide6.QtCore.QModelIndex()):
+	def columnCount(self, parent: typing.Optional[PySide6.QtCore.QModelIndex]=PySide6.QtCore.QModelIndex()) -> int:
 		"""
 		Returns the number of metadata entries we're displaying in the table.
 		:param parent: The parent to display the child entries under. This is a plain table, so no parent should be
@@ -171,7 +172,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			return 0
 		return 1
 
-	def roleNames(self):
+	def roleNames(self) -> typing.Dict[int, bytes]:
 		"""
 		Gets the names of the roles as exposed to QML.
 
@@ -180,7 +181,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		"""
 		return {role: field.encode("utf-8") for role, field in self.role_to_field.items()}
 
-	def data(self, index, role=PySide6.QtCore.Qt.DisplayRole):
+	def data(self, index: PySide6.QtCore.QModelIndex, role: int=PySide6.QtCore.Qt.DisplayRole) -> typing.Any:
 		"""
 		Returns one field of the data in the list.
 		:param index: The row of the entry to return the data from.
@@ -232,7 +233,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		return str(value)  # Default, just convert to string.
 
 	@PySide6.QtCore.Slot(str)
-	def add(self, path) -> None:
+	def add(self, path: str) -> None:
 		"""
 		Add a certain file to the playlist.
 		:param path: The path to the file to add.
@@ -250,7 +251,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		self.playlist_changed.emit()
 
 	@PySide6.QtCore.Slot(int)
-	def remove(self, index) -> None:
+	def remove(self, index: int) -> None:
 		"""
 		Remove a certain file from the playlist.
 		:param index: The position of the file to remove.
@@ -267,7 +268,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		self.playlist_changed.emit()
 
 	@PySide6.QtCore.Slot(str, int)
-	def reorder(self, path, new_index) -> None:
+	def reorder(self, path: str, new_index: int) -> None:
 		"""
 		Move a certain file to a certain position in the playlist.
 
@@ -302,7 +303,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		self.playlist_changed.emit()
 
 	@PySide6.QtCore.Slot(result="float")
-	def playlist_endtime(self):
+	def playlist_endtime(self) -> float:
 		"""
 		Get the proposed endtime of the DJ session, as configured by the user.
 		:return: The endtime in number of seconds since the Unix epoch.
@@ -345,7 +346,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			return False
 		return self.track_data[-1]["suggested"]
 
-	def cumulative_update(self):
+	def cumulative_update(self) -> None:
 		"""
 		Updates the cumulative duration timer with the currently remaining times.
 		"""

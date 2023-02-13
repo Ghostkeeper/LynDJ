@@ -19,15 +19,16 @@ import mutagen.mp3
 import mutagen.ogg
 import mutagen.wave
 import os.path  # To know where to store the database.
+import sqlite3  # To cache metadata on disk.
 import threading  # To store the database after a certain amount of time.
 import time  # To store the database after a certain amount of time.
-import sqlite3  # To cache metadata on disk.
+import typing
 
 import lyndj.storage  # To know where to store the database.
 
 VERSION = 0
 
-metadata = {}
+metadata: typing.Dict[str, typing.Any] = {}
 """
 The single source of truth for the currently known metadata.
 
@@ -40,7 +41,7 @@ metadata_lock = threading.Lock()
 While the metadata dictionary is modified or iterated over, this lock has to be obtained.
 """
 
-def load():
+def load() -> None:
 	"""
 	Reads the metadata from the database file into memory.
 
@@ -77,7 +78,7 @@ def load():
 
 # When we change the database, save the database to disk after a short delay.
 # If there's multiple changes in short succession, those will be combined into a single write.
-def store_after():
+def store_after() -> None:
 	"""
 	Waits a certain amount of time, then stores the metadata to disk.
 
@@ -88,7 +89,7 @@ def store_after():
 	global store_thread
 	store_thread = None
 
-store_thread = None
+store_thread: typing.Optional[threading.Thread] = None
 """
 Thread that waits a moment, and then stores the database.
 
@@ -101,7 +102,7 @@ Note that this is imperfect. If the metadata changes while the database is still
 changes will not be written to disk. As such, it is wise to also save the database at application closing. 
 """
 
-def trigger_store():
+def trigger_store() -> None:
 	"""
 	After a set amount of time, triggers the serialisation of metadata to disk.
 	"""
@@ -111,7 +112,7 @@ def trigger_store():
 	if not store_thread.is_alive():
 		store_thread.start()
 
-def store():
+def store() -> None:
 	"""
 	Serialises the metadata on disk in a database file.
 	"""
@@ -149,7 +150,7 @@ def store():
 				(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"]))
 	connection.commit()
 
-def has(path):
+def has(path: str) -> bool:
 	"""
 	Get whether we have any metadata entry about a file.
 
@@ -159,7 +160,7 @@ def has(path):
 	"""
 	return path in metadata
 
-def get(path, field):
+def get(path: str, field: str) -> typing.Any:
 	"""
 	Get a metadata field from the cache about a certain file.
 	:param path: The file to get the metadata field from.
@@ -171,7 +172,7 @@ def get(path, field):
 		add_file(path)
 	return metadata[path][field]
 
-def add(path, entry):
+def add(path: str, entry: typing.Dict[str, typing.Any]) -> None:
 	"""
 	Add or override a metadata entry for a certain file.
 	:param path: The path to the file that the metadata is for.
@@ -181,7 +182,7 @@ def add(path, entry):
 		metadata[path] = entry
 	trigger_store()
 
-def add_file(path):
+def add_file(path: str) -> None:
 	"""
 	Read the metadata from a given file and store it in our database.
 
@@ -265,7 +266,7 @@ def add_file(path):
 		"cachetime": last_modified
 	})
 
-def change(path, key, value) -> None:
+def change(path: str, key: str, value: typing.Any) -> None:
 	"""
 	Change an individual metadata element of a file, and change it also inside of that file.
 
@@ -320,7 +321,7 @@ def change(path, key, value) -> None:
 	metadata[path][key] = value
 	trigger_store()
 
-def is_music_file(path) -> bool:
+def is_music_file(path: str) -> bool:
 	"""
 	Returns whether the given file is a music file that we can read.
 	:param path: The file to check.
@@ -331,7 +332,7 @@ def is_music_file(path) -> bool:
 	ext = os.path.splitext(path)[1]
 	return ext in [".mp3", ".flac", ".opus", ".ogg", ".wav"]  # Supported file formats.
 
-def add_directory(path):
+def add_directory(path: str) -> None:
 	"""
 	Read the metadata from all music files in a directory (not its subdirectories) and store them in our database.
 

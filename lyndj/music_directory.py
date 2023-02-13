@@ -10,6 +10,7 @@ import os  # To list files in the music directory.
 import os.path  # To list file paths in the music directory.
 import PySide6.QtCore  # To expose this table to QML, and get the standard music directory.
 import time  # To display the last played time relative to the current time.
+import typing
 
 import lyndj.background_tasks
 import lyndj.metadata  # To get information about the files in the music directory.
@@ -22,7 +23,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 	A list of the tracks contained within a certain directory, and their metadata.
 	"""
 
-	def __init__(self, parent=None):
+	def __init__(self, parent: typing.Optional[PySide6.QtCore.QObject]=None) -> None:
 		"""
 		Construct a new music directory table.
 		:param parent: The parent element to this QML element, if any.
@@ -44,13 +45,13 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			prefs.add("directory/sort_order", ["bpm", "last_played", "age", "style", "energy", "title", "duration", "author", "comment"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
 		if not prefs.has("directory/sort_direction"):
 			prefs.add("directory/sort_direction", [False, False, False, False, False, False, False, False, False])  # For each sort order, whether it is descending (True) or ascending (False).
-		self.music = []  # The actual data contained in this table.
+		self.music: typing.List[typing.Dict[str, typing.Any]] = []  # The actual data contained in this table.
 
 		if not prefs.has("directory/column_width"):
 			fraction = 1.0 / len(self.column_fields)  # Equal fraction for each column.
 			prefs.add("directory/column_width", [fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction])
 
-	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
+	def rowCount(self, parent: typing.Optional[PySide6.QtCore.QModelIndex]=PySide6.QtCore.QModelIndex()) -> int:
 		"""
 		Returns the number of music files in this table.
 		:param parent: The parent to display the child entries under. This is a plain table, so no parent should be
@@ -61,7 +62,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			return 0
 		return len(self.music)
 
-	def columnCount(self, parent=PySide6.QtCore.QModelIndex()):
+	def columnCount(self, parent: typing.Optional[PySide6.QtCore.QModelIndex]=PySide6.QtCore.QModelIndex()) -> int:
 		"""
 		Returns the number of metadata entries we're displaying in the table.
 		:param parent: The parent to display the child entries under. This is a plain table, so no parent should be
@@ -72,7 +73,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			return 0
 		return len(self.column_fields)
 
-	def data(self, index, role=PySide6.QtCore.Qt.DisplayRole):
+	def data(self, index: PySide6.QtCore.QModelIndex, role: int=PySide6.QtCore.Qt.DisplayRole) -> typing.Any:
 		"""
 		Returns one cell of the table.
 		:param index: The row and column index of the cell to give the data from.
@@ -108,7 +109,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			return str(round(difference / day)) + " days"
 		return str(value)  # Default, just convert to string.
 
-	def flags(self, index):
+	def flags(self, index: PySide6.QtCore.QModelIndex) -> int:
 		"""
 		Returns metadata properties of a cell.
 		:param index: The cell to get metadata of.
@@ -117,7 +118,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		return PySide6.QtCore.Qt.ItemFlag.ItemIsSelectable | PySide6.QtCore.Qt.ItemFlag.ItemIsEnabled
 
 	@PySide6.QtCore.Slot(int, int, int, result=str)
-	def headerData(self, section, orientation, role=PySide6.QtCore.Qt.DisplayRole):
+	def headerData(self, section: int, orientation: int, role: int=PySide6.QtCore.Qt.DisplayRole) -> typing.Optional[str]:
 		"""
 		Returns the row or column labels for the table.
 
@@ -138,7 +139,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			return None
 
 	@PySide6.QtCore.Slot(str, bool)
-	def sort(self, column, descending_order) -> None:
+	def sort(self, column: typing.Union[int, str], descending_order: bool) -> None:
 		"""
 		Sort the table by a certain column number.
 		:param column: The index of the column to sort by, or the role to sort by.
@@ -161,14 +162,14 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		# Now sort it according to that priority.
 		self.resort()
 
-	def resort(self):
+	def resort(self) -> None:
 		"""
 		Re-sort the table according to the current sorting priority list.
 		"""
 		prefs = lyndj.preferences.Preferences.get_instance()
 		sort_field = prefs.get("directory/sort_order")
 		sort_direction = prefs.get("directory/sort_direction")
-		def sort_key(entry):
+		def sort_key(entry: typing.Dict[str, typing.Any]) -> typing.List[typing.Any]:
 			"""
 			Create a key for each element to be sorted by.
 			:param entry: A metadata entry.
@@ -188,7 +189,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		self.music = list(sorted(self.music, key=sort_key))
 		self.layoutChanged.emit()
 
-	def directory_set(self, new_directory) -> None:
+	def directory_set(self, new_directory: str) -> None:
 		"""
 		Change the current directory that this model is looking at.
 		:param new_directory: A path to a directory to look at.
@@ -233,7 +234,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		return self._directory
 
 	@PySide6.QtCore.Slot(str, result="int")
-	def is_sorted(self, field) -> int:
+	def is_sorted(self, field: str) -> int:
 		"""
 		Gives the sorting status of a field in the table.
 
@@ -251,7 +252,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			return 1
 
 	@PySide6.QtCore.Slot(int, result=str)
-	def get_path(self, index) -> str:
+	def get_path(self, index: int) -> str:
 		"""
 		Get the path to the file at the given row in the table.
 		:param index: A row number to get the file path of.
@@ -260,7 +261,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		return self.music[index]["path"]
 
 	@PySide6.QtCore.Slot(str, result=int)
-	def get_row(self, path) -> int:
+	def get_row(self, path: str) -> int:
 		"""
 		Get the row number of a certain file, by the path to the file.
 
@@ -275,7 +276,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			return -1
 
 	@PySide6.QtCore.Slot(str, str, str)
-	def change_metadata(self, path, key, value) -> None:
+	def change_metadata(self, path: str, key: str, value: typing.Any) -> None:
 		"""
 		Change an individual metadata element of a file, and change it also inside of that file.
 

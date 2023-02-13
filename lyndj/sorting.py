@@ -8,18 +8,20 @@
 Some sorting utility functions.
 """
 
+import typing
+
 class ReverseOrder:
 	"""
 	Causes the comparison between instances to be inverted.
 	"""
-	def __init__(self, instance):
+	def __init__(self, instance: typing.Any):
 		"""
 		Wraps the reverse order around the given object.
 		:param instance: The object to invert comparisons of.
 		"""
 		self.instance = instance
 
-	def __eq__(self, other):
+	def __eq__(self, other: typing.Any) -> bool:
 		"""
 		Tests if this object is equal to the other.
 		:param other: Another object to test equality to.
@@ -29,7 +31,7 @@ class ReverseOrder:
 			return self.instance == other.instance
 		return self.instance == other
 
-	def __lt__(self, other):
+	def __lt__(self, other: typing.Any) -> bool:
 		"""
 		Tests if this object should be sorted before the other.
 

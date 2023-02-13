@@ -6,11 +6,16 @@
 
 import logging
 import PySide6.QtCore  # For QTimers to execute code after a certain amount of time.
+import typing
 
 import lyndj.metadata  # To get the events for a track.
 import lyndj.playlist  # To remove the track from the playlist when it finishes playing.
 import lyndj.preferences  # For some playback preferences.
 import lyndj.waypoints_timeline  # To parse waypoints.
+
+if typing.TYPE_CHECKING:
+	import pydub
+	import lyndj.player
 
 class MusicControl:
 	"""
@@ -22,7 +27,7 @@ class MusicControl:
 	interrupted.
 	"""
 
-	def __init__(self, path, sound, player):
+	def __init__(self, path: str, sound: "pydub.AudioSegment", player: "lyndj.player.Player") -> None:
 		"""
 		Creates a music control track for a certain song.
 		:param path: The path to the file that this track is controlling the music for.
@@ -36,7 +41,7 @@ class MusicControl:
 		pause_between_songs = lyndj.preferences.Preferences.get_instance().get("player/silence") * 1000
 
 		# Create a list of events for this track.
-		self.events = []
+		self.events: typing.List[PySide6.QtCore.QTimer] = []
 
 		# Song ends.
 		duration = len(sound)
@@ -77,21 +82,21 @@ class MusicControl:
 					self.events.append(volume_change_timer)
 					volume = new_volume
 
-	def play(self):
+	def play(self) -> None:
 		"""
 		Start all the timers for the events, causing the events to occur in order.
 		"""
 		for event in self.events:
 			event.start()
 
-	def stop(self):
+	def stop(self) -> None:
 		"""
 		Cancel all of the timers for the events, interrupting them from being executed.
 		"""
 		for event in self.events:
 			event.stop()
 
-	def song_ends(self):
+	def song_ends(self) -> None:
 		"""
 		Triggered when the music file has finished playing.
 		"""

@@ -22,7 +22,7 @@ class Theme(PySide6.QtCore.QObject):
 	"""
 	This class is a singleton. This is the singleton instance.
 	"""
-	_instance = None
+	_instance: typing.Optional["Theme"] = None
 
 	@classmethod
 	def get_instance(cls, _engine=None, _script=None) -> "Theme":
@@ -38,7 +38,7 @@ class Theme(PySide6.QtCore.QObject):
 			cls._instance = Theme()
 		return cls._instance
 
-	def __init__(self):
+	def __init__(self) -> None:
 		"""
 		Construct a new instance of the Theme class.
 		"""
@@ -55,7 +55,7 @@ class Theme(PySide6.QtCore.QObject):
 
 		self.load(update_gui=False)
 
-	def change_theme(self, preference_key) -> None:
+	def change_theme(self, preference_key: str) -> None:
 		"""
 		Triggered when the preferences change, this function changes the theme if necessary.
 		:param preference_key: The preference that was changed.
@@ -92,12 +92,12 @@ class Theme(PySide6.QtCore.QObject):
 		"""
 		return self.icons
 
-	def load(self, update_gui=True) -> None:
+	def load(self, update_gui: bool=True) -> None:
 		"""
 		Load the theme from the theme file.
 
 		The currently set theme from the preferences will be used for this.
-		:param trigger_change: Whether to notify the GUI that the theme changed. This should not be done for the initial
+		:param update_gui: Whether to notify the GUI that the theme changed. This should not be done for the initial
 		load of the theme, to prevent essentially loading the GUI twice.
 		"""
 		theme_name = lyndj.preferences.Preferences.get_instance().get("theme")
