@@ -41,7 +41,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		if not prefs.has("playlist/playlist"):
 			prefs.add("playlist/playlist", [])
 		prefs.add("playlist/slow_bpm", 100)
@@ -77,7 +77,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		This will request the data for the files in the given list and fill the model with data.
 		"""
 		new_track_data = []
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		paths = copy.copy(prefs.get("playlist/playlist"))
 		suggested_track = ""
 		if prefs.get("autodj/enabled"):
@@ -202,7 +202,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			medium_rgba = [medium.red(), medium.green(), medium.blue(), medium.alpha()]
 			fast = theme_inst.colours["tempo_fast"]
 			fast_rgba = [fast.red(), fast.green(), fast.blue(), fast.alpha()]
-			prefs = lyndj.preferences.Preferences.getInstance()
+			prefs = lyndj.preferences.Preferences.get_instance()
 			slow_bpm = prefs.get("playlist/slow_bpm")
 			medium_bpm = prefs.get("playlist/medium_bpm")
 			fast_bpm = prefs.get("playlist/fast_bpm")
@@ -231,7 +231,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		:param path: The path to the file to add.
 		"""
 		# If the file is already in the playlist, do nothing.
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		playlist = prefs.get("playlist/playlist")
 		if path in playlist:
 			logging.debug(f"Tried adding {path} to the playlist, but it's already in the playlist.")
@@ -248,7 +248,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		Remove a certain file from the playlist.
 		:param index: The position of the file to remove.
 		"""
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		playlist = prefs.get("playlist/playlist")
 		if index < 0 or index >= len(playlist):
 			logging.error(f"Trying to remove playlist entry {index}, which is out of range.")
@@ -270,7 +270,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		:param path: The path of the file to reorder.
 		:param new_index: The new position of the file.
 		"""
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		playlist = prefs.get("playlist/playlist")
 		try:
 			old_index = playlist.index(path)
@@ -301,7 +301,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		:return: The endtime in number of seconds since the Unix epoch.
 		"""
 		# Parse from the preference first.
-		endtime_str = lyndj.preferences.Preferences.getInstance().get("playlist/end_time")
+		endtime_str = lyndj.preferences.Preferences.get_instance().get("playlist/end_time")
 		components = endtime_str.split(":")
 		set_hours = int(components[0])
 		set_minutes = int(components[1])
@@ -334,7 +334,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		"""
 		if len(self.track_data) == 0:
 			return False
-		if not lyndj.preferences.Preferences.getInstance().get("autodj/enabled"):
+		if not lyndj.preferences.Preferences.get_instance().get("autodj/enabled"):
 			return False
 		return self.track_data[-1]["suggested"]
 

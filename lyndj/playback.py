@@ -92,7 +92,7 @@ def play_loop():
 			if current_position >= len(audio_source):  # Playback completed. Stop taking the GIL and go into stand-by.
 				audio_source = None
 				continue
-			chunk_size = lyndj.preferences.Preferences.getInstance().get("player/buffer_size")
+			chunk_size = lyndj.preferences.Preferences.get_instance().get("player/buffer_size")
 			chunk = audio_source[current_position:current_position + chunk_size]
 			chunk = filter(chunk)
 			stream.write(chunk.raw_data)

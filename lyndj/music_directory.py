@@ -32,7 +32,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		self.column_fields = ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy"]
 
 		self._directory = ""
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		music_locations = PySide6.QtCore.QStandardPaths.standardLocations(PySide6.QtCore.QStandardPaths.StandardLocation.MusicLocation)
 		if music_locations:
 			browse_path = music_locations[0]
@@ -147,7 +147,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		logging.info(f"Sorting music directory by {column}, {'descending' if descending_order else 'ascending'}")
 		if type(column) is int:
 			column = self.column_fields[column]
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		sort_field = prefs.get("directory/sort_order")
 		sort_direction = prefs.get("directory/sort_direction")
 		current_index = sort_field.index(column)  # Remove the old place in the sorting priority.
@@ -165,7 +165,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		"""
 		Re-sort the table according to the current sorting priority list.
 		"""
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		sort_field = prefs.get("directory/sort_order")
 		sort_direction = prefs.get("directory/sort_direction")
 		def sort_key(entry):
@@ -242,7 +242,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		* 0: The field is not sorted (not the highest priority anyway).
 		* -1: The field is sorted in descending order.
 		"""
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		if prefs.get("directory/sort_order")[0] != field:  # Not the highest priority sort.
 			return 0
 		if prefs.get("directory/sort_direction")[0]:  # Descending.

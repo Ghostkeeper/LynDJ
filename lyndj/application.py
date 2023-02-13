@@ -46,7 +46,7 @@ class Application(PySide6.QtWidgets.QApplication):
 
 		logging.debug("Registering QML types.")
 		self.create_gui_preferences()
-		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.preferences.Preferences, "Lyn", 1, 0, "Preferences", lyndj.preferences.Preferences.getInstance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.preferences.Preferences, "Lyn", 1, 0, "Preferences", lyndj.preferences.Preferences.get_instance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.theme.Theme, "Lyn", 1, 0, "Theme", lyndj.theme.Theme.getInstance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.playlist.Playlist, "Lyn", 1, 0, "Playlist", lyndj.playlist.Playlist.get_instance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.history.History, "Lyn", 1, 0, "History", lyndj.history.History.get_instance())
@@ -74,7 +74,7 @@ class Application(PySide6.QtWidgets.QApplication):
 		The QML can't create new preferences. While the scope of the GUI would claim these preferences for themselves,
 		it can't be defined there. We should define them here instead.
 		"""
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		prefs.add("window/width", 1280)
 		prefs.add("window/height", 720)
 		prefs.add("window/x", 100)

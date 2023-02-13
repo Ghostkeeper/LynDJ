@@ -41,7 +41,7 @@ class Theme(PySide6.QtCore.QObject):
 	def __init__(self):
 		super().__init__(None)
 
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		prefs.add("theme", "LightDeco")
 		prefs.valuesChanged.connect(self.change_theme)
 
@@ -97,7 +97,7 @@ class Theme(PySide6.QtCore.QObject):
 		:param trigger_change: Whether to notify the GUI that the theme changed. This should not be done for the initial
 		load of the theme, to prevent essentially loading the GUI twice.
 		"""
-		theme_name = lyndj.preferences.Preferences.getInstance().get("theme")
+		theme_name = lyndj.preferences.Preferences.get_instance().get("theme")
 		theme_directory = os.path.join(lyndj.storage.source(), "theme", theme_name)
 		logging.info(f"Loading theme from: {theme_directory}")
 

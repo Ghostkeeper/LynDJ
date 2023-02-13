@@ -32,7 +32,7 @@ class Preferences(PySide6.QtCore.QObject):
 	_instance = None
 
 	@classmethod
-	def getInstance(cls, _engine=None, _script=None, _bla=None) -> "Preferences":
+	def get_instance(cls, _engine=None, _script=None, _bla=None) -> "Preferences":
 		"""
 		Gets an instance of the preferences class.
 

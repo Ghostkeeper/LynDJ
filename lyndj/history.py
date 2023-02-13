@@ -120,7 +120,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 			medium_rgba = [medium.red(), medium.green(), medium.blue(), medium.alpha()]
 			fast = theme_inst.colours["tempo_fast"]
 			fast_rgba = [fast.red(), fast.green(), fast.blue(), fast.alpha()]
-			prefs = lyndj.preferences.Preferences.getInstance()
+			prefs = lyndj.preferences.Preferences.get_instance()
 			slow_bpm = prefs.get("playlist/slow_bpm")
 			medium_bpm = prefs.get("playlist/medium_bpm")
 			fast_bpm = prefs.get("playlist/fast_bpm")

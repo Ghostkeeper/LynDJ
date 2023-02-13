@@ -88,7 +88,7 @@ class Player(PySide6.QtCore.QObject):
 		:param parent: A parent Qt Object that this object is a child of.
 		"""
 		super().__init__(parent)
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		if not prefs.has("player/fadeout"):
 			prefs.add("player/fadeout", 2.0)  # Fade-out for 2 seconds by default.
 		if not prefs.has("player/fourier_samples"):
@@ -119,10 +119,10 @@ class Player(PySide6.QtCore.QObject):
 			self.play_next()
 		elif Player.current_track is not None and not new_is_playing:
 			logging.info(f"Stopping playback.")
-			fading = Player.current_track.fade(to_gain=-120, start=lyndj.playback.current_position, duration=round(lyndj.preferences.Preferences.getInstance().get("player/fadeout") * 1000))
+			fading = Player.current_track.fade(to_gain=-120, start=lyndj.playback.current_position, duration=round(lyndj.preferences.Preferences.get_instance().get("player/fadeout") * 1000))
 			lyndj.playback.swap(fading)
 			if (time.time() - Player.start_time) / self.current_duration > 0.5:  # Count it as "played" if we're over halfway through the track.
-				self.song_finished.emit(lyndj.preferences.Preferences.getInstance().get("playlist/playlist")[0])
+				self.song_finished.emit(lyndj.preferences.Preferences.get_instance().get("playlist/playlist")[0])
 			Player.current_track = None
 			Player.control_track.stop()
 			Player.control_track = None
@@ -144,7 +144,7 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		Play the next song in the playlist.
 		"""
-		current_playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
+		current_playlist = lyndj.preferences.Preferences.get_instance().get("playlist/playlist")
 		if len(current_playlist) == 0:  # Nothing left in the playlist.
 			self.is_playing_set(False)
 			return
@@ -240,7 +240,7 @@ class Player(PySide6.QtCore.QObject):
 		waveform = sound.get_array_of_samples()
 		num_samples = math.floor(len(waveform) / sound.sample_width)
 		waveform = waveform[:num_samples * sound.sample_width]
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		num_chunks = prefs.get("player/fourier_samples")
 		num_channels = prefs.get("player/fourier_channels")
 		if len(waveform) == 0:  # We were unable to read the audio file.
@@ -304,7 +304,7 @@ class Player(PySide6.QtCore.QObject):
 		Get the path to the currently playing song's Fourier image.
 		:return: A path to an image.
 		"""
-		current_playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
+		current_playlist = lyndj.preferences.Preferences.get_instance().get("playlist/playlist")
 		if len(current_playlist) == 0:
 			return PySide6.QtCore.QUrl()
 		current_path = current_playlist[0]
@@ -329,7 +329,7 @@ class Player(PySide6.QtCore.QObject):
 		Get the title of the current song.
 		:return: The title of the currently playing song.
 		"""
-		current_playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
+		current_playlist = lyndj.preferences.Preferences.get_instance().get("playlist/playlist")
 		if len(current_playlist) == 0:
 			return ""
 		current_path = current_playlist[0]  # Don't request from the playlist, which may be outdated. Get directly from metadata.
@@ -341,7 +341,7 @@ class Player(PySide6.QtCore.QObject):
 		Get the path to the current song.
 		:return: The path of the currently playing song.
 		"""
-		current_playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
+		current_playlist = lyndj.preferences.Preferences.get_instance().get("playlist/playlist")
 		if len(current_playlist) == 0:
 			return ""
 		return current_playlist[0]
@@ -380,7 +380,7 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		if Player.is_mono != value:
 			Player.is_mono = value
-			lyndj.preferences.Preferences.getInstance().set("player/mono", value)
+			lyndj.preferences.Preferences.get_instance().set("player/mono", value)
 			self.mono_changed.emit()
 
 	@PySide6.QtCore.Property(bool, fset=set_mono, notify=mono_changed)

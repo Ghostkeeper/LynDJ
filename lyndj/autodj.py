@@ -47,7 +47,7 @@ class AutoDJ:
 		This is the track that the automatic DJ would suggest adding next.
 		:return: The next track to add to the playlist.
 		"""
-		prefs = lyndj.preferences.Preferences.getInstance()
+		prefs = lyndj.preferences.Preferences.get_instance()
 		if not prefs.has("directory/browse_path"):
 			return ""
 		directory = prefs.get("directory/browse_path")
@@ -157,5 +157,5 @@ class AutoDJ:
 		:return: The tracks that were played in the current session, in order of when they were played.
 		"""
 		history = [track["path"] for track in lyndj.history.History.get_instance().track_data]
-		playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
+		playlist = lyndj.preferences.Preferences.get_instance().get("playlist/playlist")
 		return list(reversed(playlist)) + history

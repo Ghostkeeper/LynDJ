@@ -33,7 +33,7 @@ class MusicControl:
 		self.sound = sound
 		self.player = player
 
-		pause_between_songs = lyndj.preferences.Preferences.getInstance().get("player/silence") * 1000
+		pause_between_songs = lyndj.preferences.Preferences.get_instance().get("player/silence") * 1000
 
 		# Create a list of events for this track.
 		self.events = []
