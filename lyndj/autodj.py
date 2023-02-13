@@ -10,6 +10,7 @@ import os  # To find the candidate tracks.
 import os.path  # To find the candidate tracks.
 import time  # To find tracks that were played this session (within 24 hours ago).
 
+import lyndj.history  # To decide on new tracks to play based on recently played tracks.
 import lyndj.metadata  # To decide on the next track to play by their metadata.
 import lyndj.preferences  # To get the current playlist and music directory.
 
@@ -149,15 +150,9 @@ class AutoDJ:
 		all of the tracks of the playlist.
 
 		The most recently played track will be returned first in the list. Only tracks that were played in the current
-		session (within the last 24 hours) will be returned.
+		session will be returned.
 		:return: The tracks that were played in the current session, in order of when they were played.
 		"""
-		prefs = lyndj.preferences.Preferences.getInstance()
-		directory = prefs.get("directory/browse_path")
-		paths = set(filter(lyndj.metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
-		playlist = prefs.get("playlist/playlist")
-		paths -= set(playlist)  # The playlist will be the files that are most recently played by the time the suggested track plays. Add them later.
-		one_day_ago = time.time() - 24 * 3600
-		paths = [path for path in paths if lyndj.metadata.has(path) and lyndj.metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
-		paths = list(sorted(paths, key=lambda path: lyndj.metadata.get(path, "last_played"), reverse=True))
-		return list(reversed(playlist)) + paths
+		history = [track["path"] for track in lyndj.history.History.getInstance().track_data]
+		playlist = lyndj.preferences.Preferences.getInstance().get("playlist/playlist")
+		return list(reversed(playlist)) + history
