@@ -138,7 +138,7 @@ Rectangle {
 			visible: Lyn.BackgroundTasks.progress != 1.0 //Only visible if there is something processing.
 			hoverEnabled: visible
 			ToolTip.visible: visible && containsMouse
-			ToolTip.text: "Background tasks: " + Lyn.BackgroundTasks.numDone + " / " + Lyn.BackgroundTasks.numTotal + " (" + Lyn.BackgroundTasks.currentDescription + ")"
+			ToolTip.text: "Background tasks: " + Lyn.BackgroundTasks.num_done + " / " + Lyn.BackgroundTasks.num_total + " (" + Lyn.BackgroundTasks.current_description + ")"
 
 			Widgets.ColourImage {
 				id: processing_icon

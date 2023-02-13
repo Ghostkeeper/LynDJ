@@ -46,8 +46,8 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		super().__init__(parent)
 		self.runner_thread = threading.Thread(target=self.worker, daemon=True)
 		self.tasks = queue.SimpleQueue()  # A list of callables containing tasks to execute.
-		self.num_done = 0  # How many tasks were completed since the queue was last empty. This is used to show a progress bar.
-		self.current_description = ""
+		self._num_done = 0  # How many tasks were completed since the queue was last empty. This is used to show a progress bar.
+		self._current_description = ""
 		self.runner_thread.start()
 
 	def add(self, task, description, allow_during_playback=True):
@@ -59,7 +59,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		to be executed while music is playing.
 		"""
 		self.tasks.put((task, description, allow_during_playback))
-		self.progressChanged.emit()
+		self.progress_changed.emit()
 
 	def worker(self):
 		"""
@@ -76,22 +76,22 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 			if not allow_during_playback and lyndj.player.Player.get_instance().isPlaying:
 				self.tasks.put((task, description, allow_during_playback))  # Put it back at the end of the queue.
 				continue
-			if self.current_description != description:
-				self.current_description = description
-				self.progressChanged.emit()
+			if self._current_description != description:
+				self._current_description = description
+				self.progress_changed.emit()
 			task()  # Execute this task.
-			self.num_done += 1
+			self._num_done += 1
 			if self.tasks.empty():
-				self.num_done = 0
-				self.current_description = ""
-			self.progressChanged.emit()  # Tell the front-end to update its progress trackers.
+				self._num_done = 0
+				self._current_description = ""
+			self.progress_changed.emit()  # Tell the front-end to update its progress trackers.
 
-	progressChanged = PySide6.QtCore.Signal()
+	progress_changed = PySide6.QtCore.Signal()
 	"""
 	If this signal fires, a progress tracker needs to be updated.
 	"""
 
-	@PySide6.QtCore.Property(float, notify=progressChanged)
+	@PySide6.QtCore.Property(float, notify=progress_changed)
 	def progress(self):
 		"""
 		Get the current process as a fraction between 0 and 1.
@@ -104,28 +104,28 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		"""
 		if self.tasks.empty():
 			return 1.0
-		return self.num_done / (self.num_done + self.tasks.qsize())
+		return self._num_done / (self._num_done + self.tasks.qsize())
 
-	@PySide6.QtCore.Property(int, notify=progressChanged)
-	def numDone(self):
+	@PySide6.QtCore.Property(int, notify=progress_changed)
+	def num_done(self):
 		"""
 		Get the amount of tasks that have been completed since the last time the queue was empty.
 		:return: The amount of tasks done.
 		"""
-		return self.num_done
+		return self._num_done
 
-	@PySide6.QtCore.Property(int, notify=progressChanged)
-	def numTotal(self):
+	@PySide6.QtCore.Property(int, notify=progress_changed)
+	def num_total(self):
 		"""
 		Get the amount of tasks that are queued since the last time the queue was empty.
 		:return: The amount of tasks to do plus the amount of tasks done.
 		"""
-		return self.num_done + self.tasks.qsize()
+		return self._num_done + self.tasks.qsize()
 
-	@PySide6.QtCore.Property(str, notify=progressChanged)
-	def currentDescription(self):
+	@PySide6.QtCore.Property(str, notify=progress_changed)
+	def current_description(self):
 		"""
 		Get a human-readable description of the currently running task.
 		:return: A description of the currently running task.
 		"""
-		return self.current_description
+		return self._current_description
