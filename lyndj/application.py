@@ -47,7 +47,7 @@ class Application(PySide6.QtWidgets.QApplication):
 		logging.debug("Registering QML types.")
 		self.create_gui_preferences()
 		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.preferences.Preferences, "Lyn", 1, 0, "Preferences", lyndj.preferences.Preferences.get_instance())
-		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.theme.Theme, "Lyn", 1, 0, "Theme", lyndj.theme.Theme.getInstance())
+		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.theme.Theme, "Lyn", 1, 0, "Theme", lyndj.theme.Theme.get_instance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.playlist.Playlist, "Lyn", 1, 0, "Playlist", lyndj.playlist.Playlist.get_instance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(lyndj.history.History, "Lyn", 1, 0, "History", lyndj.history.History.get_instance())
 		PySide6.QtQml.qmlRegisterSingletonInstance(Application, "Lyn", 1, 0, "Application", self)

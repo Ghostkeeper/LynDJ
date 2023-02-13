@@ -25,7 +25,7 @@ class Theme(PySide6.QtCore.QObject):
 	_instance = None
 
 	@classmethod
-	def getInstance(cls, _engine=None, _script=None) -> "Theme":
+	def get_instance(cls, _engine=None, _script=None) -> "Theme":
 		"""
 		Gets an instance of the theme class.
 

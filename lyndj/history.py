@@ -113,7 +113,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 				return "0:00"
 		if field == "bpm":
 			# Display tempo as a colour!
-			theme_inst = lyndj.theme.Theme.getInstance()
+			theme_inst = lyndj.theme.Theme.get_instance()
 			slow = theme_inst.colours["tempo_slow"]
 			slow_rgba = [slow.red(), slow.green(), slow.blue(), slow.alpha()]
 			medium = theme_inst.colours["tempo_medium"]

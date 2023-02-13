@@ -126,8 +126,8 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		# If a transition is currently being made, store the start time of that transition until we can add the complete transition.
 		self.ongoing_transition_start_time = None
 
-		self.colour = colour_to_hex(lyndj.theme.Theme.getInstance().colours["foreground"])
-		self.background_colour = colour_to_hex(lyndj.theme.Theme.getInstance().colours["background"])
+		self.colour = colour_to_hex(lyndj.theme.Theme.get_instance().colours["foreground"])
+		self.background_colour = colour_to_hex(lyndj.theme.Theme.get_instance().colours["background"])
 
 		# When resizing the image, we must re-render.
 		self.widthChanged.connect(self.generate_graph)
