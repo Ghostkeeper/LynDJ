@@ -138,6 +138,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.generate_graph()
 
 	path_changed = PySide6.QtCore.Signal()
+	"""
+	Triggered when the path changes of the file to display the waypoints for.
+	"""
 
 	def set_path(self, new_path) -> None:
 		"""
@@ -161,6 +164,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		return self.current_path
 
 	field_changed = PySide6.QtCore.Signal()
+	"""
+	Triggered when the field changes to display for the file.
+	"""
 
 	def set_field(self, new_field) -> None:
 		"""

@@ -109,6 +109,9 @@ class Player(PySide6.QtCore.QObject):
 		self.song_finished.connect(self.mark_song_played)
 
 	is_playing_changed = PySide6.QtCore.Signal()
+	"""
+	Triggered when the music is started or stopped.
+	"""
 
 	def is_playing_set(self, new_is_playing) -> None:
 		"""
@@ -297,6 +300,9 @@ class Player(PySide6.QtCore.QObject):
 		lyndj.metadata.change(path, "last_played", time.time())
 
 	song_changed = PySide6.QtCore.Signal()
+	"""
+	Triggered when the currently playing song changes.
+	"""
 
 	@PySide6.QtCore.Property(PySide6.QtCore.QUrl, notify=song_changed)
 	def current_fourier(self) -> PySide6.QtCore.QUrl:

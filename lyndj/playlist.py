@@ -27,6 +27,9 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 	"""
 
 	instance = None
+	"""
+	This class is a singleton. This stores the one instance that is allowed to exist.
+	"""
 
 	@classmethod
 	def get_instance(cls):
@@ -39,6 +42,10 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		return cls.instance
 
 	def __init__(self, parent=None):
+		"""
+		Construct the instance of this class.
+		:param parent: If this instance is created in a QML scene, the parent QML element.
+		"""
 		super().__init__(parent)
 
 		prefs = lyndj.preferences.Preferences.get_instance()

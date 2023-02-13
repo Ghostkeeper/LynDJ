@@ -4,6 +4,10 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+"""
+This module provides some functions to get the directories where to store certain types of files for this application.
+"""
+
 import logging
 import os  # To get OS-specific paths.
 import os.path  # To construct new paths.

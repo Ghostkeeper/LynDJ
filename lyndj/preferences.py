@@ -48,8 +48,8 @@ class Preferences(PySide6.QtCore.QObject):
 
 	def __init__(self) -> None:
 		"""
-		Creates the preferences object
-		:param parent:
+		Creates the preferences object.
+		:param parent: If this instance is part of a QML scene, the parent QML element.
 		"""
 		super().__init__(None)
 

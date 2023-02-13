@@ -39,6 +39,9 @@ class Theme(PySide6.QtCore.QObject):
 		return cls._instance
 
 	def __init__(self):
+		"""
+		Construct a new instance of the Theme class.
+		"""
 		super().__init__(None)
 
 		prefs = lyndj.preferences.Preferences.get_instance()
@@ -60,10 +63,10 @@ class Theme(PySide6.QtCore.QObject):
 		if preference_key == "theme":
 			self.load()
 
+	themeChanged = PySide6.QtCore.Signal()
 	"""
 	Triggered when the theme changes.
 	"""
-	themeChanged = PySide6.QtCore.Signal()
 
 	@PySide6.QtCore.Property("QVariantMap", notify=themeChanged)
 	def colour(self) -> typing.Dict[str, PySide6.QtGui.QColor]:

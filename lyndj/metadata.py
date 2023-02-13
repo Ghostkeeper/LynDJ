@@ -4,6 +4,12 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+"""
+Tracks metadata for audio files stored on this computer.
+
+The functions in this module request and change the metadata, and store it on disk.
+"""
+
 import logging
 import mutagen  # To read metadata from music files.
 import mutagen.easyid3

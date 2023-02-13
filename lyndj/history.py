@@ -22,6 +22,9 @@ class History(PySide6.QtCore.QAbstractListModel):
 	"""
 
 	instance = None
+	"""
+	This class is a singleton. This stores the one instance that is allowed to exist.
+	"""
 
 	@classmethod
 	def get_instance(cls):
@@ -34,6 +37,10 @@ class History(PySide6.QtCore.QAbstractListModel):
 		return cls.instance
 
 	def __init__(self, parent=None):
+		"""
+		Constructs the History instance.
+		:param parent: If this instance is created in a QML scene, this is the parent QML element.
+		"""
 		super().__init__(parent)
 
 		user_role = PySide6.QtCore.Qt.UserRole

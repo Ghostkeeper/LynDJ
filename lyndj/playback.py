@@ -4,6 +4,10 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+"""
+A collection of functions to actually play audio on the system.
+"""
+
 import pyaudio  # Used to play audio.
 import pydub.utils  # For volume effects.
 import time  # To sleep the thread when there is no audio to play.
@@ -13,7 +17,14 @@ import lyndj.player  # To get the playback parameters.
 import lyndj.preferences
 
 audio_source = None
-current_position = 0  # Location in the file where we are currently playing (in ms).
+"""
+The audio track that is currently being played.
+"""
+
+current_position = 0
+"""
+The location in the file where we are currently playing (in ms).
+"""
 
 def play(new_audio):
 	"""
@@ -105,4 +116,7 @@ def play_loop():
 			audio_server.terminate()
 
 play_thread = threading.Thread(target=play_loop, daemon=True)
-play_thread.start()
+"""
+A thread that continuously sends audio to the system to play.
+"""
+play_thread.start()  # Start that thread to feed audio to the system.
