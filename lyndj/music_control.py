@@ -6,7 +6,6 @@
 
 import logging
 import PySide6.QtCore  # For QTimers to execute code after a certain amount of time.
-import time  # To update the last played time.
 
 import lyndj.metadata  # To get the events for a track.
 import lyndj.playlist  # To remove the track from the playlist when it finishes playing.
