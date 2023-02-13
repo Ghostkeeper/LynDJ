@@ -86,6 +86,7 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 				paths.append(suggested_track)
 				if len(paths) == 1:  # If this is the only track in the playlist, actually go and add it to the playlist for real.
 					prefs.get("playlist/playlist").append(suggested_track)
+					logging.info(f"The playlist is empty. Auto-playing suggested track: {suggested_track}")
 					# And then give a new suggestion.
 					suggested_track = lyndj.autodj.AutoDJ().suggested_track()
 					if suggested_track != "":
