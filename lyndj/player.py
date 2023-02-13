@@ -106,6 +106,8 @@ class Player(PySide6.QtCore.QObject):
 
 		Player.is_mono = prefs.get("player/mono")
 
+		self.song_finished.connect(self.mark_song_played)
+
 	is_playing_changed = PySide6.QtCore.Signal()
 
 	def is_playing_set(self, new_is_playing) -> None:
@@ -120,7 +122,7 @@ class Player(PySide6.QtCore.QObject):
 			fading = Player.current_track.fade(to_gain=-120, start=lyndj.playback.current_position, duration=round(lyndj.preferences.Preferences.getInstance().get("player/fadeout") * 1000))
 			lyndj.playback.swap(fading)
 			if (time.time() - Player.start_time) / self.currentDuration > 0.5:  # Count it as "played" if we're over halfway through the track.
-				lyndj.metadata.change(lyndj.preferences.Preferences.getInstance().get("playlist/playlist")[0], "last_played", time.time())
+				self.song_finished.emit(lyndj.preferences.Preferences.getInstance().get("playlist/playlist")[0])
 			Player.current_track = None
 			Player.control_track.stop()
 			Player.control_track = None
@@ -279,6 +281,20 @@ class Player(PySide6.QtCore.QObject):
 		directory = os.path.join(lyndj.storage.cache(), "fourier")
 		for filename in os.listdir(directory):
 			os.remove(os.path.join(directory, filename))
+
+	song_finished = PySide6.QtCore.Signal(str)
+	"""
+	Emitted when a song has finished playing or is stopped towards the end of the track.
+
+	The parameter is the path to the song that had completed playing.
+	"""
+
+	def mark_song_played(self, path) -> None:
+		"""
+		Mark that the current song was recently played.
+		:param path: The path to the song that was played.
+		"""
+		lyndj.metadata.change(path, "last_played", time.time())
 
 	songChanged = PySide6.QtCore.Signal()
 

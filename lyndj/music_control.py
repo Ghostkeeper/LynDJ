@@ -98,6 +98,6 @@ class MusicControl:
 		"""
 		logging.debug(f"Event for {self.path}: Song ends")
 		# Remove the previous track from the playlist.
-		lyndj.metadata.change(self.path, "last_played", time.time())  # Update last played first so that AutoDJ adds a correct new song when we remove it from the playlist.
+		self.player.song_finished.emit(self.path)
 		lyndj.playlist.Playlist.getInstance().remove(0)
 		self.player.play_next()

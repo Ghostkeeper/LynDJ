@@ -4,12 +4,9 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
-import copy
 import math  # To format durations.
-import os.path  # To find the recently played paths.
 import PySide6.QtCore  # To expose this list to QML.
 import PySide6.QtGui  # To calculate display colours for song tempo.
-import time  # To determine the remaining time until songs in the playlist start/end playing.
 
 import lyndj.metadata  # To show file metadata in the playlist table.
 import lyndj.player  # To trigger updates after the song changes.
@@ -48,41 +45,20 @@ class History(PySide6.QtCore.QAbstractListModel):
 			user_role + 5: "comment",  # Any comment for the track.
 		}
 
-		lyndj.player.Player.get_instance().songChanged.connect(self.update)  # Update the history when the current song changes.
 		self.track_data = []  # The source of data for the model.
-		self.update()
+		lyndj.player.Player.get_instance().song_finished.connect(self.add)  # Update the history when a song finished playing.
 
-	def update(self) -> None:
+	def add(self, path) -> None:
 		"""
-		Fill the data in this model from the list of music track paths in the playlist.
-
-		This will request the data for the files in the given list and fill the model with data.
+		Add a track to the history.
+		:param path: The path of the track to add to the history.
 		"""
-		new_track_data = []
+		if not lyndj.metadata.has(path):
+			lyndj.metadata.add_file(path)
 
-		prefs = lyndj.preferences.Preferences.getInstance()
-		directory = prefs.get("directory/browse_path")
-		paths = set(filter(lyndj.metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
-		one_day_ago = time.time() - 24 * 3600
-		paths = [path for path in paths if lyndj.metadata.has(path) and lyndj.metadata.get(path, "last_played") >= one_day_ago]  # Only include tracks that were played this session, i.e. today.
-		paths = list(sorted(paths, key=lambda path: lyndj.metadata.get(path, "last_played"), reverse=True))
-
-		for path in paths:
-			file_metadata = copy.copy(lyndj.metadata.metadata[path])  # Make a copy that we can add information to.
-			new_track_data.append(file_metadata)
-
-		# Send correct updates to Qt.
-		if len(new_track_data) < len(self.track_data):
-			self.beginRemoveRows(PySide6.QtCore.QModelIndex(), len(new_track_data), len(self.track_data))
-			self.track_data = new_track_data
-			self.endRemoveRows()
-		elif len(new_track_data) > len(self.track_data):
-			self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(self.track_data), len(new_track_data) - 1)
-			self.track_data = new_track_data
-			self.endInsertRows()
-		else:
-			self.track_data = new_track_data
-		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(self.track_data), 0))
+		self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(self.track_data), len(self.track_data))
+		self.track_data.append(lyndj.metadata.metadata[path])
+		self.endInsertRows()
 
 	def rowCount(self, parent=PySide6.QtCore.QModelIndex()):
 		"""
