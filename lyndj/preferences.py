@@ -26,10 +26,10 @@ class Preferences(PySide6.QtCore.QObject):
 	Stores application preferences and makes sure they get reloaded.
 	"""
 
+	_instance = None
 	"""
 	This class is a singleton. This is the one instance.
 	"""
-	_instance = None
 
 	@classmethod
 	def get_instance(cls, _engine=None, _script=None) -> "Preferences":
