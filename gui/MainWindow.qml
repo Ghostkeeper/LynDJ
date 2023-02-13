@@ -108,6 +108,7 @@ ApplicationWindow {
 			}
 			onCurrentIndexChanged: {
 				if(currentItem) {
+					history.currentIndex = -1;
 					file_browser.selectByPath(currentItem.path);
 				}
 			}
@@ -133,6 +134,12 @@ ApplicationWindow {
 				PropertyAnimation {
 					duration: 500
 					easing.type: Easing.InOutQuad
+				}
+			}
+			onCurrentIndexChanged: {
+				if(currentItem) {
+					playlist.currentIndex = -1;
+					file_browser.selectByPath(currentItem.path);
 				}
 			}
 		}

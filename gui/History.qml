@@ -42,7 +42,7 @@ ListView {
 			ToolTip.delay: 500
 
 			onClicked: {
-				playlist.currentIndex = index;
+				history.currentIndex = index;
 			}
 		}
 
