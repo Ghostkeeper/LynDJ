@@ -80,7 +80,6 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		prefs = lyndj.preferences.Preferences.getInstance()
 		paths = copy.copy(prefs.get("playlist/playlist"))
 		suggested_track = ""
-		added_double_suggested = False
 		if prefs.get("autodj/enabled"):
 			suggested_track = lyndj.autodj.AutoDJ().suggested_track()
 			if suggested_track != "":
@@ -90,7 +89,6 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 					# And then give a new suggestion.
 					suggested_track = lyndj.autodj.AutoDJ().suggested_track()
 					if suggested_track != "":
-						added_double_suggested = True
 						paths.append(suggested_track)
 		for path in paths:
 			if not lyndj.metadata.has(path):
@@ -108,11 +106,19 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 		if suggested_track != "":
 			new_track_data[-1]["suggested"] = True
 
-		if added_double_suggested:
-			self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(new_track_data), len(new_track_data))
+		inserted_rows = False
+		removed_rows = False
+		if len(new_track_data) > len(self.track_data):
+			self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(self.track_data), len(new_track_data) - 1)
+			inserted_rows = True
+		elif len(new_track_data) < len(self.track_data):
+			self.beginRemoveRows(PySide6.QtCore.QModelIndex(), len(new_track_data), len(self.track_data) - 1)
+			removed_rows = True
 		self.track_data = new_track_data
-		if added_double_suggested:
+		if inserted_rows:
 			self.endInsertRows()
+		if removed_rows:
+			self.endRemoveRows()
 		self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(len(self.track_data), 0))
 
 	def preferences_changed(self, key):
@@ -231,10 +237,8 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			return
 
 		logging.info(f"Adding {path} to the playlist.")
-		self.beginInsertRows(PySide6.QtCore.QModelIndex(), len(playlist), len(playlist))
 		playlist.append(path)
 		prefs.changed_internally("playlist/playlist")  # Trigger everything to update, including self.track_data.
-		self.endInsertRows()
 		self.playlist_changed.emit()
 
 	@PySide6.QtCore.Slot(int)
@@ -250,10 +254,8 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			return
 
 		logging.info(f"Removing {playlist[index]} from the playlist.")
-		self.beginRemoveRows(PySide6.QtCore.QModelIndex(), index, index)
 		playlist.pop(index)
 		prefs.changed_internally("playlist/playlist")
-		self.endRemoveRows()
 		self.playlist_changed.emit()
 
 	@PySide6.QtCore.Slot(str, int)
