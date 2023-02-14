@@ -25,7 +25,8 @@ class Sound:
 		# If the bytes is not divisible by integer number of frames, cut off the end.
 		bytes_per_frame = sample_size * channels
 		extraneous_bytes = len(samples) % bytes_per_frame
-		samples = samples[:-extraneous_bytes]
+		if extraneous_bytes > 0:
+			samples = samples[:-extraneous_bytes]
 
 		self.samples = samples
 		self.frame_rate = frame_rate
