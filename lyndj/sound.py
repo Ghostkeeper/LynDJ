@@ -103,6 +103,23 @@ class Sound:
 		"""
 		return len(self.samples) / self.sample_size / self.channels / self.frame_rate
 
+	def sample_array(self) -> array.array:
+		"""
+		Get the samples in this sound as an array.
+
+		The array contains each sample as a separate element. The array will have a length of the length of the sample
+		byte array divided by the sample size. The channels are still interweaved in this array.
+		:return: An array of samples.
+		"""
+		size_to_array_type = {
+			1: "b",
+			2: "H",
+			4: "I"
+		}
+		sample_array = array.array(size_to_array_type[self.sample_size])
+		sample_array.frombytes(self.samples)
+		return sample_array
+
 	def rms(self) -> float:
 		"""
 		Get the Root Mean Square level of this sound.
@@ -113,14 +130,7 @@ class Sound:
 		num_samples = len(self.samples) / self.sample_size
 		if num_samples == 0:
 			return 0.0
-		size_to_array_type = {
-			1: "b",
-			2: "H",
-			4: "I"
-		}
-		sample_array = array.array(size_to_array_type[self.sample_size])
-		sample_array.frombytes(self.samples)
-		sum_squares = sum(sample ** 2 for sample in sample_array)
+		sum_squares = sum(sample ** 2 for sample in self.sample_array())
 		return int(math.sqrt(sum_squares / num_samples))
 
 	def trim_silence(self, threshold: float=-64.0) -> "Sound":
@@ -159,13 +169,12 @@ class Sound:
 		if self.channels == 1:  # Already mono.
 			return self
 
+		sample_array = self.sample_array()
 		size_to_array_type = {
 			1: "b",
 			2: "H",
 			4: "I"
 		}
-		sample_array = array.array(size_to_array_type[self.sample_size])
-		sample_array.frombytes(self.samples)
 		mixed_array = array.array(size_to_array_type[self.sample_size])
 		for i in range(len(sample_array) // self.channels):
 			mixed_array[i] = sum((sample_array[i * self.channels + j] for j in range(self.channels))) / self.channels
@@ -178,13 +187,7 @@ class Sound:
 		:param volume: A volume factor.
 		:return: A new sound, with the amplitude multiplied by the given volume factor.
 		"""
-		size_to_array_type = {
-			1: "b",
-			2: "H",
-			4: "I"
-		}
-		sample_array = array.array(size_to_array_type[self.sample_size])
-		sample_array.frombytes(self.samples)
+		sample_array = self.sample_array()
 		for i in range(len(sample_array)):
 			sample_array[i] *= volume
 		return Sound(sample_array.tobytes(), frame_rate=self.frame_rate, channels=self.channels, sample_size=self.sample_size)
