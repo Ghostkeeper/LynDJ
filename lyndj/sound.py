@@ -4,6 +4,9 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import array  # For fast operations on wave data.
+import logging
+import math  # To calculate audio RMS.
 import typing
 
 class Sound:
@@ -99,3 +102,51 @@ class Sound:
 		:return: How long it takes to play this sound.
 		"""
 		return len(self.samples) / self.sample_size / self.channels / self.frame_rate
+
+	def rms(self) -> float:
+		"""
+		Get the Root Mean Square level of this sound.
+
+		This is a measure of roughly how loud the signal is.
+		:return: The RMS of this sound, in values (not dB, but between 0 and the maximum possible sample value).
+		"""
+		num_samples = len(self.samples) / self.sample_size
+		if num_samples == 0:
+			return 0.0
+		size_to_array_type = {
+			1: "b",
+			2: "H",
+			4: "I"
+		}
+		sample_array = array.array(size_to_array_type[self.sample_size])
+		sample_array.frombytes(self.samples)
+		sum_squares = sum(sample ** 2 for sample in sample_array)
+		return int(math.sqrt(sum_squares / num_samples))
+
+	def trim_silence(self, threshold: float=-64.0) -> "Sound":
+		"""
+		Remove parts of silence from the start and end of this sound.
+		:param threshold: Audio amplitude below this threshold is considered silence. In decibels.
+		:return: A trimmed sound object.
+		"""
+		max_value = (2 ** (self.sample_size * 8 - 1))
+		threshold_value = 10 ** (threshold / 20) * max_value
+		slice_size = 0.01  # Break the audio in 10ms slices, to check each slice for its volume.
+
+		# Forward scan from the start.
+		start_trim = 0
+		while start_trim < self.duration():
+			slice = self[start_trim:start_trim + slice_size]
+			if slice.rms() > threshold_value:
+				break
+			start_trim += slice_size
+		# Backward scan from the end.
+		end_trim = self.duration() - slice_size
+		while end_trim > 0:
+			slice = self[end_trim:end_trim + slice_size]
+			if slice.rms() > threshold_value:
+				break
+			end_trim -= slice_size
+
+		logging.debug(f"Trimmed {start_trim}s from the start, {self.duration() - end_trim}s of silence from the end of the track.")
+		return self[start_trim:end_trim]
