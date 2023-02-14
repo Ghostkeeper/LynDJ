@@ -14,6 +14,25 @@ class Sound:
 	number of channels and sample size.
 	"""
 
+	@classmethod
+	def from_mono(cls, left: "Sound", right: "Sound") -> "Sound":
+		"""
+		Combine two mono sounds into one stereo sound.
+		:param left: The left audio channel.
+		:param right: The right audio channel.
+		:return: A combined stereo channel.
+		"""
+		assert left.channels == 1
+		assert right.channels == 1
+		assert left.frame_rate == right.frame_rate
+		assert left.sample_size == right.sample_size
+		assert len(left.samples) == len(right.samples)
+
+		new_data = bytes(len(left.samples) * 2)
+		new_data[0::2] = left.samples
+		new_data[1::2] = right.samples
+		return Sound(new_data, frame_rate=left.frame_rate, channels=2, sample_size=left.sample_size)
+
 	def __init__(self, samples: bytes, frame_rate: int=44100, channels: int=2, sample_size: int=2) -> None:
 		"""
 		Construct a new audio sample using the raw sample data.
