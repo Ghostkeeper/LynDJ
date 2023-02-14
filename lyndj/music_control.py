@@ -96,6 +96,34 @@ class MusicControl:
 		for event in self.events:
 			event.stop()
 
+	def fadeout(self, duration: float) -> None:
+		"""
+		Fade out the music playback.
+		:param duration: How slowly to fade out to zero volume.
+		"""
+		self.stop()  # Stop all normal events first.
+		self.events = []
+		time = 0.1
+		start_volume = self.player.volume
+		while time < duration:
+			new_volume = (1 - (time / duration)) * start_volume
+			timer = PySide6.QtCore.QTimer()
+			timer.setInterval(round(time * 1000))
+			timer.setSingleShot(True)
+			timer.timeout.connect(lambda v=new_volume: self.player.set_volume(v))
+			timer.setTimerType(PySide6.QtCore.Qt.PreciseTimer)
+			self.events.append(timer)
+			time += 0.05  # Adjust volume every 0.05s.
+		# And another event for the final 0 volume.
+		timer = PySide6.QtCore.QTimer()
+		timer.setInterval(round(duration * 1000))
+		timer.setSingleShot(True)
+		timer.timeout.connect(lambda: self.player.set_volume(0))
+		timer.setTimerType(PySide6.QtCore.Qt.PreciseTimer)
+		self.events.append(timer)
+		for event in self.events:
+			event.start()
+
 	def song_ends(self) -> None:
 		"""
 		Triggered when the music file has finished playing.

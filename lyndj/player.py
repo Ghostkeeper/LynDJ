@@ -123,13 +123,10 @@ class Player(PySide6.QtCore.QObject):
 			self.play_next()
 		elif Player.current_track is not None and not new_is_playing:
 			logging.info(f"Stopping playback.")
-			fading = Player.current_track.fade(to_gain=-120, start=lyndj.playback.current_position, duration=round(lyndj.preferences.Preferences.get_instance().get("player/fadeout") * 1000))
-			lyndj.playback.swap(fading)
+			self.control_track.fadeout(lyndj.preferences.Preferences.get_instance().get("player/fadeout"))
 			if (time.time() - Player.start_time) / self.current_duration > 0.5:  # Count it as "played" if we're over halfway through the track.
 				self.song_finished.emit(lyndj.preferences.Preferences.get_instance().get("playlist/playlist")[0])
 			Player.current_track = None
-			Player.control_track.stop()
-			Player.control_track = None
 			Player.start_time = None
 		self.is_playing_changed.emit()
 
