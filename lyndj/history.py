@@ -56,6 +56,11 @@ class History(PySide6.QtCore.QAbstractListModel):
 		self.track_data: typing.List[typing.Dict[str, typing.Any]] = []  # The source of data for the model.
 		lyndj.player.Player.get_instance().song_finished.connect(self.add)  # Update the history when a song finished playing.
 
+	changed = PySide6.QtCore.Signal()
+	"""
+	Triggered when anything changes in the history.
+	"""
+
 	def add(self, path: str) -> None:
 		"""
 		Add a track to the history.
@@ -67,6 +72,7 @@ class History(PySide6.QtCore.QAbstractListModel):
 		self.beginInsertRows(PySide6.QtCore.QModelIndex(), 0, 0)
 		self.track_data.insert(0, lyndj.metadata.metadata[path])
 		self.endInsertRows()
+		self.changed.emit()
 
 	def rowCount(self, parent: typing.Optional[PySide6.QtCore.QModelIndex]=PySide6.QtCore.QModelIndex()) -> int:
 		"""
@@ -146,3 +152,11 @@ class History(PySide6.QtCore.QAbstractListModel):
 			# Above the fast tempo. Completely fast.
 			return fast
 		return str(value)  # Default, just convert to string.
+
+	@PySide6.QtCore.Property(int, notify=changed)
+	def count(self) -> int:
+		"""
+		Get the number of entries in the history.
+		:return: The number of entries in the history.
+		"""
+		return len(self.track_data)

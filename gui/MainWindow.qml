@@ -154,6 +154,7 @@ ApplicationWindow {
 			height: childrenRect.height
 
 			color: Lyn.Theme.colour["background"]
+			visible: Lyn.History.count > 0
 
 			Widgets.ImageButton {
 				source: Lyn.Theme.icon[history.height === 0 ? "expando_up" : "expando_down"]
