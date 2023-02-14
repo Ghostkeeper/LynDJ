@@ -4,6 +4,8 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import typing
+
 class Sound:
 	"""
 	This class represents an audio segment.
@@ -32,6 +34,45 @@ class Sound:
 		self.frame_rate = frame_rate
 		self.channels = channels
 		self.sample_size = sample_size
+
+	def __getitem__(self, index: typing.Union[int, float, slice]) -> "Sound":
+		"""
+		Gets a sub-segment of this sound.
+
+		If the segment given is partly out of range, the sound will be shorter than the desired length.
+
+		The step element of a slice is ignored. Only the start and the end of the slice is used.
+
+		The index and slice bounds are given by the duration in the song, in seconds. They can be ``float``s.
+		:param index: Either a single number to indicate a timestamp that you want to access, or a slice to indicate a
+		range of time.
+		:return: A part of this sound. If given a single index, the sound will last for at most 1 second. If given a
+		range, the sound will be the length of that range.
+		"""
+		duration = self.duration()
+		start = 0.0
+		end = duration
+		if isinstance(index, slice):
+			if index.start:
+				start = index.start
+			if index.stop:
+				end = index.stop
+		else:
+			start = index
+			end = (index + 1)
+
+		# Negative indices indicate a duration from the end of the sound.
+		if start < 0:
+			start += duration
+		if end < 0:
+			end += duration
+		# Clamp to the range of duration of the sound.
+		start = max(0.0, min(duration, start))
+		end = max(0.0, min(duration, end))
+		# Convert to positions in the sample array.
+		start = round(start * self.sample_size * self.channels * self.frame_rate)
+		end = round(end * self.sample_size * self.channels * self.frame_rate)
+		return Sound(self.samples[start:end], self.frame_rate, self.channels, self.sample_size)
 
 	def duration(self) -> float:
 		"""
