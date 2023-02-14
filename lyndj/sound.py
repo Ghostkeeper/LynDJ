@@ -150,3 +150,24 @@ class Sound:
 
 		logging.debug(f"Trimmed {start_trim}s from the start, {self.duration() - end_trim}s of silence from the end of the track.")
 		return self[start_trim:end_trim]
+
+	def to_mono(self) -> "Sound":
+		"""
+		Mix this sound to mono.
+		:return: A new sound with only one channel, where the audio has been mixed to mono.
+		"""
+		if self.channels == 1:  # Already mono.
+			return self
+
+		size_to_array_type = {
+			1: "b",
+			2: "H",
+			4: "I"
+		}
+		sample_array = array.array(size_to_array_type[self.sample_size])
+		sample_array.frombytes(self.samples)
+		mixed_array = array.array(size_to_array_type[self.sample_size])
+		for i in range(0, len(sample_array) // self.channels):
+			mixed_array[i] = sum((sample_array[i * self.channels + j] for j in range(self.channels))) / self.channels
+		mixed_data = mixed_array.tobytes()
+		return Sound(mixed_data, frame_rate=self.frame_rate, channels=1, sample_size=self.sample_size)
