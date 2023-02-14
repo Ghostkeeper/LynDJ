@@ -167,7 +167,24 @@ class Sound:
 		sample_array = array.array(size_to_array_type[self.sample_size])
 		sample_array.frombytes(self.samples)
 		mixed_array = array.array(size_to_array_type[self.sample_size])
-		for i in range(0, len(sample_array) // self.channels):
+		for i in range(len(sample_array) // self.channels):
 			mixed_array[i] = sum((sample_array[i * self.channels + j] for j in range(self.channels))) / self.channels
 		mixed_data = mixed_array.tobytes()
 		return Sound(mixed_data, frame_rate=self.frame_rate, channels=1, sample_size=self.sample_size)
+
+	def __mul__(self, volume: float) -> "Sound":
+		"""
+		Amplify the sound.
+		:param volume: A volume factor.
+		:return: A new sound, with the amplitude multiplied by the given volume factor.
+		"""
+		size_to_array_type = {
+			1: "b",
+			2: "H",
+			4: "I"
+		}
+		sample_array = array.array(size_to_array_type[self.sample_size])
+		sample_array.frombytes(self.samples)
+		for i in range(len(sample_array)):
+			sample_array[i] *= volume
+		return Sound(sample_array.tobytes(), frame_rate=self.frame_rate, channels=self.channels, sample_size=self.sample_size)
