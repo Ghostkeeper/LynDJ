@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=LynDJ
+GenericName=LynDJ Music Player
+Comment=Plays music in a way that is easy for Lindy Hop DJs
+Exec=LynDJ %F
+Icon=icon
+Terminal=false
+Type=Application
+Categories=Audio;Qt;Player;
+Keywords=Music;Dance;DJ;
+X-AppImage-Version=1.0
