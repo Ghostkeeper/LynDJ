@@ -4,6 +4,10 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import os  # To change the working directory.
+import os.path  # To change the working directory.
+os.chdir(os.path.dirname(__file__))
+
 import logging
 import signal  # To catch interrupts that need to stop the application.
 import sys  # Return correct exit code.
