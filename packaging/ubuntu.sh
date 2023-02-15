@@ -21,6 +21,7 @@ python3 -m PyInstaller LynDJ.spec
 
 # Package the build.
 cp packaging/AppRun dist/LynDJ/AppRun
+chmod +x dist/LynDJ/AppRun
 cp packaging/icon.png dist/LynDJ/.DirIcon
 cp packaging/LynDJ.desktop dist/LynDJ/LynDJ.desktop
 ./appimagetool-x86_64.AppImage dist/LynDJ/
