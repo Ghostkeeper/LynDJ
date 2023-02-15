@@ -9,13 +9,18 @@
 
 # Install dependencies.
 sudo apt install python3-pip portaudio19-dev
+wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+chmod +x appimagetool-x86_64.AppImage
 python3 -m pip install pyinstaller
 python3 -m pip install -r "requirements.txt"
 
 # Build the application.
+rm -r dist
 pyinstaller LynDJ.spec
 
 # Package the build.
-cp package/AppRun dist/LynDJ/AppRun
-cp package/icon.png dist/LynDJ/.DirIcon
-cp package/LynDJ.desktop dist/LynDJ/LynDJ.desktop
+cp packaging/AppRun dist/LynDJ/AppRun
+cp packaging/icon.png dist/LynDJ/.DirIcon
+cp packaging/LynDJ.desktop dist/LynDJ/LynDJ.desktop
+./appimagetool-x86_64.AppImage dist/LynDJ/
+mv LynDJ-x86_64.AppImage LynDJ.AppImage
