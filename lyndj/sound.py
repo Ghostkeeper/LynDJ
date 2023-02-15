@@ -113,8 +113,8 @@ class Sound:
 		"""
 		size_to_array_type = {
 			1: "b",
-			2: "H",
-			4: "I"
+			2: "h",
+			4: "i"
 		}
 		sample_array = array.array(size_to_array_type[self.sample_size])
 		sample_array.frombytes(self.samples)
@@ -172,8 +172,8 @@ class Sound:
 		sample_array = self.sample_array()
 		size_to_array_type = {
 			1: "b",
-			2: "H",
-			4: "I"
+			2: "h",
+			4: "i"
 		}
 		mixed_array = array.array(size_to_array_type[self.sample_size])
 		for i in range(len(sample_array) // self.channels):
@@ -189,5 +189,5 @@ class Sound:
 		"""
 		sample_array = self.sample_array()
 		for i in range(len(sample_array)):
-			sample_array[i] *= volume
+			sample_array[i] = round(sample_array[i] * volume)
 		return Sound(sample_array.tobytes(), frame_rate=self.frame_rate, channels=self.channels, sample_size=self.sample_size)
