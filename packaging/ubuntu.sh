@@ -8,10 +8,14 @@
 # Tested using Ubuntu 22.04.
 
 # Install dependencies.
-sudo apt update
-sudo apt install python3-pip portaudio19-dev libfuse2
-wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
-chmod +x appimagetool-x86_64.AppImage
+if [ $(dpkg-query -W -f='${Status}' python3-pip 2>/dev/null | grep -c "ok installed") -eq 0 && $(dpkg-query -W -f='${Status}' portaudio19-dev 2>/dev/null | grep -c "ok installed") -eq 0 && $(dpkg-query -W -f='${Status}' libfuse2 2>/dev/null | grep -c "ok installed") -eq 0]; then
+	sudo apt update
+	sudo apt install python3-pip portaudio19-dev libfuse2
+fi
+if [[ ! -e appimagetool-x86_64.AppImage ]]; then
+	wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+	chmod +x appimagetool-x86_64.AppImage
+fi
 python3 -m pip install pyinstaller
 python3 -m pip install -r "requirements.txt"
 
