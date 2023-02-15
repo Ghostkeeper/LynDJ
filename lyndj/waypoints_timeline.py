@@ -203,7 +203,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		If no song is playing, it'll get the duration from the metadata of the current path.
 		"""
 		if lyndj.player.Player.current_track is not None:
-			self.duration = len(lyndj.player.Player.current_track) / 1000.0
+			self.duration = lyndj.player.Player.current_track.duration()
 		elif self.current_path == "":
 			self.duration = 0
 		else:

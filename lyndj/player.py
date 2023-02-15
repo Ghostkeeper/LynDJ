@@ -9,9 +9,6 @@ import math  # Transformations on the Fourier transform.
 import miniaudio  # To decode audio files.
 import numpy  # For the Fourier transform in Scipy.
 import os.path  # To cache Fourier transform images.
-import pydub  # The media player we're using to play music.
-import pydub.utils  # For our custom silence detector.
-import pydub.playback  # The playback module of Pydub.
 import PySide6.QtCore  # Exposing the player to QML.
 import PySide6.QtGui  # For the QImage to display the Fourier transform.
 import scipy.fft  # For the Fourier transform.
@@ -24,6 +21,7 @@ import lyndj.music_control  # To control the currently playing track.
 import lyndj.playback  # To actually play the music.
 import lyndj.preferences  # To get the playlist.
 import lyndj.storage  # To cache Fourier transform images.
+import lyndj.sound  # To store the audio we're playing.
 
 class Player(PySide6.QtCore.QObject):
 	"""
@@ -40,7 +38,7 @@ class Player(PySide6.QtCore.QObject):
 	This class is a singleton. This stores the one instance that is allowed to exist.
 	"""
 
-	current_track: typing.Optional["pydub.AudioSegment"] = None
+	current_track: typing.Optional["lyndj.sound.Sound"] = None
 	"""
 	If a song is playing, this holds the currently playing track.
 
@@ -154,8 +152,8 @@ class Player(PySide6.QtCore.QObject):
 		logging.info(f"Starting playback of track: {next_song}")
 
 		decoded = miniaudio.decode_file(next_song)
-		track = pydub.AudioSegment(data=bytes(decoded.samples), sample_width=decoded.sample_width, frame_rate=decoded.sample_rate, channels=decoded.nchannels)
-		Player.current_track = self.trim_silence(track)
+		track = lyndj.sound.Sound(decoded.samples.tobytes(), sample_size=decoded.sample_width, channels=decoded.nchannels, frame_rate=decoded.sample_rate)
+		Player.current_track = track.trim_silence()
 		Player.control_track = lyndj.music_control.MusicControl(next_song, Player.current_track, self)
 
 		fourier_file = lyndj.metadata.get(next_song, "fourier")
@@ -173,35 +171,6 @@ class Player(PySide6.QtCore.QObject):
 		lyndj.playback.play(Player.current_track)
 		Player.control_track.play()
 
-	def trim_silence(self, track: pydub.AudioSegment) -> pydub.AudioSegment:
-		"""
-		Trims silence from the start and end of a track.
-		:param track: A track to trim.
-		:return: A trimmed track.
-		"""
-		threshold_db = -64  # If the volume gets below -64db, we consider it silence.
-		threshold_value = pydub.utils.db_to_float(threshold_db) * track.max_possible_amplitude
-		slice_size = 10  # Break the audio in 10ms slices, to check each slice for its volume.
-
-		# Forward scan from the start.
-		pos = 0
-		for pos in range(0, len(track), slice_size):
-			slice = track[pos:pos + slice_size]
-			if slice.rms > threshold_value:
-				break
-		start_trim = pos
-
-		# Backward scan from the end.
-		pos = len(track) - slice_size
-		for pos in range(len(track) - slice_size, 0, -slice_size):
-			slice = track[pos:pos + slice_size]
-			if slice.rms > threshold_value:
-				break
-		end_trim = pos + slice_size
-		logging.debug(f"Trimmed {start_trim}ms from the start, {len(track) - end_trim}ms of silence from the end of the track.")
-
-		return track[start_trim:end_trim]
-
 	def load_and_generate_fourier(self, path: str) -> None:
 		"""
 		Load a sound waveform and generate a Fourier image with it.
@@ -216,15 +185,15 @@ class Player(PySide6.QtCore.QObject):
 		fourier_file = lyndj.metadata.get(path, "fourier")
 		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
 			decoded = miniaudio.decode_file(path)
-			segment = pydub.AudioSegment(data=bytes(decoded.samples), sample_width=decoded.sample_width, frame_rate=decoded.sample_rate, channels=decoded.nchannels)
-			segment = self.trim_silence(segment)
+			segment = lyndj.sound.Sound(decoded.samples.tobytes(), sample_size=decoded.sample_width, channels=decoded.nchannels, frame_rate=decoded.sample_rate)
+			segment = segment.trim_silence()
 			fourier = self.generate_fourier(segment, path)
 			filename = os.path.splitext(os.path.basename(path))[0] + uuid.uuid4().hex[:8] + ".png"  # File's filename, but with an 8-character random string to prevent collisions.
 			filepath = os.path.join(lyndj.storage.cache(), "fourier", filename)
 			fourier.save(filepath)
 			lyndj.metadata.change(path, "fourier", filepath)
 
-	def generate_fourier(self, sound: pydub.AudioSegment, path: str) -> PySide6.QtGui.QImage:
+	def generate_fourier(self, sound: lyndj.sound.Sound, path: str) -> PySide6.QtGui.QImage:
 		"""
 		Generate an image of the Fourier transform of a track.
 		:param sound: A sound sample to generate the Fourier transform from.
@@ -233,22 +202,18 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		logging.debug(f"Generating Fourier image for {path}")
 		# Get some metadata about this sound. We need the number of (stereo) channels and the bit depth.
-		sound = sound.set_channels(1)  # Mix to mono.
-		bit_depth = sound.sample_width * 8
-		waveform_dtype = numpy.byte if bit_depth == 8 else numpy.short if bit_depth == 16 else int
+		sound = sound.to_mono()  # Mix to mono.
 
 		# Get the waveform and transform it into frequency space.
-		waveform = sound.get_array_of_samples()
-		num_samples = math.floor(len(waveform) / sound.sample_width)
-		waveform = waveform[:num_samples * sound.sample_width]
 		prefs = lyndj.preferences.Preferences.get_instance()
 		num_chunks = prefs.get("player/fourier_samples")
 		num_channels = prefs.get("player/fourier_channels")
-		if len(waveform) == 0:  # We were unable to read the audio file.
+		if len(sound.samples) == 0:  # We were unable to read the audio file.
 			logging.error(f"Unable to read waveform from audio file to generate Fourier: {path}")
 			return PySide6.QtGui.QImage(numpy.zeros((num_channels, num_chunks), dtype=numpy.ubyte), num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)
 
-		waveform_numpy = numpy.frombuffer(waveform, dtype=waveform_dtype)
+		waveform_dtype = numpy.byte if sound.sample_size == 1 else numpy.short if sound.sample_size == 2 else int
+		waveform_numpy = numpy.frombuffer(sound.samples, dtype=waveform_dtype)
 		chunks = numpy.array_split(waveform_numpy, num_chunks)  # Split the sound in chunks, each of which will be displayed as 1 horizontal pixel.
 		chunk_size = len(chunks[0])
 		split_points = numpy.logspace(1, math.log10(chunk_size), num_channels).astype(numpy.int32)  # We'll display a certain number of frequencies as vertical pixels. They are logarithmically spaced on the frequency spectrum.
@@ -325,7 +290,7 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		if Player.current_track is None:
 			return 0
-		return len(Player.current_track) / 1000.0
+		return Player.current_track.duration()
 
 	@PySide6.QtCore.Property(str, notify=song_changed)
 	def current_title(self) -> str:

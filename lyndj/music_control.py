@@ -14,7 +14,7 @@ import lyndj.preferences  # For some playback preferences.
 import lyndj.waypoints_timeline  # To parse waypoints.
 
 if typing.TYPE_CHECKING:
-	import pydub
+	import lyndj.sound
 	import lyndj.player
 
 class MusicControl:
@@ -27,7 +27,7 @@ class MusicControl:
 	interrupted.
 	"""
 
-	def __init__(self, path: str, sound: "pydub.AudioSegment", player: "lyndj.player.Player") -> None:
+	def __init__(self, path: str, sound: "lyndj.sound.Sound", player: "lyndj.player.Player") -> None:
 		"""
 		Creates a music control track for a certain song.
 		:param path: The path to the file that this track is controlling the music for.
@@ -44,9 +44,9 @@ class MusicControl:
 		self.events: typing.List[PySide6.QtCore.QTimer] = []
 
 		# Song ends.
-		duration = len(sound)
+		duration = sound.duration()
 		song_end_timer = PySide6.QtCore.QTimer()
-		song_end_timer.setInterval(round(duration + pause_between_songs))
+		song_end_timer.setInterval(round(duration * 1000 + pause_between_songs))
 		song_end_timer.setSingleShot(True)
 		song_end_timer.timeout.connect(self.song_ends)
 		self.events.append(song_end_timer)
@@ -57,13 +57,14 @@ class MusicControl:
 		if len(volume_waypoints) > 0:
 			volume = 0.5
 			pos = -1
-			for t in range(25, duration, 50):  # Adjust volume every 50ms if applicable.
-				t /= 1000.0  # Convert to seconds, to compare with timestamps from waypoints.
+			t = 0.025
+			while t < duration:
 				if t >= volume_waypoints[pos + 1][0]:
 					pos += 1
 					if pos >= len(volume_waypoints) - 1:
 						break  # After last waypoint.
 				if pos < 0:
+					t += 0.05
 					continue  # Before first waypoint.
 				# Interpolate the new volume.
 				time_start, level_start = volume_waypoints[pos]
@@ -81,6 +82,7 @@ class MusicControl:
 					volume_change_timer.setTimerType(PySide6.QtCore.Qt.PreciseTimer)
 					self.events.append(volume_change_timer)
 					volume = new_volume
+				t += 0.05
 
 	def play(self) -> None:
 		"""

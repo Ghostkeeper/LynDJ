@@ -9,7 +9,6 @@ A collection of functions to actually play audio on the system.
 """
 
 import pyaudio  # Used to play audio.
-import pydub.utils  # For volume effects.
 import time  # To sleep the thread when there is no audio to play.
 import threading  # The audio is played on a different thread.
 import typing
@@ -18,19 +17,19 @@ import lyndj.player  # To get the playback parameters.
 import lyndj.preferences
 
 if typing.TYPE_CHECKING:
-	import pydub
+	import lyndj.sound
 
-audio_source: typing.Optional["pydub.AudioSegment"] = None
+audio_source: typing.Optional["lyndj.sound.Sound"] = None
 """
 The audio track that is currently being played.
 """
 
-current_position = 0
+current_position = 0.0
 """
-The location in the file where we are currently playing (in ms).
+The location in the file where we are currently playing (in seconds).
 """
 
-def play(new_audio: "pydub.AudioSegment") -> None:
+def play(new_audio: "lyndj.sound.Sound") -> None:
 	"""
 	Start the playback of a new audio source.
 	:param new_audio: The new audio source to play.
@@ -38,9 +37,9 @@ def play(new_audio: "pydub.AudioSegment") -> None:
 	global audio_source
 	audio_source = new_audio
 	global current_position
-	current_position = 0  # Start from the start.
+	current_position = 0.0  # Start from the start.
 
-def swap(new_audio: "pydub.AudioSegment") -> None:
+def swap(new_audio: "lyndj.sound.Sound") -> None:
 	"""
 	Swap out an audio source for another without changing the playback position.
 	:param new_audio: The new audio source to play.
@@ -48,7 +47,7 @@ def swap(new_audio: "pydub.AudioSegment") -> None:
 	global audio_source
 	audio_source = new_audio
 
-def filter(chunk: "pydub.AudioSegment") -> "pydub.AudioSegment":
+def filter(chunk: "lyndj.sound.Sound") -> "lyndj.sound.Sound":
 	"""
 	Apply effects to a chunk of audio.
 
@@ -62,14 +61,11 @@ def filter(chunk: "pydub.AudioSegment") -> "pydub.AudioSegment":
 	"""
 	# Apply player volume.
 	volume = lyndj.player.Player.main_volume
-	gain = pydub.utils.ratio_to_db(volume)
-	chunk = chunk + gain
+	chunk = chunk * volume
 
 	# Convert to mono, if necessary.
-	if lyndj.player.Player.is_mono and chunk.channels == 2:
-		channels = chunk.split_to_mono()
-		new = channels[0].overlay(channels[1]) - 4  # -4dB because we're doubling the sound, so we must halve the amplitude first.
-		chunk = pydub.AudioSegment.from_mono_audiosegments(new, new)
+	if lyndj.player.Player.is_mono:
+		chunk = chunk.to_mono()
 
 	return chunk
 
@@ -95,22 +91,22 @@ def play_loop() -> None:
 			if audio_source is None:
 				time.sleep(0.1)  # Sleep until we have an audio source.
 				continue
-			if audio_source.sample_width != current_sample_width or audio_source.frame_rate != current_rate or audio_source.channels != current_channels:
+			chunk_size = lyndj.preferences.Preferences.get_instance().get("player/buffer_size") / 1000.0
+			chunk = audio_source[current_position:current_position + chunk_size]
+			chunk = filter(chunk)
+			if chunk.sample_size != current_sample_width or chunk.frame_rate != current_rate or chunk.channels != current_channels:
 				# New audio source, so re-generate the stream.
 				if stream:
 					stream.stop_stream()
 					stream.close()
-				current_sample_width = audio_source.sample_width
-				current_rate = audio_source.frame_rate
-				current_channels = audio_source.channels
+				current_sample_width = chunk.sample_size
+				current_rate = chunk.frame_rate
+				current_channels = chunk.channels
 				stream = audio_server.open(format=audio_server.get_format_from_width(current_sample_width), rate=current_rate, channels=current_channels, output=True)
-			if current_position >= len(audio_source):  # Playback completed. Stop taking the GIL and go into stand-by.
+			if current_position >= audio_source.duration():  # Playback completed. Stop taking the GIL and go into stand-by.
 				audio_source = None
 				continue
-			chunk_size = lyndj.preferences.Preferences.get_instance().get("player/buffer_size")
-			chunk = audio_source[current_position:current_position + chunk_size]
-			chunk = filter(chunk)
-			stream.write(chunk.raw_data)
+			stream.write(chunk.samples)
 			current_position += chunk_size
 	finally:
 		if stream:
