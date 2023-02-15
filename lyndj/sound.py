@@ -7,6 +7,7 @@
 import array  # For fast operations on wave data.
 import logging
 import math  # To calculate audio RMS.
+import numpy  # For fast operations on wave data.
 import typing
 
 class Sound:
@@ -169,18 +170,10 @@ class Sound:
 		if self.channels == 1:  # Already mono.
 			return self
 
-		sample_array = self.sample_array()
-		size_to_array_type = {
-			1: "b",
-			2: "h",
-			4: "i"
-		}
-		mixed_array = array.array(size_to_array_type[self.sample_size])
-		mixed_array.append(0)
-		mixed_array = mixed_array * (len(sample_array) // self.channels)  # Resize to correct size.
-		for i in range(len(sample_array) // self.channels):
-			mixed_array[i] = sum((sample_array[i * self.channels + j] for j in range(self.channels))) // self.channels
-		mixed_data = mixed_array.tobytes()
+		waveform_dtype = numpy.byte if self.sample_size == 1 else numpy.short if self.sample_size == 2 else int
+		waveform_numpy = numpy.frombuffer(self.samples, dtype=waveform_dtype)
+		mixed_samples = sum([waveform_numpy[channel::self.channels] // self.channels for channel in range(self.channels)])
+		mixed_data = mixed_samples.tobytes()
 		return Sound(mixed_data, frame_rate=self.frame_rate, channels=1, sample_size=self.sample_size)
 
 	def __mul__(self, volume: float) -> "Sound":
