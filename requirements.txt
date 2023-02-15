@@ -1,6 +1,6 @@
 miniaudio >= 1.55
 mutagen >=1.45.1
 numpy >=1.21.0
-PySide6 >=6.3.0
+PySide6-Essentials ==6.3.2
 pyaudio >= 0.2.13
 scipy >=1.8.0
