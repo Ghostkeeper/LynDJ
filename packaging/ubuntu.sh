@@ -8,15 +8,16 @@
 # Tested using Ubuntu 22.04.
 
 # Install dependencies.
-sudo apt install python3-pip portaudio19-dev
+sudo apt update
+sudo apt install python3-pip portaudio19-dev libfuse2
 wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
 chmod +x appimagetool-x86_64.AppImage
 python3 -m pip install pyinstaller
 python3 -m pip install -r "requirements.txt"
 
 # Build the application.
-rm -r dist
-pyinstaller LynDJ.spec
+rm -rf dist
+python3 -m PyInstaller LynDJ.spec
 
 # Package the build.
 cp packaging/AppRun dist/LynDJ/AppRun
