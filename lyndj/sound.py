@@ -158,7 +158,7 @@ class Sound:
 				break
 			end_trim -= slice_size
 
-		logging.debug(f"Trimmed {start_trim}s from the start, {self.duration() - end_trim}s of silence from the end of the track.")
+		logging.debug(f"Trimmed {round(start_trim, 2)}s from the start, {round(self.duration() - end_trim, 2)}s of silence from the end of the track.")
 		return self[start_trim:end_trim]
 
 	def to_mono(self) -> "Sound":
@@ -176,8 +176,10 @@ class Sound:
 			4: "i"
 		}
 		mixed_array = array.array(size_to_array_type[self.sample_size])
+		mixed_array.append(0)
+		mixed_array = mixed_array * (len(sample_array) // self.channels)  # Resize to correct size.
 		for i in range(len(sample_array) // self.channels):
-			mixed_array[i] = sum((sample_array[i * self.channels + j] for j in range(self.channels))) / self.channels
+			mixed_array[i] = sum((sample_array[i * self.channels + j] for j in range(self.channels))) // self.channels
 		mixed_data = mixed_array.tobytes()
 		return Sound(mixed_data, frame_rate=self.frame_rate, channels=1, sample_size=self.sample_size)
 
