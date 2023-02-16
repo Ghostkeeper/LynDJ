@@ -12,7 +12,7 @@
 RequestExecutionLevel admin
 
 InstallDir "C:\Program Files\LynDJ"
-LicenseData "LICENSE.md"
+LicenseData "..\LICENSE.md"
 Name "${APP_NAME}"
 outFile "${APP_NAME}-installer.exe"
 
