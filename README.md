@@ -82,6 +82,7 @@ cd LynDJ
 ```
 3. Run the script that generates an AppImage:
 ```
+chmod +x packaging/ubuntu.sh
 packaging/ubuntu.sh
 ```
 4. Test the application by running the AppImage that was generated.
