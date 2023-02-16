@@ -5,7 +5,7 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 # Script to package the application on Ubuntu.
-# Tested using Ubuntu 22.04.
+# Tested using Ubuntu 22.04 and Debian 11.
 
 # Install dependencies.
 if [ $(dpkg-query -W -f='${Status}' python3-pip 2>/dev/null | grep -c "ok installed") -eq 0 && $(dpkg-query -W -f='${Status}' portaudio19-dev 2>/dev/null | grep -c "ok installed") -eq 0 && $(dpkg-query -W -f='${Status}' libfuse2 2>/dev/null | grep -c "ok installed") -eq 0]; then
