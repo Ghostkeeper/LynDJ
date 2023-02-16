@@ -152,9 +152,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		:param new_path: The new path to store the waypoints of.
 		"""
 		self.current_path = new_path
-		try:
+		if new_path != "":
 			self.waypoints = self.parse_waypoints(lyndj.metadata.get(new_path, self.current_field))  # Update the waypoints to represent the new path.
-		except KeyError:  # Path doesn't exist. Happens at init when path is still empty string.
+		else:
 			self.waypoints = []
 		self.update_duration()
 		self.generate_graph()
