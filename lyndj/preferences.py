@@ -19,6 +19,8 @@ QML_IMPORT_NAME = "Lyn"
 QML_IMPORT_MAJOR_VERSION = 1
 QML_IMPORT_MINOR_VERSION = 0
 
+VERSION = 0
+
 @PySide6.QtQml.QmlElement
 @PySide6.QtQml.QmlSingleton
 class Preferences(PySide6.QtCore.QObject):
@@ -131,6 +133,7 @@ class Preferences(PySide6.QtCore.QObject):
 				continue
 			if self.defaults[key] != value:  # Not equal to default.
 				changed[key] = value
+		changed["version"] = VERSION
 		with open(filepath, "w") as f:
 			json.dump(changed, f, indent="\t")
 
