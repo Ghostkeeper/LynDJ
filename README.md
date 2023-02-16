@@ -17,7 +17,7 @@ Main features
 
 Development state
 -----------------
-This project is in alpha testing at the moment. It is in regular use by the developer in weekly socials in the local city. However, it is not feature-complete yet, and not considered stable yet, without some more stringent testing.
+This project is currently in beta testing. It needs some more rigorous testing for weird situations that don't often occur in regular use. All features for the initial release are completed. Not all major bugs are ironed out yet, however.
 
 Installation
 ------------
