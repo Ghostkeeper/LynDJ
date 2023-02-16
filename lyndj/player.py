@@ -23,6 +23,8 @@ import lyndj.preferences  # To get the playlist.
 import lyndj.storage  # To cache Fourier transform images.
 import lyndj.sound  # To store the audio we're playing.
 
+FOURIER_VERSION = 0
+
 class Player(PySide6.QtCore.QObject):
 	"""
 	An object that is responsible for playing music files, controlling how they're played (pause, play, volume,
@@ -102,6 +104,10 @@ class Player(PySide6.QtCore.QObject):
 			prefs.add("player/mono", False)  # Whether to play audio in mono or not.
 		if not prefs.has("player/buffer_size"):
 			prefs.add("player/buffer_size", 10)  # Size of chunks to send to audio server, in ms. Larger chunks are more efficient, but cause greater delays.
+
+		# Version number of the Fourier cache images. If outdated, erase them and re-generate.
+		with open(os.path.join(lyndj.storage.cache(), "fourier", "version.txt"), "w") as f:
+			f.write(str(FOURIER_VERSION))
 
 		Player.is_mono = prefs.get("player/mono")
 
