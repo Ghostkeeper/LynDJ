@@ -10,6 +10,7 @@ This is the first release of LynDJ. This release has the following features:
     * Keyboard navigation through the table.
     * A button to queue or dequeue tracks from the library.
     * Track metadata can be changed by right-clicking on a table cell.
+    * Double-clicking a track will cause it to be added to the playlist.
   * The interface has a playlist to show the tracks to be played.
     * Each track shows the title, duration and cumulative duration until the file completes playing.
     * The comment for the track is shown when hovered.
@@ -28,7 +29,7 @@ This is the first release of LynDJ. This release has the following features:
   * A separate window to adjust the application preferences.
 * A system to store persistent preferences.
   * The window size, state and position is also saved between application runs.
-* A logging system to the terminal.
+* A logging system to the terminal and a file.
 * A theme system to allow changing the look-and-feel of the application.
   * The theme can be changed on the fly without restarting the application.
   * Themes can customise colours, sizes, icons/images and fonts.
