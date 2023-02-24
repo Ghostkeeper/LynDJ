@@ -15,4 +15,7 @@ export PYTHONPATH=$here/lib/python3.10
 export QT_PLUGIN_PATH=$here/PySide6/Qt/plugins
 export QML2_IMPORT_PATH=$here/PySide6/Qt/qml
 
+# Use XCB binaries which are packaged. E.g. Wayland is not.
+export QT_QPA_PLATFORM=xcb
+
 $here/LynDJ "$@"
