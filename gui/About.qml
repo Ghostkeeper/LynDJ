@@ -50,6 +50,19 @@ Window {
 
 				source: Lyn.Theme.icon["icon"]
 			}
+
+			Text {
+				anchors {
+					left: parent.left
+					right: parent.right
+				}
+
+				color: Lyn.Theme.colour["foreground"]
+				font: Lyn.Theme.font["title"]
+				text: "LynDJ " + Qt.application.version
+				horizontalAlignment: Text.AlignHCenter
+				elide: Text.ElideRight
+			}
 		}
 	}
 }

@@ -1,4 +1,4 @@
-1.0 - Let's Dance
+1.0.0 - Let's Dance
 ----
 This is the first release of LynDJ. This release has the following features:
 * A graphical interface.
@@ -27,6 +27,7 @@ This is the first release of LynDJ. This release has the following features:
       * The Fourier image resolution and brightness can be adjusted in the preferences.
   * The divider between the playlist and the library can be dragged to resize both components.
   * A separate window to adjust the application preferences.
+  * An about window to show the version of the application and to show what's in the application.
 * A system to store persistent preferences.
   * The window size, state and position is also saved between application runs.
 * A logging system to the terminal and a file.
