@@ -33,6 +33,18 @@ a = Analysis(
 	cipher=block_cipher,
 	noarchive=False,
 )
+# Don't include system libraries on Posix, such as libEGL. Except a few that are necessary in AppImage. See https://github.com/AppImageCommunity/pkg2appimage/blob/master/excludelist
+a.exclude_system_libraries(list_of_exceptions=[
+	"libportaudio*", "libsqlite3*",  # Definitely needed by LynDJ.
+	"libgio*", "libdconfsettings*", "libgvfsdbus*", "libgobject*", "libgiognomeproxy*", "libgiognutls*", "libgioenvironmentproxy*", "libglib*", "libgiolibproxy*", "libgioremote-volume-monitor*", "libgmodule*", "libgthread*", "libcairo*", "libpango*"  # Package GLib and related, workaround for undefined symbol: g_module_open_full
+	"libselinux*",  # See https://github.com/AppImage/AppImages/issues/83. This makes it impossible to package on Arch Linux, but does allow it to run elsewhere.
+	"libpcre*",  # Missing on Fedora 24, SLED 12 SP1, OpenSUSE Leap 42.2.
+	"libkrb5support*", "libk5crypto*", "libkrb5*", "libgssapi",  # Missing on Arch Linux.
+	"libkeyutils*",  # Missing on Void Linux.
+	"libgdk_pixbuf*",  # Missing on Ubuntu.
+	"libcrypto*", "libssl*",  # Missing on CentOS 7.
+	"libblkid*", "libmount*", "libffi*", "libbsd*", "libbrotlidec*", "libbrotlicommon*", "libxkbcommon*", "libXau*", "libpng16*", "libgcrypt*", "libzstd*", "libdbus*", "libcap*", "libXdmcp*", "libsystemd*", "liblz4*", "liblzma*", "libmd*", "libxcb-xfixes*", "libxcb-render*", "libxcb-shape*", "libwayland-cursor*", "libwayland-client*", "libgvfscommon*", "libgraphite2*", "libXcursor*", "libgdk*", "libpixman*", "libwayland*", "libXdamage*", "libgtk*", "libXext*", "libXfixes*", "libatk*", "libXinerama*", "libXcomposite*", "libepoxy*", "libjpeg*", "libXrender*", "libdatrie*", "libXi*", "libXrandr*", "libatspi*", "libxcb-shm*", "libwayland-server*", "libnettle*", "libidn2*", "libhogweed*", "libgnutls*", "libtasn1*", "libunistring*", "libxcb-xkb*", "libX11-xcb*", "libxcb-sync*", "libxcb-render-util*", "libxkbcommon-x11*", "libxcb-randr*", "libxcb-image*", "libxcb-keysyms*", "libxcb-icccm*", "libxcb-util*", "libproxy*", "libxcb-glx*", "libmpdec*", "libbz2*", "libreadline*", "libtinfo*", "libyaml*", "libgirepository*", "libudev*", "libxxhash*", "libapt-pkg*", "libdb*", "libncursesw*", "libblas*", "liblapack*", "libquadmath*", "libgfortran*", "liblbfgsb*"  # Unknown status, including just to be sure.
+])
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(
 	pyz,
