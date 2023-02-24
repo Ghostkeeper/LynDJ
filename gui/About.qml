@@ -14,6 +14,7 @@ Window {
 	id: about_window
 	width: Lyn.Theme.size["popup"].width
 	height: Lyn.Theme.size["popup"].height
+	minimumWidth: Lyn.Theme.size["popup"].width / 10
 
 	color: Lyn.Theme.colour["background"]
 	title: "About"
@@ -44,7 +45,7 @@ Window {
 			spacing: Lyn.Theme.size["margin"].height
 
 			Image {
-				width: parent.width / 3
+				width: Lyn.Theme.size["popup"].width / 3
 				height: width
 				anchors.horizontalCenter: parent.horizontalCenter
 
@@ -125,7 +126,7 @@ Window {
 					height: childrenRect.height
 
 					Text {
-						width: parent.width * 0.3
+						width: Math.round(parent.width * 0.3)
 
 						elide: Text.ElideRight
 						linkColor: Lyn.Theme.colour["secondary"]
@@ -137,7 +138,7 @@ Window {
 					}
 					Text {
 						anchors.right: parent.right
-						width: parent.width * 0.7
+						width: Math.round(parent.width * 0.7)
 
 						elide: Text.ElideRight
 						color: Lyn.Theme.colour["foreground"]
@@ -154,7 +155,7 @@ Window {
 					height: childrenRect.height
 
 					Text {
-						width: parent.width * 0.3
+						width: Math.round(parent.width * 0.3)
 
 						elide: Text.ElideRight
 						linkColor: Lyn.Theme.colour["secondary"]
@@ -166,7 +167,7 @@ Window {
 					}
 					Text {
 						anchors.right: parent.right
-						width: parent.width * 0.7
+						width: Math.round(parent.width * 0.7)
 
 						elide: Text.ElideRight
 						color: Lyn.Theme.colour["foreground"]
@@ -183,7 +184,7 @@ Window {
 					height: childrenRect.height
 
 					Text {
-						width: parent.width * 0.3
+						width: Math.round(parent.width * 0.3)
 
 						elide: Text.ElideRight
 						linkColor: Lyn.Theme.colour["secondary"]
@@ -195,7 +196,7 @@ Window {
 					}
 					Text {
 						anchors.right: parent.right
-						width: parent.width * 0.7
+						width: Math.round(parent.width * 0.7)
 
 						elide: Text.ElideRight
 						color: Lyn.Theme.colour["foreground"]
@@ -212,7 +213,7 @@ Window {
 					height: childrenRect.height
 
 					Text {
-						width: parent.width * 0.3
+						width: Math.round(parent.width * 0.3)
 
 						elide: Text.ElideRight
 						linkColor: Lyn.Theme.colour["secondary"]
@@ -224,7 +225,7 @@ Window {
 					}
 					Text {
 						anchors.right: parent.right
-						width: parent.width * 0.7
+						width: Math.round(parent.width * 0.7)
 
 						elide: Text.ElideRight
 						color: Lyn.Theme.colour["foreground"]
@@ -241,7 +242,7 @@ Window {
 					height: childrenRect.height
 
 					Text {
-						width: parent.width * 0.3
+						width: Math.round(parent.width * 0.3)
 
 						elide: Text.ElideRight
 						linkColor: Lyn.Theme.colour["secondary"]
@@ -253,7 +254,7 @@ Window {
 					}
 					Text {
 						anchors.right: parent.right
-						width: parent.width * 0.7
+						width: Math.round(parent.width * 0.7)
 
 						elide: Text.ElideRight
 						color: Lyn.Theme.colour["foreground"]
@@ -270,7 +271,7 @@ Window {
 					height: childrenRect.height
 
 					Text {
-						width: parent.width * 0.3
+						width: Math.round(parent.width * 0.3)
 
 						elide: Text.ElideRight
 						linkColor: Lyn.Theme.colour["secondary"]
@@ -282,7 +283,7 @@ Window {
 					}
 					Text {
 						anchors.right: parent.right
-						width: parent.width * 0.7
+						width: Math.round(parent.width * 0.7)
 
 						elide: Text.ElideRight
 						color: Lyn.Theme.colour["foreground"]
@@ -299,7 +300,7 @@ Window {
 					height: childrenRect.height
 
 					Text {
-						width: parent.width * 0.3
+						width: Math.round(parent.width * 0.3)
 
 						elide: Text.ElideRight
 						linkColor: Lyn.Theme.colour["secondary"]
@@ -311,7 +312,7 @@ Window {
 					}
 					Text {
 						anchors.right: parent.right
-						width: parent.width * 0.7
+						width: Math.round(parent.width * 0.7)
 
 						elide: Text.ElideRight
 						color: Lyn.Theme.colour["foreground"]
@@ -328,7 +329,7 @@ Window {
 					height: childrenRect.height
 
 					Text {
-						width: parent.width * 0.3
+						width: Math.round(parent.width * 0.3)
 
 						elide: Text.ElideRight
 						linkColor: Lyn.Theme.colour["secondary"]
@@ -340,7 +341,7 @@ Window {
 					}
 					Text {
 						anchors.right: parent.right
-						width: parent.width * 0.7
+						width: Math.round(parent.width * 0.7)
 
 						elide: Text.ElideRight
 						color: Lyn.Theme.colour["foreground"]
@@ -357,7 +358,7 @@ Window {
 					height: childrenRect.height
 
 					Text {
-						width: parent.width * 0.3
+						width: Math.round(parent.width * 0.3)
 
 						elide: Text.ElideRight
 						linkColor: Lyn.Theme.colour["secondary"]
@@ -369,7 +370,7 @@ Window {
 					}
 					Text {
 						anchors.right: parent.right
-						width: parent.width * 0.7
+						width: Math.round(parent.width * 0.7)
 
 						elide: Text.ElideRight
 						color: Lyn.Theme.colour["foreground"]
@@ -386,7 +387,7 @@ Window {
 					height: childrenRect.height
 
 					Text {
-						width: parent.width * 0.3
+						width: Math.round(parent.width * 0.3)
 
 						elide: Text.ElideRight
 						linkColor: Lyn.Theme.colour["secondary"]
@@ -398,7 +399,7 @@ Window {
 					}
 					Text {
 						anchors.right: parent.right
-						width: parent.width * 0.7
+						width: Math.round(parent.width * 0.7)
 
 						elide: Text.ElideRight
 						color: Lyn.Theme.colour["foreground"]
