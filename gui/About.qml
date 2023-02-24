@@ -97,6 +97,316 @@ Window {
 					Qt.openUrlExternally(link);
 				}
 			}
+
+			Text {
+				anchors {
+					left: parent.left
+					right: parent.right
+				}
+
+				color: Lyn.Theme.colour["foreground"]
+				font: Lyn.Theme.font["default"]
+				wrapMode: Text.Wrap
+				text: "This application is free and open source, and depends on these fantastic other open source projects."
+			}
+
+			Column { //The dependencies, without spacing.
+				anchors {
+					left: parent.left
+					leftMargin: Lyn.Theme.size["margin"].width
+					right: parent.right
+				}
+
+				Item {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
+					height: childrenRect.height
+
+					Text {
+						width: parent.width * 0.3
+
+						elide: Text.ElideRight
+						linkColor: Lyn.Theme.colour["secondary"]
+						font: Lyn.Theme.font["default"]
+						text: "<a href=\"https://www.python.org\">Python</a>"
+						onLinkActivated: function(link) {
+							Qt.openUrlExternally(link);
+						}
+					}
+					Text {
+						anchors.right: parent.right
+						width: parent.width * 0.7
+
+						elide: Text.ElideRight
+						color: Lyn.Theme.colour["foreground"]
+						font: Lyn.Theme.font["default"]
+						text: "Running the logic of the application"
+					}
+				}
+
+				Item {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
+					height: childrenRect.height
+
+					Text {
+						width: parent.width * 0.3
+
+						elide: Text.ElideRight
+						linkColor: Lyn.Theme.colour["secondary"]
+						font: Lyn.Theme.font["default"]
+						text: "<a href=\"https://www.qt.io/qt-for-python\">PySide</a>"
+						onLinkActivated: function(link) {
+							Qt.openUrlExternally(link);
+						}
+					}
+					Text {
+						anchors.right: parent.right
+						width: parent.width * 0.7
+
+						elide: Text.ElideRight
+						color: Lyn.Theme.colour["foreground"]
+						font: Lyn.Theme.font["default"]
+						text: "Showing the interface"
+					}
+				}
+
+				Item {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
+					height: childrenRect.height
+
+					Text {
+						width: parent.width * 0.3
+
+						elide: Text.ElideRight
+						linkColor: Lyn.Theme.colour["secondary"]
+						font: Lyn.Theme.font["default"]
+						text: "<a href=\"https://github.com/irmen/pyminiaudio\">PyMiniaudio</a>"
+						onLinkActivated: function(link) {
+							Qt.openUrlExternally(link);
+						}
+					}
+					Text {
+						anchors.right: parent.right
+						width: parent.width * 0.7
+
+						elide: Text.ElideRight
+						color: Lyn.Theme.colour["foreground"]
+						font: Lyn.Theme.font["default"]
+						text: "Decoding audio files"
+					}
+				}
+
+				Item {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
+					height: childrenRect.height
+
+					Text {
+						width: parent.width * 0.3
+
+						elide: Text.ElideRight
+						linkColor: Lyn.Theme.colour["secondary"]
+						font: Lyn.Theme.font["default"]
+						text: "<a href=\"https://people.csail.mit.edu/hubert/pyaudio\">PyAudio</a>"
+						onLinkActivated: function(link) {
+							Qt.openUrlExternally(link);
+						}
+					}
+					Text {
+						anchors.right: parent.right
+						width: parent.width * 0.7
+
+						elide: Text.ElideRight
+						color: Lyn.Theme.colour["foreground"]
+						font: Lyn.Theme.font["default"]
+						text: "Playing audio through the system"
+					}
+				}
+
+				Item {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
+					height: childrenRect.height
+
+					Text {
+						width: parent.width * 0.3
+
+						elide: Text.ElideRight
+						linkColor: Lyn.Theme.colour["secondary"]
+						font: Lyn.Theme.font["default"]
+						text: "<a href=\"https://github.com/quodlibet/mutagen\">Mutagen</a>"
+						onLinkActivated: function(link) {
+							Qt.openUrlExternally(link);
+						}
+					}
+					Text {
+						anchors.right: parent.right
+						width: parent.width * 0.7
+
+						elide: Text.ElideRight
+						color: Lyn.Theme.colour["foreground"]
+						font: Lyn.Theme.font["default"]
+						text: "Reading metadata from music tracks"
+					}
+				}
+
+				Item {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
+					height: childrenRect.height
+
+					Text {
+						width: parent.width * 0.3
+
+						elide: Text.ElideRight
+						linkColor: Lyn.Theme.colour["secondary"]
+						font: Lyn.Theme.font["default"]
+						text: "<a href=\"https://numpy.org\">NumPy</a>"
+						onLinkActivated: function(link) {
+							Qt.openUrlExternally(link);
+						}
+					}
+					Text {
+						anchors.right: parent.right
+						width: parent.width * 0.7
+
+						elide: Text.ElideRight
+						color: Lyn.Theme.colour["foreground"]
+						font: Lyn.Theme.font["default"]
+						text: "Processing audio data efficiently"
+					}
+				}
+
+				Item {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
+					height: childrenRect.height
+
+					Text {
+						width: parent.width * 0.3
+
+						elide: Text.ElideRight
+						linkColor: Lyn.Theme.colour["secondary"]
+						font: Lyn.Theme.font["default"]
+						text: "<a href=\"https://scipy.org\">SciPy</a>"
+						onLinkActivated: function(link) {
+							Qt.openUrlExternally(link);
+						}
+					}
+					Text {
+						anchors.right: parent.right
+						width: parent.width * 0.7
+
+						elide: Text.ElideRight
+						color: Lyn.Theme.colour["foreground"]
+						font: Lyn.Theme.font["default"]
+						text: "Generating audio spectrographs"
+					}
+				}
+
+				Item {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
+					height: childrenRect.height
+
+					Text {
+						width: parent.width * 0.3
+
+						elide: Text.ElideRight
+						linkColor: Lyn.Theme.colour["secondary"]
+						font: Lyn.Theme.font["default"]
+						text: "<a href=\"https://pyinstaller.org\">PyInstaller</a>"
+						onLinkActivated: function(link) {
+							Qt.openUrlExternally(link);
+						}
+					}
+					Text {
+						anchors.right: parent.right
+						width: parent.width * 0.7
+
+						elide: Text.ElideRight
+						color: Lyn.Theme.colour["foreground"]
+						font: Lyn.Theme.font["default"]
+						text: "Building an application executable"
+					}
+				}
+
+				Item {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
+					height: childrenRect.height
+
+					Text {
+						width: parent.width * 0.3
+
+						elide: Text.ElideRight
+						linkColor: Lyn.Theme.colour["secondary"]
+						font: Lyn.Theme.font["default"]
+						text: "<a href=\"https://nsis.sourceforge.io\">NSIS</a>"
+						onLinkActivated: function(link) {
+							Qt.openUrlExternally(link);
+						}
+					}
+					Text {
+						anchors.right: parent.right
+						width: parent.width * 0.7
+
+						elide: Text.ElideRight
+						color: Lyn.Theme.colour["foreground"]
+						font: Lyn.Theme.font["default"]
+						text: "Creating an installer for Windows"
+					}
+				}
+
+				Item {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
+					height: childrenRect.height
+
+					Text {
+						width: parent.width * 0.3
+
+						elide: Text.ElideRight
+						linkColor: Lyn.Theme.colour["secondary"]
+						font: Lyn.Theme.font["default"]
+						text: "<a href=\"https://appimage.org\">AppImageKit</a>"
+						onLinkActivated: function(link) {
+							Qt.openUrlExternally(link);
+						}
+					}
+					Text {
+						anchors.right: parent.right
+						width: parent.width * 0.7
+
+						elide: Text.ElideRight
+						color: Lyn.Theme.colour["foreground"]
+						font: Lyn.Theme.font["default"]
+						text: "Creating an executable package for Linux"
+					}
+				}
+			}
 		}
 	}
 }
