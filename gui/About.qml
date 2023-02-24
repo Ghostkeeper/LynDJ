@@ -51,17 +51,35 @@ Window {
 				source: Lyn.Theme.icon["icon"]
 			}
 
-			Text {
+			Column { //Sub-column without spacing.
 				anchors {
 					left: parent.left
 					right: parent.right
 				}
+				Text {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
 
-				color: Lyn.Theme.colour["foreground"]
-				font: Lyn.Theme.font["title"]
-				text: "LynDJ " + Qt.application.version
-				horizontalAlignment: Text.AlignHCenter
-				elide: Text.ElideRight
+					color: Lyn.Theme.colour["foreground"]
+					font: Lyn.Theme.font["title"]
+					text: "LynDJ " + Qt.application.version
+					horizontalAlignment: Text.AlignHCenter
+					elide: Text.ElideRight
+				}
+				Text {
+					anchors {
+						left: parent.left
+						right: parent.right
+					}
+
+					color: Lyn.Theme.colour["foreground"]
+					font: Lyn.Theme.font["default"]
+					text: "by " + Qt.application.organization
+					horizontalAlignment: Text.AlignHCenter
+					elide: Text.ElideRight
+				}
 			}
 		}
 	}
