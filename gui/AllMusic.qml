@@ -11,6 +11,7 @@ import Lyn 1.0 as Lyn
 import "./widgets" as Widgets
 
 Item {
+	id: all_music
 	property string selectedFilePath: {
 		if(music_table.selectedRow >= 0 && music_directory) {
 			return music_directory.get_path(music_table.selectedRow);
@@ -202,6 +203,9 @@ Item {
 								change_dialogue.open();
 							}
 						}
+					}
+					onDoubleClicked: function(mouse) {
+						Lyn.Playlist.add(all_music.selectedFilePath);
 					}
 				}
 			}
