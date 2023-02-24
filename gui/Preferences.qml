@@ -14,6 +14,7 @@ Window {
 	id: preferences_window
 	width: Lyn.Theme.size["popup"].width
 	height: Lyn.Theme.size["popup"].height
+	minimumWidth: Lyn.Theme.size["popup"].width / 10
 
 	color: Lyn.Theme.colour["background"]
 	title: "Preferences"
