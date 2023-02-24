@@ -17,7 +17,7 @@ Rectangle {
 
 	color: Lyn.Theme.colour["primary_background"]
 
-	Image {
+	Button {
 		id: logo
 		anchors {
 			top: parent.top
@@ -29,9 +29,29 @@ Rectangle {
 		}
 		width: height
 
-		source: Lyn.Theme.icon["icon"]
-		sourceSize.width: width
-		sourceSize.height: height
+		flat: true
+		onClicked: about.show()
+
+		background: Image {
+			anchors.fill: parent
+
+			source: Lyn.Theme.icon["icon"]
+			sourceSize.width: width
+			sourceSize.height: height
+		}
+
+		MouseArea { //To change the cursor.
+			anchors.fill: parent
+
+			hoverEnabled: true
+			onPressed: function(mouse) { //Don't catch the mouse events.
+				mouse.accepted = false;
+			}
+			cursorShape: Qt.PointingHandCursor
+		}
+		About {
+			id: about
+		}
 	}
 
 	Text {
