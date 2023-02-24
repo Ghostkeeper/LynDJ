@@ -39,7 +39,7 @@ a.exclude_system_libraries(list_of_exceptions=[
 	"libgio*", "libdconfsettings*", "libgvfsdbus*", "libgobject*", "libgiognomeproxy*", "libgiognutls*", "libgioenvironmentproxy*", "libglib*", "libgiolibproxy*", "libgioremote-volume-monitor*", "libgmodule*", "libgthread*", "libcairo*", "libpango*"  # Package GLib and related, workaround for undefined symbol: g_module_open_full
 	"libselinux*",  # See https://github.com/AppImage/AppImages/issues/83. This makes it impossible to package on Arch Linux, but does allow it to run elsewhere.
 	"libpcre*",  # Missing on Fedora 24, SLED 12 SP1, OpenSUSE Leap 42.2.
-	"libkrb5support*", "libk5crypto*", "libkrb5*", "libgssapi",  # Missing on Arch Linux.
+	"libkrb5support*", "libk5crypto*", "libkrb5*", "libgssapi*",  # Missing on Arch Linux.
 	"libkeyutils*",  # Missing on Void Linux.
 	"libgdk_pixbuf*",  # Missing on Ubuntu.
 	"libcrypto*", "libssl*",  # Missing on CentOS 7.
