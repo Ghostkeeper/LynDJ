@@ -81,6 +81,22 @@ Window {
 					elide: Text.ElideRight
 				}
 			}
+
+			Text {
+				anchors {
+					left: parent.left
+					right: parent.right
+				}
+
+				color: Lyn.Theme.colour["foreground"]
+				linkColor: Lyn.Theme.colour["secondary"]
+				font: Lyn.Theme.font["default"]
+				wrapMode: Text.Wrap
+				text: "LynDJ is distributed under the terms of the AGPLv3 license. Visit <a href=\"https://github.com/Ghostkeeper/LynDJ\">Github</a> for details on distributing the application."
+				onLinkActivated: function(link) {
+					Qt.openUrlExternally(link);
+				}
+			}
 		}
 	}
 }
