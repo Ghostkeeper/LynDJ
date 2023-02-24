@@ -20,8 +20,7 @@ python3 -m pip install pyinstaller
 python3 -m pip install -r "requirements.txt"
 
 # Build the application.
-rm -rf dist
-python3 -m PyInstaller LynDJ.spec
+python3 -m PyInstaller LynDJ.spec --noconfirm
 
 # Package the build.
 cp packaging/AppRun dist/LynDJ/AppRun
