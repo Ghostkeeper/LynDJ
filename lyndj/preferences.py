@@ -60,7 +60,6 @@ class Preferences(PySide6.QtCore.QObject):
 		self.save_timer.setInterval(250)  # After a preference changed, after 250ms, it'll auto-save.
 		self.save_timer.timeout.connect(self.save)
 
-		lyndj.storage.ensure_exists()
 		self.ensure_exists()
 
 		self.defaults = {}

@@ -20,6 +20,7 @@ Entry point for the application. This starts a QtApplication.
 
 if __name__ == "__main__":
 	# Configure logging.
+	lyndj.storage.ensure_exists()
 	file_handler = logging.handlers.RotatingFileHandler(os.path.join(lyndj.storage.data(), "lyndj.log"), maxBytes=1024 * 1024 * 10, backupCount=2, encoding="utf-8")  # Limit log file size to 10MB.
 	console_handler = logging.StreamHandler()
 	logging.basicConfig(
