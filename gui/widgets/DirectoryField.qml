@@ -43,7 +43,13 @@ Item {
 
 		onAccepted: {
 			var path = selectedFolder.toString();
-			path = path.replace(/^file:\/{2}/, ""); //Remove file:// schema.
+			if(path.startsWith("file:///")) {
+				//On Windows, the path starts with file:///c:/[...] and should be turned into c:/[...]
+				//However on Unix, the path starts with file:///home/[...] and should be turned into /home/[...]
+				//So on Windows, one extra slash needs to be removed. Detect that it's Windows by having a drive letter there.
+				var schema_length = path.charAt(9) === ":" ? 8 : 7;
+				path = path.substring(schema_length);
+			}
 			path = decodeURIComponent(path); //Unescape HTML-encoded characters.
 			directory.text = path;
 		}
