@@ -85,4 +85,7 @@ section "uninstall"
 	# Remove start menu entry.
 	delete "$SMPROGRAMS\LynDJ\LynDJ.lnk"
 	rmDir "$SMPROGRAMS\LynDJ"
+
+	# Remove program from registry.
+	deleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ"
 sectionEnd
