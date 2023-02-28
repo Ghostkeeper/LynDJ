@@ -35,11 +35,12 @@ class Application(PySide6.QtWidgets.QApplication):
 		Starts the application.
 		:param argv: Command-line parameters provided to the application. Qt understands some of these.
 		"""
-		logging.info("Starting application.")
+		version = "1.0.0"
+		logging.info(f"Starting application version {version}.")
 		super().__init__(argv)
 		self.setApplicationName("LynDJ")
 		self.setApplicationDisplayName("LynDJ")
-		self.setApplicationVersion("1.0.0")
+		self.setApplicationVersion(version)
 		self.setOrganizationName("Ghostkeeper")
 
 		logging.debug("Loading metadata database.")
