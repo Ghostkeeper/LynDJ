@@ -71,6 +71,14 @@ section "install"
 	writeRegDword HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "NoRepair" 1  # This uninstaller doesn't repair.
 sectionEnd
 
+function un.onInit
+	setShellVarContext all
+
+	messageBox mb_okcancel "Uninstall LynDJ, removing it permanently from your computer?" IDOK next
+		abort
+	next:
+	!insertmacro VerifyUserIsAdmin
+functionEnd
 section "uninstall"
 	rmDir /r $INSTDIR
 
