@@ -43,10 +43,21 @@ section "install"
 	setOutPath $INSTDIR
 	file /r ..\dist\*.*
 
+	# Create the uninstaller.
+	writeUninstaller "$INSTDIR\uninstall.exe"
+
 	# Desktop shortcut.
-	CreateShortcut "$DESKTOP\LynDJ.lnk" "$INSTDIR\LynDJ.exe" "" "$INSTDIR\icon.ico"
+	createShortcut "$DESKTOP\LynDJ.lnk" "$INSTDIR\LynDJ.exe" "" "$INSTDIR\icon.ico"
 
 	# Start menu entry.
-	CreateDirectory "$SMPROGRAMS\LynDJ"
-	CreateShortCut "$SMPROGRAMS\LynDJ\LynDJ.lnk" "$INSTDIR\LynDJ.exe" "" "$INSTDIR\icon.ico"
+	createDirectory "$SMPROGRAMS\LynDJ"
+	createShortCut "$SMPROGRAMS\LynDJ\LynDJ.lnk" "$INSTDIR\LynDJ.exe" "" "$INSTDIR\icon.ico"
+sectionEnd
+
+section "uninstall"
+	rmDir /r $INSTDIR
+
+	# Remove start menu entry.
+	delete "$SMPROGRAMS\LynDJ\LynDJ.lnk"
+	rmDir "$SMPROGRAMS\LynDJ"
 sectionEnd
