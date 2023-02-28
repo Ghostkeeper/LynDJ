@@ -7,6 +7,9 @@
 !define APP_NAME "LynDJ"
 !define WEBSITE "https://github.com/Ghostkeeper/LynDJ"
 !define DESCRIPTION "Plays music in a way that is easy for Lindy Hop DJs"
+!define VERSIONMAJOR 1
+!define VERSIONMINOR 0
+!define VERSIONPATCH 0
 
 # Need administrative rights in order to install to Program Files.
 RequestExecutionLevel admin
@@ -52,6 +55,20 @@ section "install"
 	# Start menu entry.
 	createDirectory "$SMPROGRAMS\LynDJ"
 	createShortCut "$SMPROGRAMS\LynDJ\LynDJ.lnk" "$INSTDIR\LynDJ.exe" "" "$INSTDIR\icon.ico"
+
+	# Registry entries for the program, so that it gets listed in add/remove program screen of Windows.
+	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "DisplayName" "LynDJ - ${DESCRIPTION}"
+	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
+	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "InstallLocation" "$\"$INSTDIR$\""
+	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "DisplayIcon" "$\"$INSTDIR\icon.ico$\""
+	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "Publisher" "Ghostkeeper"
+	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "HelpLink" "$\"${WEBSITE}$\""
+	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "DisplayVersion" "$\"${VERSIONMAJOR}.${VERSIONMINOR}.${VERSIONPATCH}$\""
+	writeRegDword HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "VersionMajor" ${VERSIONMAJOR}
+	writeRegDword HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "VersionMinor" ${VERSIONMINOR}
+	writeRegDword HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "NoModify" 1  # This uninstaller doesn't modify.
+	writeRegDword HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "NoRepair" 1  # This uninstaller doesn't repair.
 sectionEnd
 
 section "uninstall"
