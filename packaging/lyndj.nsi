@@ -14,7 +14,7 @@
 # Need administrative rights in order to install to Program Files.
 RequestExecutionLevel admin
 
-InstallDir "$PROGRAMFILES\LynDJ"
+InstallDir "$PROGRAMFILES64\LynDJ"
 LicenseData "..\LICENSE.md"
 Name "${APP_NAME}"
 outFile "${APP_NAME}-installer.exe"
