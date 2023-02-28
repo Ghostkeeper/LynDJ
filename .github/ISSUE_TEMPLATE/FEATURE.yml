@@ -1,0 +1,16 @@
+name: Feature Request
+description: Suggest an idea for a new feature in this application.
+labels: enhancement
+body:
+- type: textarea
+  id: problem
+  attributes:
+    label: Problem statement
+    description: If your feature solves a particular problem you're having, what problem does it solve?
+- type: textarea
+  id: solution
+  attributes:
+    label: Requested solution
+    description: What would you suggest to solve the problem?
+  validations:
+    required: true
