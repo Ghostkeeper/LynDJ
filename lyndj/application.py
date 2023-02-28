@@ -21,6 +21,7 @@ import lyndj.playlist  # To register this with QML.
 import lyndj.preferences  # To register this with QML and define some preferences.
 import lyndj.storage  # To find the window icon.
 import lyndj.theme  # To register this with QML.
+import lyndj.upgrader  # To upgrade configuration files if necessary.
 import lyndj.waypoints_timeline  # To register this with QML.
 
 class Application(PySide6.QtWidgets.QApplication):
@@ -42,6 +43,10 @@ class Application(PySide6.QtWidgets.QApplication):
 		self.setApplicationDisplayName("LynDJ")
 		self.setApplicationVersion(version)
 		self.setOrganizationName("Ghostkeeper")
+
+		logging.info("Checking for configuration to upgrade.")
+		upgrader = lyndj.upgrader.Upgrader()
+		upgrader.upgrade()
 
 		logging.debug("Loading metadata database.")
 		lyndj.metadata.load()
