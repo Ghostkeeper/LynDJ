@@ -42,5 +42,11 @@ functionEnd
 section "install"
 	setOutPath $INSTDIR
 	file /r ..\dist\*.*
-	CreateShortcut "$desktop\LynDJ.lnk" "$instdir\LynDJ.exe"
+
+	# Desktop shortcut.
+	CreateShortcut "$DESKTOP\LynDJ.lnk" "$INSTDIR\LynDJ.exe" "" "$INSTDIR\icon.ico"
+
+	# Start menu entry.
+	CreateDirectory "$SMPROGRAMS\LynDJ"
+	CreateShortCut "$SMPROGRAMS\LynDJ\LynDJ.lnk" "$INSTDIR\LynDJ.exe" "" "$INSTDIR\icon.ico"
 sectionEnd
