@@ -1,0 +1,17 @@
+name: Need Help
+description: You need help to use this software, i.e. the documentation needs improving.
+labels: documentation
+body:
+- type: markdown
+  attributes:
+    value: |
+      If you need help with downloading, building or using the software, please consult the [documentation](https://github.com/Ghostkeeper/LynDJ/blob/master/README.md) first.
+
+      When you need help, it could mean that either the documentation is insufficient or too hidden, or that the software is not intuitive enough. If you would like to suggest a way to make the software more intuitive, please [create a feature request](https://github.com/Ghostkeeper/LynDJ/issues/new?assignees=&labels=bug&template=feature.yml) instead.
+- type: textarea
+  id: description
+  attributes:
+    label: Description
+    description: I need help with...
+  validations:
+    required: true
