@@ -18,6 +18,12 @@ body:
       placeholder: Tell us what you expected!
     validations:
       required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: How would you describe the bug?
+      placeholder: Anything else...
   - type: dropdown
     id: version
     attributes:
