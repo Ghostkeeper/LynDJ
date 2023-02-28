@@ -50,7 +50,9 @@ section "install"
 	writeUninstaller "$INSTDIR\uninstall.exe"
 
 	# Desktop shortcut.
+	setShellVarContext current
 	createShortcut "$DESKTOP\LynDJ.lnk" "$INSTDIR\LynDJ.exe" "" "$INSTDIR\icon.ico"
+	setShellVarContext all
 
 	# Start menu entry.
 	createDirectory "$SMPROGRAMS\LynDJ"
