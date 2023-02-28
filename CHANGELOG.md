@@ -64,3 +64,6 @@ This is the first release of LynDJ. This release has the following features:
   * A build system builds the application using PyInstaller.
   * The application is packaged for Linux using AppImage, creating an executable image.
   * The application is packaged for Windows using NSIS, creating an installer.
+    * The NSIS installer installs the application in a designated folder.
+    * The NSIS installer creates a desktop shortcut and a start menu shortcut.
+    * The NSIS installer registers the program.
