@@ -11,7 +11,7 @@
 # Need administrative rights in order to install to Program Files.
 RequestExecutionLevel admin
 
-InstallDir "C:\Program Files\LynDJ"
+InstallDir "$PROGRAMFILES\LynDJ"
 LicenseData "..\LICENSE.md"
 Name "${APP_NAME}"
 outFile "${APP_NAME}-installer.exe"
@@ -29,7 +29,7 @@ Page instfiles
 UserInfo::GetAccountType
 pop $0
 ${If} $0 != "admin"
-	messageBox mb_iconstop "Administrator rights required to install to Program Files!"
+	messageBox mb_iconstop "Administrator rights required to install to Program Files and register the program!"
 	setErrorLevel 740
 	quit
 ${EndIf}
