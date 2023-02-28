@@ -44,7 +44,7 @@ functionEnd
 
 section "install"
 	setOutPath $INSTDIR
-	file /r ..\dist\*.*
+	file /r ..\dist\LynDJ\*.*
 
 	# Create the uninstaller.
 	writeUninstaller "$INSTDIR\uninstall.exe"
