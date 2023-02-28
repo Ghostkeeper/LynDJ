@@ -63,7 +63,7 @@ section "install"
 	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "InstallLocation" "$\"$INSTDIR$\""
 	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "DisplayIcon" "$\"$INSTDIR\icon.ico$\""
 	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "Publisher" "Ghostkeeper"
-	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "HelpLink" "$\"${WEBSITE}$\""
+	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "HelpLink" "${WEBSITE}"
 	writeRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "DisplayVersion" "${VERSIONMAJOR}.${VERSIONMINOR}.${VERSIONPATCH}"
 	writeRegDword HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "VersionMajor" ${VERSIONMAJOR}
 	writeRegDword HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\LynDJ" "VersionMinor" ${VERSIONMINOR}
