@@ -47,7 +47,7 @@ class Upgrader:
 				try:
 					prefs = json.load(f)
 					version_nr = prefs["version"]
-					if version_nr > 0:
+					if version_nr != "1.0.0":
 						too_modern.append(("preferences", version_nr))
 						logging.error(f"The preferences file is too modern for this version of the application! Version {version_nr}.")
 				except json.JSONDecodeError:

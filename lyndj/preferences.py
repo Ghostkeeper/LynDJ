@@ -19,7 +19,7 @@ QML_IMPORT_NAME = "Lyn"
 QML_IMPORT_MAJOR_VERSION = 1
 QML_IMPORT_MINOR_VERSION = 0
 
-VERSION = 0
+VERSION = "1.0.0"
 
 @PySide6.QtQml.QmlElement
 @PySide6.QtQml.QmlSingleton
