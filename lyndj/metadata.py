@@ -26,8 +26,6 @@ import typing
 
 import lyndj.storage  # To know where to store the database.
 
-VERSION = 0
-
 metadata: typing.Dict[str, typing.Any] = {}
 """
 The single source of truth for the currently known metadata.
@@ -121,7 +119,6 @@ def store() -> None:
 		# Create the database anew.
 		logging.info("Creating metadata database.")
 		connection = sqlite3.connect(db_file)
-		connection.execute(f"PRAGMA user_version = {VERSION}")
 		connection.execute("""CREATE TABLE metadata(
 			path text PRIMARY KEY,
 			title text,

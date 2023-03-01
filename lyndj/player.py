@@ -105,10 +105,6 @@ class Player(PySide6.QtCore.QObject):
 		if not prefs.has("player/buffer_size"):
 			prefs.add("player/buffer_size", 10)  # Size of chunks to send to audio server, in ms. Larger chunks are more efficient, but cause greater delays.
 
-		# Version number of the Fourier cache images. If outdated, erase them and re-generate.
-		with open(os.path.join(lyndj.storage.cache(), "fourier", "version.txt"), "w") as f:
-			f.write(str(FOURIER_VERSION))
-
 		Player.is_mono = prefs.get("player/mono")
 
 		self.song_finished.connect(self.mark_song_played)
