@@ -2,6 +2,8 @@ LynDJ
 =====
 LynDJ is a desktop application designed for playing music for an audience. In particular, it is specialised to playing music for Lindy Hop socials. This DJ software allows playback of music easily and safely, and provides extra control and information for what is important for swing dancing.
 
+![Screenshot of the main interface](screenshot.png)
+
 Main features
 -------------
 * A graphical interface with a thematic design.
@@ -17,7 +19,7 @@ Main features
 
 Development state
 -----------------
-This project is currently in beta testing. It needs some more rigorous testing for weird situations that don't often occur in regular use. All features for the initial release are completed. Not all major bugs are ironed out yet, however.
+It seems that all of the major bugs have been fixed and the project is being tested for its initial release.
 
 Installation
 ------------
