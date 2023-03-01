@@ -12,7 +12,7 @@ import PySide6.QtCore  # To expose this table to QML, and get the standard music
 import time  # To display the last played time relative to the current time.
 import typing
 
-import lyndj.background_tasks
+import lyndj.background_tasks  # To generate Fourier images in the background.
 import lyndj.metadata  # To get information about the files in the music directory.
 import lyndj.player  # To cache Fourier images of the tracks in this directory.
 import lyndj.preferences  # To store the sorting order.
