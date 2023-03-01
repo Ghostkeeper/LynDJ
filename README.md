@@ -66,6 +66,10 @@ python lyndj.py
 ```
 </details>
 
+Usage
+-----
+For usage instructions, please refer to [the documentation](doc/usage.md).
+
 Build
 -----
 These are instructions to create a release build of this software.
