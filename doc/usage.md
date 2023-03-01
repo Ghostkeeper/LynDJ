@@ -146,6 +146,8 @@ To show that background processing is going on, an hourglass symbol is shown in 
 
 ![A background task is going on](usage_background_tasks.png)
 
+*Some background tasks will not be ran while music is playing, to prevent the audio buffer from being empty due to lack of processing power. While playing music, the background tasks may appear to take indefinitely. It may be better to keep the application open for a while before your DJ set in order to let the background tasks finish for optimal performance during your DJ set.*
+
 Further options
 ---------------
 There is a preferences screen that allows you to tweak detailed behaviour of the software. To access this, click on the gear icon in the top-right corner of the application.
