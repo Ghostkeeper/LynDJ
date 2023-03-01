@@ -136,7 +136,7 @@ To change metadata of a file, simply right-click on a cell in the table. This wi
 
 *The duration and last played fields cannot be adjusted.*
 
-The values you fill in for age, style and energy are entirely up to you to categorise as you wish. You can make up your own categories to categorise the tracks by style, for instance. However for the AutoDJ it is best to be consistent. The AutoDJ will generally attempt to create varied sets, and will suggest a track with an age, style and energy level that hasn't recently been played. As such, having spelling mistakes in these categories will reduce the effectiveness of the AutoDJ due to it thinking the tracks e.g. have different styles even if the difference is just a typo. The energy level of the track is also interpreted with specific values for High and Medium.
+The values you fill in for age, style and energy are entirely up to you to categorise as you wish. You can make up your own categories to categorise the tracks by style, for instance. However for the AutoDJ it is best to be consistent. The AutoDJ will generally attempt to create varied sets, and will suggest a track with an age, style and energy level that hasn't recently been played. As such, having spelling mistakes in these categories will reduce the effectiveness of the AutoDJ due to it thinking the tracks e.g. have different styles even if the difference is just a typo. The energy level of the track is also interpreted with specific values for High and Low.
 
 Background tasks
 ----------------
