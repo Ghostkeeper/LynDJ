@@ -17,10 +17,6 @@ Main features
 * Toggling between mono and stereo, for use with bad speaker set-ups.
 * An Auto-DJ will suggest the next track to play.
 
-Development state
------------------
-It seems that all of the major bugs have been fixed and the project is being tested for its initial release.
-
 Installation
 ------------
 There are several ways to install this application onto your computer. This outlines your options, from easy to hard. Each option includes instructions for various platforms. If your platform is not listed, please select the most similar platform (e.g. for Arch Linux, installation is probably similar to Ubuntu). Note that the instructions are written for a clean installation of the operating system. You might already have some of the prerequisites installed.
