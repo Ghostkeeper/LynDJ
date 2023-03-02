@@ -23,8 +23,6 @@ import lyndj.preferences  # To get the playlist.
 import lyndj.storage  # To cache Fourier transform images.
 import lyndj.sound  # To store the audio we're playing.
 
-FOURIER_VERSION = 0
-
 class Player(PySide6.QtCore.QObject):
 	"""
 	An object that is responsible for playing music files, controlling how they're played (pause, play, volume,
