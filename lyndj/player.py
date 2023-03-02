@@ -148,6 +148,10 @@ class Player(PySide6.QtCore.QObject):
 			self.is_playing_set(False)
 			return
 
+		# Cancel any upcoming events.
+		if Player.control_track:
+			Player.control_track.stop()
+
 		next_song = current_playlist[0]
 		logging.info(f"Starting playback of track: {next_song}")
 
