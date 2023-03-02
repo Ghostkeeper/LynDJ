@@ -137,7 +137,7 @@ class Player(PySide6.QtCore.QObject):
 		playing.
 		:return: ``True`` if the music is currently playing, or ``False`` if it is stopped.
 		"""
-		return self.current_track is not None
+		return Player.current_track is not None
 
 	def play_next(self) -> None:
 		"""

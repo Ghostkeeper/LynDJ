@@ -39,6 +39,15 @@ def play(new_audio: "lyndj.sound.Sound") -> None:
 	global current_position
 	current_position = 0.0  # Start from the start.
 
+def stop() -> None:
+	"""
+	Stop playing any audio.
+	"""
+	global audio_source
+	audio_source = None
+	global current_position
+	current_position = 0.0
+
 def swap(new_audio: "lyndj.sound.Sound") -> None:
 	"""
 	Swap out an audio source for another without changing the playback position.

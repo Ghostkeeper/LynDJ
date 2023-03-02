@@ -9,6 +9,7 @@ import PySide6.QtCore  # For QTimers to execute code after a certain amount of t
 import typing
 
 import lyndj.metadata  # To get the events for a track.
+import lyndj.playback  # To stop audio playback when stopping playing.
 import lyndj.playlist  # To remove the track from the playlist when it finishes playing.
 import lyndj.preferences  # For some playback preferences.
 import lyndj.waypoints_timeline  # To parse waypoints.
@@ -117,10 +118,15 @@ class MusicControl:
 			self.events.append(timer)
 			time += 0.05  # Adjust volume every 0.05s.
 		# And another event for the final 0 volume.
+		def fadeout_done():
+			self.player.set_volume(0)
+			lyndj.player.Player.current_track = None
+			lyndj.player.Player.control_track = None
+			lyndj.playback.stop()
 		timer = PySide6.QtCore.QTimer()
 		timer.setInterval(round(duration * 1000))
 		timer.setSingleShot(True)
-		timer.timeout.connect(lambda: self.player.set_volume(0))
+		timer.timeout.connect(lambda: fadeout_done())
 		timer.setTimerType(PySide6.QtCore.Qt.PreciseTimer)
 		self.events.append(timer)
 		for event in self.events:
