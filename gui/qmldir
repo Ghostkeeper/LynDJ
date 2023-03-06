@@ -3,6 +3,7 @@ module Gui
 About                  1.0 About.qml
 AllMusic               1.0 AllMusic.qml
 ChangeMetadataDialogue 1.0 ChangeMetadataDialogue.qml
+ConfigurationTooModern 1.1 ConfigurationTooModern.qml
 FileBrowser            1.0 FileBrowser.qml
 MainWindow             1.0 MainWindow.qml
 Player                 1.0 Player.qml
