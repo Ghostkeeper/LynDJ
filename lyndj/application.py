@@ -33,21 +33,28 @@ class Application(PySide6.QtWidgets.QApplication):
 
 	def __init__(self, argv: typing.List[str]) -> None:
 		"""
-		Starts the application.
+		Begins the start-up process.
 		:param argv: Command-line parameters provided to the application. Qt understands some of these.
 		"""
-		version = "1.0.0"
+		version = "1.1.0"
 		logging.info(f"Starting application version {version}.")
 		super().__init__(argv)
+		self.engine = None  # type: typing.Optional[PySide6.QtQml.QQmlApplicationEngine]
 		self.setApplicationName("LynDJ")
 		self.setApplicationDisplayName("LynDJ")
 		self.setApplicationVersion(version)
 		self.setOrganizationName("Ghostkeeper")
 
 		logging.info("Checking for configuration to upgrade.")
-		upgrader = lyndj.upgrader.Upgrader()
-		upgrader.upgrade()
+		upgrader = lyndj.upgrader.Upgrader(self)
+		upgrade_success = upgrader.upgrade()
+		if upgrade_success:
+			self.start_continue()
 
+	def start_continue(self) -> None:
+		"""
+		Continues the start-up process if the configuration is validated.
+		"""
 		logging.debug("Loading metadata database.")
 		lyndj.metadata.load()
 
