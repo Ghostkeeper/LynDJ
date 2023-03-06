@@ -55,4 +55,8 @@ class Upgrader:
 		:param version_nr: The version number found. This would be a newer version than this application.
 		"""
 		self.application.engine = PySide6.QtQml.QQmlApplicationEngine()
+		self.application.engine.setInitialProperties({
+			"this_version": self.application.applicationVersion(),
+			"config_version": version_nr
+		})
 		self.application.engine.load("gui/ConfigurationTooModern.qml")
