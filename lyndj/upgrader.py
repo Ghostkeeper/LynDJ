@@ -6,7 +6,7 @@
 
 import json  # To parse the preferences file.
 import logging
-import os.path  # To find the version number.
+import os.path  # To find the files to upgrade.
 import PySide6.QtCore  # To create a dialogue to ask what to do when the configuration is too modern.
 import PySide6.QtGui  # To create a dialogue to ask what to do when the configuration is too modern.
 import PySide6.QtWidgets  # To create a dialogue to ask what to do when the configuration is too modern.
@@ -28,17 +28,15 @@ class ConfigurationTooModernDialogue(PySide6.QtWidgets.QSplashScreen):
 	without interfering with the way resources are used in the main window.
 	"""
 
-	def __init__(self, application_version: str, config_version: str, application: "lyndj.application.Application") -> None:
+	def __init__(self, application_version: str, config_version: str) -> None:
 		"""
 		Creates the dialogue object in memory, and shows it to the user.
 		:param application_version: The current version of the application.
 		:param config_version: The version of the application that wrote the current configuration files.
-		:param application: The application object that runs this application.
 		"""
 		super().__init__()
 		self.application_version = application_version
 		self.config_version = config_version
-		self.application = application
 
 		self.setGeometry(100, 100, 600, 10 + 3*18 + 10 + 4*18 + 10 + 2*18 + 10 + 40 + 10)
 		self.show()
@@ -157,7 +155,7 @@ class Upgrader:
 		This shows the user a dialogue with a choice of what to do in this case.
 		:param version_nr: The version number found. This would be a newer version than this application.
 		"""
-		dialogue = ConfigurationTooModernDialogue(self.application.applicationVersion(), version_nr, self.application)
+		dialogue = ConfigurationTooModernDialogue(self.application.applicationVersion(), version_nr)
 		# While the dialogue is shown, make a miniature event loop to allow the user to click on the buttons.
 		self.application.processEvents()
 		while dialogue.isVisible():
