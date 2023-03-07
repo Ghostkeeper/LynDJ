@@ -12,12 +12,9 @@ import PySide6.QtGui  # To create a dialogue to ask what to do when the configur
 import PySide6.QtWidgets  # To create a dialogue to ask what to do when the configuration is too modern.
 import sys  # To cancel start-up if requested by the user.
 import time  # For a custom event loop for the dialogue to ask what to do when the configuration is too modern.
-import typing
 
+import lyndj.application  # To find the application version number.
 import lyndj.storage  # To find the configuration to upgrade.
-
-if typing.TYPE_CHECKING:
-	import lyndj.application
 
 class ConfigurationTooModernDialogue(PySide6.QtWidgets.QSplashScreen):
 	"""
@@ -28,14 +25,12 @@ class ConfigurationTooModernDialogue(PySide6.QtWidgets.QSplashScreen):
 	without interfering with the way resources are used in the main window.
 	"""
 
-	def __init__(self, application_version: str, config_version: str) -> None:
+	def __init__(self, config_version: str) -> None:
 		"""
 		Creates the dialogue object in memory, and shows it to the user.
-		:param application_version: The current version of the application.
 		:param config_version: The version of the application that wrote the current configuration files.
 		"""
 		super().__init__()
-		self.application_version = application_version
 		self.config_version = config_version
 
 		self.setGeometry(100, 100, 600, 10 + 3*18 + 10 + 4*18 + 10 + 2*18 + 10 + 40 + 10)
@@ -66,7 +61,7 @@ class ConfigurationTooModernDialogue(PySide6.QtWidgets.QSplashScreen):
 		painter.fillPath(circle_path.translated(20, 10 + 3*18 + 10 + 2*18 + 9), black_brush)
 		painter.drawText(30, 10 + 3*18 + 10 + 2*18, self.width() - 40, 2 * 18, text_flags, "If you cancel, you will be redirected to a website where you can download the most recent version.")
 		# Version numbers.
-		painter.drawText(10, 10 + 3*18 + 10 + 4*18 + 10, self.width() - 20, 18, text_flags, "This version: " + self.application_version)
+		painter.drawText(10, 10 + 3*18 + 10 + 4*18 + 10, self.width() - 20, 18, text_flags, "This version: " + lyndj.application.Application.version)
 		painter.drawText(10, 10 + 3*18 + 10 + 4*18 + 10 + 18, self.width() - 20, 18, text_flags, "Configuration version: " + self.config_version)
 		# Buttons.
 		button_width = int((self.width() - 40) / 3)
@@ -121,7 +116,7 @@ class Upgrader:
 	def __init__(self, application):
 		"""
 		Creates the upgrader instance.
-		:param application: The application instance to link to when creating any QML dialogues.
+		:param application: The application this is running in, for maintaining any dialogues.
 		"""
 		self.application = application
 
@@ -138,7 +133,7 @@ class Upgrader:
 				try:
 					prefs = json.load(f)
 					version_nr = prefs["version"]
-					if version_nr != self.application.applicationVersion():
+					if version_nr != lyndj.application.Application.version:
 						logging.error(f"The preferences file is too modern for this version of the application! Version {version_nr}.")
 						self.report_too_modern(version_nr)
 						return False
@@ -155,7 +150,7 @@ class Upgrader:
 		This shows the user a dialogue with a choice of what to do in this case.
 		:param version_nr: The version number found. This would be a newer version than this application.
 		"""
-		dialogue = ConfigurationTooModernDialogue(self.application.applicationVersion(), version_nr)
+		dialogue = ConfigurationTooModernDialogue(version_nr)
 		# While the dialogue is shown, make a miniature event loop to allow the user to click on the buttons.
 		self.application.processEvents()
 		while dialogue.isVisible():

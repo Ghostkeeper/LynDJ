@@ -31,18 +31,22 @@ class Application(PySide6.QtWidgets.QApplication):
 	This provides a QML engine and keeps it running until the application quits.
 	"""
 
+	version = "1.1.0"
+	"""
+	The current application version.
+	"""
+
 	def __init__(self, argv: typing.List[str]) -> None:
 		"""
 		Begins the start-up process.
 		:param argv: Command-line parameters provided to the application. Qt understands some of these.
 		"""
-		version = "1.1.0"
-		logging.info(f"Starting application version {version}.")
+		logging.info(f"Starting application version {Application.version}.")
 		super().__init__(argv)
 		self.engine = None  # type: typing.Optional[PySide6.QtQml.QQmlApplicationEngine]
 		self.setApplicationName("LynDJ")
 		self.setApplicationDisplayName("LynDJ")
-		self.setApplicationVersion(version)
+		self.setApplicationVersion(Application.version)
 		self.setOrganizationName("Ghostkeeper")
 
 		logging.info("Checking for configuration to upgrade.")
