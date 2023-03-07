@@ -47,14 +47,8 @@ class Application(PySide6.QtWidgets.QApplication):
 
 		logging.info("Checking for configuration to upgrade.")
 		upgrader = lyndj.upgrader.Upgrader(self)
-		upgrade_success = upgrader.upgrade()
-		if upgrade_success:
-			self.start_continue()
+		upgrader.upgrade()
 
-	def start_continue(self) -> None:
-		"""
-		Continues the start-up process if the configuration is validated.
-		"""
 		logging.debug("Loading metadata database.")
 		lyndj.metadata.load()
 
