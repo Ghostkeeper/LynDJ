@@ -12,6 +12,7 @@ import logging
 import os  # To get OS-specific paths.
 import os.path  # To construct new paths.
 import platform  # To store things in a different location depending on the operating system.
+import shutil  # To reset the configuration.
 
 def config() -> str:
 	"""
@@ -100,3 +101,12 @@ def source() -> str:
 	:return: A path to the directory where the application is installed.
 	"""
 	return os.getcwd()  # lyndj.py sets the CWD to its directory at start-up.
+
+def reset_to_factory_defaults() -> None:
+	"""
+	Delete all of the user's configuration, resetting the application to factory defaults.
+	"""
+	shutil.rmtree(cache())
+	shutil.rmtree(config())
+	shutil.rmtree(data())
+	ensure_exists()  # To continue running, re-create the directories.
