@@ -13,13 +13,12 @@ import PySide6.QtCore  # To allow preferences to be reached from QML.
 import PySide6.QtQml  # To register the type as singleton in QML.
 import typing
 
+import lyndj.application  # To get the current application version.
 import lyndj.storage  # To know where to store the preferences file.
 
 QML_IMPORT_NAME = "Lyn"
 QML_IMPORT_MAJOR_VERSION = 1
 QML_IMPORT_MINOR_VERSION = 0
-
-VERSION = "1.0.0"
 
 @PySide6.QtQml.QmlElement
 @PySide6.QtQml.QmlSingleton
@@ -132,7 +131,7 @@ class Preferences(PySide6.QtCore.QObject):
 				continue
 			if self.defaults[key] != value:  # Not equal to default.
 				changed[key] = value
-		changed["version"] = VERSION
+		changed["version"] = lyndj.application.Application.version
 		with open(filepath, "w") as f:
 			json.dump(changed, f, indent="\t")
 
