@@ -10,6 +10,7 @@ import os.path  # To find the files to upgrade.
 import PySide6.QtCore  # To create a dialogue to ask what to do when the configuration is too modern.
 import PySide6.QtGui  # To create a dialogue to ask what to do when the configuration is too modern.
 import PySide6.QtWidgets  # To create a dialogue to ask what to do when the configuration is too modern.
+import sqlite3  # To upgrade the metadata database.
 import sys  # To cancel start-up if requested by the user.
 import time  # For a custom event loop for the dialogue to ask what to do when the configuration is too modern.
 import typing
@@ -126,23 +127,45 @@ class Upgrader:
 		Starting point for the upgrading of the application's configuration directories.
 		"""
 		application_version = self.parse_version(lyndj.application.Application.version)
-		# Since the configuration files have never changed yet in the history of this application, we just need to check if the configuration is more modern than what this version understands.
-		# If it is present and too modern, we may not parse it properly and run into errors.
+		version_str = self.get_version()
+		version_nr = (0, 0, 0)
+		try:
+			version_nr = self.parse_version(version_str)
+		except ValueError:
+			version_str = "unknown"
+		if version_str == "unknown":
+			logging.error("The preferences file is not intelligible to this version of the application! Couldn't find the version number.")
+			self.report_too_modern(version_str)
+			return
+
+		if version_nr > application_version:
+			logging.error(f"The preferences file is too modern for this version of the application! Version {version_str}.")
+			self.report_too_modern(version_str)
+			return
+
+		# Map upgrades to finally arrive at the current version.
+		upgrade_table = {
+			"1.0.0": self.upgrade_1_0_0_to_1_1_0
+		}
+
+		while version_str in upgrade_table:
+			upgrade_table[version_str]()  # Execute that upgrade.
+			version_str = self.get_version()
+
+	def get_version(self) -> str:
+		"""
+		Get the current version number of the configuration.
+		:return: A version number, as a string, or "unknown" if it couldn't be found.
+		"""
 		preferences_path = os.path.join(lyndj.storage.config(), "preferences.json")
-		if os.path.exists(preferences_path):
-			with open(preferences_path) as f:
-				try:
-					prefs = json.load(f)
-					version_str = prefs["version"]
-					version_nr = self.parse_version(version_str)
-					if version_nr > application_version:
-						logging.error(f"The preferences file is too modern for this version of the application! Version {version_str}.")
-						self.report_too_modern(version_str)
-						return
-				except (json.JSONDecodeError, ValueError):
-					logging.error("The preferences file is not intelligible to this version of the application! Couldn't find the version number.")
-					self.report_too_modern("unknown")
-					return
+		if not os.path.exists(preferences_path):
+			return lyndj.application.Application.version  # Since we don't have any config yet, nothing to upgrade. Pretend it's the current version.
+		with open(preferences_path) as f:
+			try:
+				prefs = json.load(f)
+				return prefs["version"]
+			except (json.JSONDecodeError, KeyError):
+				return "unknown"
 
 	@classmethod
 	def parse_version(cls, version: str) -> typing.Tuple[int, int, int]:
@@ -166,3 +189,30 @@ class Upgrader:
 		while dialogue.isVisible():
 			time.sleep(0.1)
 			self.application.processEvents()
+
+	def upgrade_1_0_0_to_1_1_0(self) -> None:
+		"""
+		Upgrades the configuration from version 1.0.0 to version 1.1.0.
+		"""
+		logging.info("Upgrading configuration from 1.0.0 to 1.1.0.")
+		# Upgrade preferences file:
+		# * Update version number.
+		preferences_path = os.path.join(lyndj.storage.config(), "preferences.json")
+		with open(preferences_path) as f:
+			try:
+				prefs = json.load(f)
+				prefs["version"] = "1.1.0"  # Upgrade the version number.
+				with open(preferences_path, "w") as f:
+					json.dump(prefs, f, indent="\t")
+				logging.debug("Upgraded preferences file to 1.1.0.")
+			except json.JSONDecodeError:
+				logging.error("Failed to load preferences file while upgrading. Configuration might get corrupt!")  # But do continue trying to upgrade the rest to minimise damage.
+
+		# Update metadata database:
+		# * Add cut_start and cut_end timestamps.
+		metadata_path = os.path.join(lyndj.storage.data(), "metadata.db")
+		connection = sqlite3.connect(metadata_path)
+		connection.execute("ALTER TABLE metadata ADD cut_start real")
+		connection.execute("ALTER TABLE metadata ADD cut_end real")
+		connection.commit()
+		logging.debug("Upgraded metadata database to 1.1.0.")
