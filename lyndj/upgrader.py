@@ -121,10 +121,9 @@ class Upgrader:
 		"""
 		self.application = application
 
-	def upgrade(self) -> bool:
+	def upgrade(self):
 		"""
 		Starting point for the upgrading of the application's configuration directories.
-		:return: Whether the upgrade process was successful.
 		"""
 		application_version = self.parse_version(lyndj.application.Application.version)
 		# Since the configuration files have never changed yet in the history of this application, we just need to check if the configuration is more modern than what this version understands.
@@ -139,12 +138,11 @@ class Upgrader:
 					if version_nr > application_version:
 						logging.error(f"The preferences file is too modern for this version of the application! Version {version_str}.")
 						self.report_too_modern(version_str)
-						return False
+						return
 				except (json.JSONDecodeError, ValueError):
 					logging.error("The preferences file is not intelligible to this version of the application! Couldn't find the version number.")
 					self.report_too_modern("unknown")
-					return False
-		return True
+					return
 
 	@classmethod
 	def parse_version(cls, version: str) -> typing.Tuple[int, int, int]:
