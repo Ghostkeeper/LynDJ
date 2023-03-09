@@ -12,7 +12,8 @@ import PySide6.QtCore  # To expose this table to QML, and get the standard music
 import time  # To display the last played time relative to the current time.
 import typing
 
-import lyndj.background_tasks  # To generate Fourier images in the background.
+import lyndj.background_tasks  # To generate spectrograph images in the background.
+import lyndj.fourier  # To generate spectrograph images in the background.
 import lyndj.metadata  # To get information about the files in the music directory.
 import lyndj.player  # To cache Fourier images of the tracks in this directory.
 import lyndj.preferences  # To store the sorting order.
@@ -217,13 +218,11 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		self._directory = new_directory
 
 		# Add background tasks for caching Fourier images.
-		def cache_fourier(path):
-			lyndj.player.Player.get_instance().load_and_generate_fourier(path)
 		tasks = lyndj.background_tasks.BackgroundTasks.get_instance()
 		for path in files:
 			fourier_file = lyndj.metadata.get(path, "fourier")
 			if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
-				tasks.add(lambda p=path: cache_fourier(p), "Generating spectrograph", allow_during_playback=False)
+				tasks.add(lambda p=path: lyndj.fourier.load_and_generate_fourier(p), "Generating spectrograph", allow_during_playback=False)
 
 	@PySide6.QtCore.Property(str, fset=directory_set)
 	def directory(self) -> str:
