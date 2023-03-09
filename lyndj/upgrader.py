@@ -211,8 +211,11 @@ class Upgrader:
 		# Update metadata database:
 		# * Add cut_start and cut_end timestamps.
 		metadata_path = os.path.join(lyndj.storage.data(), "metadata.db")
-		connection = sqlite3.connect(metadata_path)
-		connection.execute("ALTER TABLE metadata ADD cut_start real")
-		connection.execute("ALTER TABLE metadata ADD cut_end real")
-		connection.commit()
-		logging.debug("Upgraded metadata database to 1.1.0.")
+		try:
+			connection = sqlite3.connect(metadata_path)
+			connection.execute("ALTER TABLE metadata ADD cut_start real")
+			connection.execute("ALTER TABLE metadata ADD cut_end real")
+			connection.commit()
+			logging.debug("Upgraded metadata database to 1.1.0.")
+		except sqlite3.OperationalError as e:
+			logging.error(f"Failed to upgrade metadata table. Configuration might get corrupt! Error: {e}")  # But do continue.
