@@ -52,7 +52,7 @@ def load() -> None:
 	logging.debug("Reading metadata from database.")
 
 	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
-	for path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime in connection.execute("SELECT * FROM metadata"):
+	for path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime, cut_start, cut_end in connection.execute("SELECT * FROM metadata"):
 		new_metadata[path] = {
 			"path": path,
 			"title": title,
@@ -69,7 +69,9 @@ def load() -> None:
 			"bass_waypoints": bass_waypoints,
 			"mids_waypoints": mids_waypoints,
 			"treble_waypoints": treble_waypoints,
-			"cachetime": cachetime
+			"cachetime": cachetime,
+			"cut_start": cut_start,
+			"cut_end": cut_end
 		}
 	with metadata_lock:
 		metadata.update(new_metadata)
@@ -135,7 +137,9 @@ def store() -> None:
 			bass_waypoints text,
 			mids_waypoints text,
 			treble_waypoints text,
-			cachetime real
+			cachetime real,
+			cut_start real,
+			cut_end real
 		)""")
 	else:
 		connection = sqlite3.connect(db_file)
@@ -143,8 +147,8 @@ def store() -> None:
 	local_metadata = metadata  # Cache locally for performance.
 	with metadata_lock:
 		for path, entry in local_metadata.items():
-			connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-				(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"]))
+			connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime, cut_start, cut_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"], entry["cut_start"], entry["cut_end"]))
 	connection.commit()
 
 def has(path: str) -> bool:
@@ -201,6 +205,8 @@ def add_file(path: str) -> None:
 		bass_waypoints = local_metadata[path]["bass_waypoints"]
 		mids_waypoints = local_metadata[path]["mids_waypoints"]
 		treble_waypoints = local_metadata[path]["treble_waypoints"]
+		cut_start = local_metadata[path]["cut_start"]
+		cut_end = local_metadata[path]["cut_end"]
 	else:
 		last_played = -1  # Never played.
 		age = ""
@@ -210,6 +216,8 @@ def add_file(path: str) -> None:
 		bass_waypoints = ""
 		mids_waypoints = ""
 		treble_waypoints = ""
+		cut_start = -1
+		cut_end = -1
 	logging.debug(f"Updating metadata for {path}")
 
 	try:
@@ -260,7 +268,9 @@ def add_file(path: str) -> None:
 		"bass_waypoints": bass_waypoints,
 		"mids_waypoints": mids_waypoints,
 		"treble_waypoints": treble_waypoints,
-		"cachetime": last_modified
+		"cachetime": last_modified,
+		"cut_start": cut_start,
+		"cut_end": cut_end
 	})
 
 def change(path: str, key: str, value: typing.Any) -> None:
