@@ -12,6 +12,7 @@ import PySide6.QtGui  # To create a dialogue to ask what to do when the configur
 import PySide6.QtWidgets  # To create a dialogue to ask what to do when the configuration is too modern.
 import sys  # To cancel start-up if requested by the user.
 import time  # For a custom event loop for the dialogue to ask what to do when the configuration is too modern.
+import typing
 
 import lyndj.application  # To find the application version number.
 import lyndj.storage  # To find the configuration to upgrade.
@@ -125,6 +126,7 @@ class Upgrader:
 		Starting point for the upgrading of the application's configuration directories.
 		:return: Whether the upgrade process was successful.
 		"""
+		application_version = self.parse_version(lyndj.application.Application.version)
 		# Since the configuration files have never changed yet in the history of this application, we just need to check if the configuration is more modern than what this version understands.
 		# If it is present and too modern, we may not parse it properly and run into errors.
 		preferences_path = os.path.join(lyndj.storage.config(), "preferences.json")
@@ -132,16 +134,26 @@ class Upgrader:
 			with open(preferences_path) as f:
 				try:
 					prefs = json.load(f)
-					version_nr = prefs["version"]
-					if version_nr != lyndj.application.Application.version:
-						logging.error(f"The preferences file is too modern for this version of the application! Version {version_nr}.")
-						self.report_too_modern(version_nr)
+					version_str = prefs["version"]
+					version_nr = self.parse_version(version_str)
+					if version_nr > application_version:
+						logging.error(f"The preferences file is too modern for this version of the application! Version {version_str}.")
+						self.report_too_modern(version_str)
 						return False
-				except json.JSONDecodeError:
+				except (json.JSONDecodeError, ValueError):
 					logging.error("The preferences file is not intelligible to this version of the application! Couldn't find the version number.")
 					self.report_too_modern("unknown")
 					return False
 		return True
+
+	@classmethod
+	def parse_version(cls, version: str) -> typing.Tuple[int, int, int]:
+		"""
+		Parse a version number into a tuple which can be compared lexicographically.
+		:param version: The version number as a string.
+		:return: A tuple representing that version number, which can be compared lexicographically.
+		"""
+		return typing.cast(typing.Tuple[int, int, int], tuple(int(component) for component in version.split(".")))
 
 	def report_too_modern(self, version_nr: str) -> None:
 		"""
