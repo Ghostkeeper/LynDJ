@@ -17,6 +17,18 @@ Main features
 * Toggling between mono and stereo, for use with bad speaker set-ups.
 * An Auto-DJ will suggest the next track to play.
 
+Support
+-------
+This application is supported on:
+* Windows 10 or newer
+* Any Linux installation with Glibc 2.31 or newer
+
+The file formats supported are:
+* WAV
+* MP3
+* FLAC
+* OGG/Vorbis
+
 Installation
 ------------
 There are several ways to install this application onto your computer. This outlines your options, from easy to hard. Each option includes instructions for various platforms. If your platform is not listed, please select the most similar platform (e.g. for Arch Linux, installation is probably similar to Ubuntu). Note that the instructions are written for a clean installation of the operating system. You might already have some of the prerequisites installed.
