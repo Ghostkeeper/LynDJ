@@ -29,6 +29,11 @@ current_position = 0.0
 The location in the file where we are currently playing (in seconds).
 """
 
+end_position = 0.0
+"""
+The location in the file where the song ends (in seconds).
+"""
+
 def play(new_audio: "lyndj.sound.Sound") -> None:
 	"""
 	Start the playback of a new audio source.
@@ -36,8 +41,6 @@ def play(new_audio: "lyndj.sound.Sound") -> None:
 	"""
 	global audio_source
 	audio_source = new_audio
-	global current_position
-	current_position = 0.0  # Start from the start.
 
 def stop() -> None:
 	"""
@@ -112,7 +115,7 @@ def play_loop() -> None:
 				current_rate = chunk.frame_rate
 				current_channels = chunk.channels
 				stream = audio_server.open(format=audio_server.get_format_from_width(current_sample_width), rate=current_rate, channels=current_channels, output=True)
-			if current_position >= audio_source.duration():  # Playback completed. Stop taking the GIL and go into stand-by.
+			if current_position >= end_position:  # Playback completed. Stop taking the GIL and go into stand-by.
 				audio_source = None
 				continue
 			stream.write(chunk.samples)

@@ -45,7 +45,7 @@ class MusicControl:
 		self.events: typing.List[PySide6.QtCore.QTimer] = []
 
 		# Song ends.
-		duration = sound.duration()
+		duration = lyndj.metadata.get(path, "cut_end") - lyndj.metadata.get(path, "cut_start")
 		song_end_timer = PySide6.QtCore.QTimer()
 		song_end_timer.setInterval(round(duration * 1000 + pause_between_songs))
 		song_end_timer.setSingleShot(True)

@@ -153,9 +153,15 @@ class Player(PySide6.QtCore.QObject):
 		logging.info(f"Starting playback of track: {next_song}")
 
 		decoded = miniaudio.decode_file(next_song)
-		track = lyndj.sound.Sound(decoded.samples.tobytes(), sample_size=decoded.sample_width, channels=decoded.nchannels, frame_rate=decoded.sample_rate)
-		Player.current_track = track.trim_silence()
+		Player.current_track = lyndj.sound.Sound(decoded.samples.tobytes(), sample_size=decoded.sample_width, channels=decoded.nchannels, frame_rate=decoded.sample_rate)
 		Player.control_track = lyndj.music_control.MusicControl(next_song, Player.current_track, self)
+
+		cut_start = lyndj.metadata.get(next_song, "cut_start")
+		cut_end = lyndj.metadata.get(next_song, "cut_end")
+		if cut_start == -1 or cut_start is None or cut_end == -1 or cut_end is None:  # Not trimmed yet.
+			cut_start, cut_end = Player.current_track.detect_silence()
+			lyndj.metadata.change(next_song, "cut_start", cut_start)
+			lyndj.metadata.change(next_song, "cut_end", cut_end)
 
 		fourier_file = lyndj.metadata.get(next_song, "fourier")
 		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
@@ -169,6 +175,8 @@ class Player(PySide6.QtCore.QObject):
 
 		self.song_changed.emit()  # We loaded up a new song.
 		Player.start_time = time.time()
+		lyndj.playback.current_position = cut_start
+		lyndj.playback.end_position = cut_end
 		lyndj.playback.play(Player.current_track)
 		Player.control_track.play()
 
@@ -216,6 +224,36 @@ class Player(PySide6.QtCore.QObject):
 		return PySide6.QtCore.QUrl.fromLocalFile(fourier_path)
 
 	@PySide6.QtCore.Property(float, notify=song_changed)
+	def current_cut_start(self) -> float:
+		"""
+		Get the start cut position of the current song, in seconds.
+
+		Before this position in the song, silence was detected.
+
+		If there is no current song playing, this returns 0.
+		:return: The timestamp of the start of the song.
+		"""
+		if Player.current_track is None:
+			return 0
+		current_path = self.currentPath
+		return lyndj.metadata.get(current_path, "cut_start")
+
+	@PySide6.QtCore.Property(float, notify=song_changed)
+	def current_cut_end(self) -> float:
+		"""
+		Get the end cut position of the current song, in seconds.
+
+		After this position in the song, silence was detected.
+
+		If there is no current song playing, this returns 0.
+		:return: The timestamp of the end of the song.
+		"""
+		if Player.current_track is None:
+			return 0
+		current_path = self.currentPath
+		return lyndj.metadata.get(current_path, "cut_end")
+
+	@PySide6.QtCore.Property(float, notify=song_changed)
 	def current_duration(self) -> float:
 		"""
 		Get the duration of the current song, in seconds.
@@ -223,9 +261,7 @@ class Player(PySide6.QtCore.QObject):
 		If there is no current song playing, this returns 0.
 		:return: The duration of the current song, in seconds.
 		"""
-		if Player.current_track is None:
-			return 0
-		return Player.current_track.duration()
+		return self.current_cut_end - self.current_cut_start
 
 	@PySide6.QtCore.Property(str, notify=song_changed)
 	def current_title(self) -> str:
