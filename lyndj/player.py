@@ -162,6 +162,7 @@ class Player(PySide6.QtCore.QObject):
 			cut_start, cut_end = Player.current_track.detect_silence()
 			lyndj.metadata.change(next_song, "cut_start", cut_start)
 			lyndj.metadata.change(next_song, "cut_end", cut_end)
+			lyndj.metadata.change(next_song, "duration", cut_end - cut_start)
 
 		fourier_file = lyndj.metadata.get(next_song, "fourier")
 		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
