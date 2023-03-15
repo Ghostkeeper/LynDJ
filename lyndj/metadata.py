@@ -337,7 +337,7 @@ def is_music_file(path: str) -> bool:
 	if not os.path.isfile(path):
 		return False  # Only read files.
 	ext = os.path.splitext(path)[1]
-	return ext in [".mp3", ".flac", ".opus", ".ogg", ".wav"]  # Supported file formats.
+	return ext in [".mp3", ".flac", ".ogg", ".wav"]  # Supported file formats.
 
 def add_directory(path: str) -> None:
 	"""

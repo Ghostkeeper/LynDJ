@@ -3,11 +3,13 @@
 In this update, some bugs were fixed that got brought up when the application was exposed to the field. Some features were built that didn't initially fit into the release schedule for 1.0.
 
 New features:
+* Added a system to upgrade configuration files when first running a new version of the application.
 * When the configuration files are incompatible or corrupt, a dialogue will be shown at start-up to ask the user what to do about it.
 
 Bug fixes:
 * Rapidly restarting the music after stopping it will no longer continue the fade-out.
 * Music now actually stops after the fade-out when stopping playback, rather than continuing at 0 volume.
+* No longer show Opus files in the file browsers since it is not supported.
 
 1.0.0 - Let's Dance
 ----
