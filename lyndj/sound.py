@@ -134,11 +134,12 @@ class Sound:
 		sum_squares = sum(sample ** 2 for sample in self.sample_array())
 		return int(math.sqrt(sum_squares / num_samples))
 
-	def trim_silence(self, threshold: float=-64.0) -> "Sound":
+	def detect_silence(self, threshold: float=-64.0) -> typing.Tuple[float, float]:
 		"""
-		Remove parts of silence from the start and end of this sound.
+		Find silence at the start and end of the track.
 		:param threshold: Audio amplitude below this threshold is considered silence. In decibels.
-		:return: A trimmed sound object.
+		:return: A tuple containing two timestamps: One near the start of the track, one near the end. Both timestamps
+		are relative to the start of the track.
 		"""
 		max_value = (2 ** (self.sample_size * 8 - 1))
 		threshold_value = 10 ** (threshold / 20) * max_value
@@ -159,7 +160,16 @@ class Sound:
 				break
 			end_trim -= slice_size
 
-		logging.debug(f"Trimmed {round(start_trim, 2)}s from the start, {round(self.duration() - end_trim, 2)}s of silence from the end of the track.")
+		logging.debug(f"Silence is {round(start_trim, 2)}s from the start, {round(self.duration() - end_trim, 2)}s from the end of the track.")
+		return (start_trim, end_trim)
+
+	def trim_silence(self, threshold: float=-64.0) -> "Sound":
+		"""
+		Remove parts of silence from the start and end of this sound.
+		:param threshold: Audio amplitude below this threshold is considered silence. In decibels.
+		:return: A trimmed sound object.
+		"""
+		start_trim, end_trim = self.detect_silence(threshold)
 		return self[start_trim:end_trim]
 
 	def to_mono(self) -> "Sound":
