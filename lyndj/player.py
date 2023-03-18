@@ -264,6 +264,18 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		return self.current_cut_end - self.current_cut_start
 
+	@PySide6.QtCore.Property(float, notify=song_changed)
+	def current_total_duration(self) -> float:
+		"""
+		Get the duration of the current song in its original form, without being cut, in seconds.
+
+		If there is no current song playing, this returns 0.
+		:return: The duration of the current song without being cut, in seconds.
+		"""
+		if Player.current_track is None:
+			return 0
+		return Player.current_track.duration()
+
 	@PySide6.QtCore.Property(str, notify=song_changed)
 	def current_title(self) -> str:
 		"""

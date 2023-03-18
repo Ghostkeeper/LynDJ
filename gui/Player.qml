@@ -153,6 +153,50 @@ Rectangle {
 			field: "volume_waypoints"
 		}
 
+		//Left clip.
+		Widgets.ColourImage {
+			id: left_clip
+			anchors {
+				left: parent.left
+				bottom: parent.bottom
+			}
+			width: Lyn.Player.current_cut_start / Lyn.Player.current_total_duration * parent.width
+
+			colour: Lyn.Theme.colour["foreground"]
+			source: Lyn.Theme.icon["clip_bar"]
+		}
+		Widgets.ColourImage {
+			anchors {
+				right: left_clip.right
+				bottom: left_clip.bottom
+			}
+
+			colour: Lyn.Theme.colour["foreground"]
+			source: Lyn.Theme.icon["clip_start"]
+		}
+
+		//Right clip.
+		Widgets.ColourImage {
+			id: right_clip
+			anchors {
+				right: parent.right
+				bottom: parent.bottom
+			}
+			width: (Lyn.Player.current_total_duration - Lyn.Player.current_cut_end) / Lyn.Player.current_total_duration * parent.width
+
+			colour: Lyn.Theme.colour["foreground"]
+			source: Lyn.Theme.icon["clip_bar"]
+		}
+		Widgets.ColourImage {
+			anchors {
+				right: right_clip.left
+				bottom: right_clip.bottom
+			}
+
+			colour: Lyn.Theme.colour["foreground"]
+			source: Lyn.Theme.icon["clip_end"]
+		}
+
 		//Progress indicator.
 		Item {
 			id: progress_indicator
