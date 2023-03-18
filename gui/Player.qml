@@ -160,19 +160,30 @@ Rectangle {
 				left: parent.left
 				bottom: parent.bottom
 			}
-			width: Lyn.Player.current_cut_start / Lyn.Player.current_total_duration * parent.width
+			height: left_clip_handle.height
+			width: left_clip_handle.x + left_clip_handle.width
 
 			colour: Lyn.Theme.colour["foreground"]
 			source: Lyn.Theme.icon["clip_bar"]
 		}
 		Widgets.ColourImage {
-			anchors {
-				right: left_clip.right
-				bottom: left_clip.bottom
-			}
+			id: left_clip_handle
+			anchors.bottom: left_clip.bottom
+			x: Lyn.Player.current_cut_start / Lyn.Player.current_total_duration * parent.width - width
 
 			colour: Lyn.Theme.colour["foreground"]
 			source: Lyn.Theme.icon["clip_start"]
+
+			MouseArea { //Allow dragging.
+				anchors.fill: parent
+
+				cursorShape: Qt.SizeHorCursor
+				drag.target: left_clip_handle
+				drag.axis: Drag.XAxis
+				drag.minimumX: -width
+				drag.maximumX: right_clip_handle.x - width
+				drag.threshold: 0
+			}
 		}
 
 		//Right clip.
@@ -182,19 +193,30 @@ Rectangle {
 				right: parent.right
 				bottom: parent.bottom
 			}
-			width: (Lyn.Player.current_total_duration - Lyn.Player.current_cut_end) / Lyn.Player.current_total_duration * parent.width
+			height: right_clip_handle.height
+			width: parent.width - right_clip_handle.x
 
 			colour: Lyn.Theme.colour["foreground"]
 			source: Lyn.Theme.icon["clip_bar"]
 		}
 		Widgets.ColourImage {
-			anchors {
-				right: right_clip.left
-				bottom: right_clip.bottom
-			}
+			id: right_clip_handle
+			anchors.bottom: right_clip.bottom
+			x: Lyn.Player.current_cut_end / Lyn.Player.current_total_duration * parent.width
 
 			colour: Lyn.Theme.colour["foreground"]
 			source: Lyn.Theme.icon["clip_end"]
+
+			MouseArea { //Allow dragging.
+				anchors.fill: parent
+
+				cursorShape: Qt.SizeHorCursor
+				drag.target: right_clip_handle
+				drag.axis: Drag.XAxis
+				drag.minimumX: left_clip_handle.x + left_clip_handle.width
+				drag.maximumX: parent.parent.width
+				drag.threshold: 0
+			}
 		}
 
 		//Progress indicator.
