@@ -118,32 +118,8 @@ Rectangle {
 		}
 	}
 
-	//Fourier image above the progress indicator.
-	Widgets.ScreenImage {
-		id: fourier
-		anchors {
-			right: progress_indicator.right
-			left: progress_indicator.left
-			bottom: progress_indicator.top
-			top: parent.top
-			topMargin: Lyn.Theme.size["margin"].height
-		}
-
-		colour: Lyn.Theme.colour["foreground"]
-		source: Lyn.Player.current_fourier
-	}
-
-	//Waypoints timeline.
-	Lyn.WaypointsTimeline {
-		id: volume_timeline
-		anchors.fill: fourier
-		path: Lyn.Player.currentPath
-		field: "volume_waypoints"
-	}
-
-	//Progress indicator.
+	//Containing progress indicators and Fourier image.
 	Item {
-		id: progress_indicator
 		anchors {
 			right: play_stop_button.left
 			rightMargin: Lyn.Theme.size["margin"].width
@@ -151,65 +127,94 @@ Rectangle {
 			leftMargin: Lyn.Theme.size["margin"].width
 			bottom: parent.bottom
 			bottomMargin: Lyn.Theme.size["margin"].height
+			top: parent.top
+			topMargin: Lyn.Theme.size["margin"].height
 		}
-		height: progress_hook.height
 
-		Widgets.ColourImage {
-			id: progress_bar
-			width: 0
+		//Fourier image above the progress indicator.
+		Widgets.ScreenImage {
+			id: fourier
+			anchors {
+				left: parent.left
+				right: parent.right
+				top: parent.top
+				bottom: progress_indicator.top
+			}
 
 			colour: Lyn.Theme.colour["foreground"]
-			source: Lyn.Theme.icon["progress_bar"]
+			source: Lyn.Player.current_fourier
+		}
 
-			NumberAnimation on width {
-				id: progress_animation
-				from: 0
-				to: progress_indicator.width
-				duration: Lyn.Player.current_duration * 1000
-				running: Lyn.Player.is_playing
+		//Waypoints timeline.
+		Lyn.WaypointsTimeline {
+			id: volume_timeline
+			anchors.fill: fourier
+			path: Lyn.Player.currentPath
+			field: "volume_waypoints"
+		}
 
-				readonly property var __: Connections { //NumberAnimation cannot have child elements. Store this in a property. It still works.
-					target: Lyn.Player
-					function onSong_changed() {
-						progress_animation.restart();
-					}
-					function onIs_playingChanged() {
-						progress_animation.restart();
-						progress_animation.running = Lyn.Player.is_playing;
+		//Progress indicator.
+		Item {
+			id: progress_indicator
+			anchors {
+				left: parent.left
+				right: parent.right
+				bottom: parent.bottom
+			}
+			height: progress_hook.height
+
+			Widgets.ColourImage {
+				id: progress_bar
+				width: 0
+
+				colour: Lyn.Theme.colour["foreground"]
+				source: Lyn.Theme.icon["progress_bar"]
+
+				NumberAnimation on width {
+					id: progress_animation
+					from: 0
+					to: progress_indicator.width
+					duration: Lyn.Player.current_duration * 1000
+					running: Lyn.Player.is_playing
+
+					readonly property var __: Connections { //NumberAnimation cannot have child elements. Store this in a property. It still works.
+						target: Lyn.Player
+						function onSong_changed() {
+							progress_animation.restart();
+						}
+						function onIs_playingChanged() {
+							progress_animation.restart();
+							progress_animation.running = Lyn.Player.is_playing;
+						}
 					}
 				}
 			}
-		}
-		Widgets.ColourImage { //Hook at the end of the progress bar.
-			id: progress_hook
-			anchors.horizontalCenter: progress_bar.right
+			Widgets.ColourImage { //Hook at the end of the progress bar.
+				id: progress_hook
+				anchors.horizontalCenter: progress_bar.right
 
-			visible: Lyn.Player.is_playing
-			colour: Lyn.Theme.colour["foreground"]
-			source: Lyn.Theme.icon["progress_end"]
-		}
-		//Progress marker overlaying the fourier timeline.
-		Rectangle {
-			anchors {
-				horizontalCenter: progress_hook.horizontalCenter
-				bottom: progress_hook.top
+				visible: Lyn.Player.is_playing
+				colour: Lyn.Theme.colour["foreground"]
+				source: Lyn.Theme.icon["progress_end"]
 			}
-			width: 2
-			height: fourier.height
+			//Progress marker overlaying the fourier timeline.
+			Rectangle {
+				anchors {
+					horizontalCenter: progress_hook.horizontalCenter
+					bottom: progress_hook.top
+				}
+				width: 2
+				height: fourier.height
 
-			visible: Lyn.Player.is_playing
-			color: Lyn.Theme.colour["translucent_foreground"]
+				visible: Lyn.Player.is_playing
+				color: Lyn.Theme.colour["translucent_foreground"]
+			}
 		}
-	}
 
-	Text
-	{
-		anchors {
-			left: fourier.left
-			top: fourier.top
+		Text
+		{
+			font: Lyn.Theme.font["title"]
+			text: Lyn.Player.current_title
 		}
-
-		font: Lyn.Theme.font["title"]
-		text: Lyn.Player.current_title
 	}
 }
