@@ -201,8 +201,8 @@ Rectangle {
 		Item {
 			id: progress_indicator
 			anchors {
-				left: parent.left
-				right: parent.right
+				left: left_clip.right
+				right: right_clip.left
 				bottom: parent.bottom
 			}
 			height: progress_hook.height
