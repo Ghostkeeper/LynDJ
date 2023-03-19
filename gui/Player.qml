@@ -163,6 +163,7 @@ Rectangle {
 			height: left_clip_handle.height
 			width: left_clip_handle.x + left_clip_handle.width
 
+			visible: Lyn.Player.current_total_duration !== 0
 			colour: Lyn.Theme.colour["foreground"]
 			source: Lyn.Theme.icon["clip_bar"]
 		}
@@ -171,12 +172,14 @@ Rectangle {
 			anchors.bottom: left_clip.bottom
 			x: Lyn.Player.current_cut_start / Lyn.Player.current_total_duration * parent.width - width
 
+			visible: Lyn.Player.current_total_duration !== 0
 			colour: Lyn.Theme.colour["foreground"]
 			source: Lyn.Theme.icon["clip_start"]
 
 			MouseArea { //Allow dragging.
 				anchors.fill: parent
 
+				enabled: parent.visible
 				cursorShape: Qt.SizeHorCursor
 				drag.target: left_clip_handle
 				drag.axis: Drag.XAxis
@@ -196,6 +199,7 @@ Rectangle {
 			height: right_clip_handle.height
 			width: parent.width - right_clip_handle.x
 
+			visible: Lyn.Player.current_total_duration !== 0
 			colour: Lyn.Theme.colour["foreground"]
 			source: Lyn.Theme.icon["clip_bar"]
 		}
@@ -204,12 +208,14 @@ Rectangle {
 			anchors.bottom: right_clip.bottom
 			x: Lyn.Player.current_cut_end / Lyn.Player.current_total_duration * parent.width
 
+			visible: Lyn.Player.current_total_duration !== 0
 			colour: Lyn.Theme.colour["foreground"]
 			source: Lyn.Theme.icon["clip_end"]
 
 			MouseArea { //Allow dragging.
 				anchors.fill: parent
 
+				enabled: parent.visible
 				cursorShape: Qt.SizeHorCursor
 				drag.target: right_clip_handle
 				drag.axis: Drag.XAxis
