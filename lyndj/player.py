@@ -276,6 +276,18 @@ class Player(PySide6.QtCore.QObject):
 			return 0
 		return Player.current_track.duration()
 
+	@PySide6.QtCore.Slot(result=float)
+	def current_progress(self) -> float:
+		"""
+		Get the current song's progress, as a fraction between 0 (the song just started) and 1 (the song completed).
+
+		If there is no current song playing, this returns -1.
+		:return: The current song's progress.
+		"""
+		if Player.current_track is None:
+			return -1
+		return (lyndj.playback.current_position - self.current_cut_start) / self.current_duration
+
 	@PySide6.QtCore.Property(str, notify=song_changed)
 	def current_title(self) -> str:
 		"""
