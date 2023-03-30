@@ -10,7 +10,7 @@ Main features
 * The interface is designed to prevent accidentally starting/stopping playback, for use with fiddly touch pads.
 * Select music from your library, and create a playlist.
 * Control volume for playback, and store these volume changes for future play-throughs of that track.
-* Track metadata on tracks such as BPM, recording age, style, energy level and wen it was last played.
+* Track metadata on tracks such as BPM, recording age, style, energy level and when it was last played.
 * Sort your library by any metadata.
 * Set an end time for your session and get a warning when that time is approaching.
 * A frequency spectrograph to visualise upcoming musical cues.
@@ -33,6 +33,21 @@ Installation
 ------------
 There are several ways to install this application onto your computer. This outlines your options, from easy to hard. Each option includes instructions for various platforms. If your platform is not listed, please select the most similar platform (e.g. for Arch Linux, installation is probably similar to Ubuntu). Note that the instructions are written for a clean installation of the operating system. You might already have some of the prerequisites installed.
 
+<details>
+<summary>AppImage: Ubuntu 22.04</summary>
+
+1. Download the latest AppImage file from the [releases](https://github.com/Ghostkeeper/LynDJ/releases/latest) of this repository.
+2. Make the downloaded file executable by right-clicking on it, selecting "Properties" and under the "Permissions" tab checking the checkbox for "Allow executing file as program". Close the properties window.
+3. Double-click the AppImage file in order to launch the application.
+</details>
+<details>
+<summary>Installer: Windows 10</summary>
+
+1. Download the latest installer from the [releases](https://github.com/Ghostkeeper/LynDJ/releases/latest) of this repository.
+2. Double-click the downloaded file to launch the installer.
+3. Progress through the steps outlined by the installer. It will ask you where to install the application. For the default location in Program Files, administrator rights will be needed.
+4. At the end of the installation process, find the application in your start menu to launch it.
+</details>
 <details>
 <summary>From source: Ubuntu 22.04</summary>
 
