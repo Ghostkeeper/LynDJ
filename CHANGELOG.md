@@ -5,6 +5,11 @@ In this update, some bugs were fixed that got brought up when the application wa
 New features:
 * Added a system to upgrade configuration files when first running a new version of the application.
 * When the configuration files are incompatible or corrupt, a dialogue will be shown at start-up to ask the user what to do about it.
+* You can now manually adjust the trimming of audio from the start and end of each track.
+  * The default for this trim is the automatic silence detection, so the default behaviour is the same.
+  * The trim is shown with caliper-like sliders across the bottom of the window.
+  * As a background task, the trim is pre-calculated and stored. This improves performance when starting playback of a new track.
+  * To facilitate changing the trimming, the silence is now included in the spectrograph. Spectrograph should be re-generated for this version.
 
 Bug fixes:
 * Rapidly restarting the music after stopping it will no longer continue the fade-out.
