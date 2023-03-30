@@ -16,6 +16,7 @@ Main features
 * A frequency spectrograph to visualise upcoming musical cues.
 * Toggling between mono and stereo, for use with bad speaker set-ups.
 * An Auto-DJ will suggest the next track to play.
+* Trim silence from tracks automatically, or manually cut from the start or end of each track.
 
 Support
 -------
