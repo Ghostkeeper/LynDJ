@@ -95,7 +95,7 @@ For usage instructions, please refer to [the documentation](doc/usage.md).
 
 Build
 -----
-These are instructions to create a release build of this software.
+If you wish to modify this application, you can run the application from the source code as outlined above. However to distribute your modifications you can also create a build, which will make it easier for other people to install the application with your modifications. These are instructions to create a release build of this software.
 
 <details>
 <summary>Ubuntu 22.04</summary>
