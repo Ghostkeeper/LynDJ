@@ -51,6 +51,7 @@ class MusicControl:
 		song_end_timer.setSingleShot(True)
 		song_end_timer.timeout.connect(self.song_ends)
 		self.events.append(song_end_timer)
+		self.song_end_timer_index = 0
 
 		# Volume transitions.
 		volume_waypoints = lyndj.metadata.get(path, "volume_waypoints")
@@ -131,6 +132,23 @@ class MusicControl:
 		self.events.append(timer)
 		for event in self.events:
 			event.start()
+
+	def set_song_ends(self, duration: float) -> None:
+		"""
+		Change the point at which the song is set to end.
+
+		The song will be considered to end in the given amount of time, approximately from the moment that this function
+		is called.
+		:param duration: How much time until the song is supposed to end, in seconds.
+		"""
+		self.events[self.song_end_timer_index].stop()  # Cancel the old timer.
+		pause_between_songs = lyndj.preferences.Preferences.get_instance().get("player/silence") * 1000
+		song_end_timer = PySide6.QtCore.QTimer()
+		song_end_timer.setInterval(round(duration * 1000 + pause_between_songs))
+		song_end_timer.setSingleShot(True)
+		song_end_timer.timeout.connect(self.song_ends)
+		self.events[self.song_end_timer_index] = song_end_timer  # Replace the old one.
+		song_end_timer.start()
 
 	def song_ends(self) -> None:
 		"""

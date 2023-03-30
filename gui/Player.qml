@@ -120,6 +120,7 @@ Rectangle {
 
 	//Containing progress indicators and Fourier image.
 	Item {
+		id: player_progress
 		anchors {
 			right: play_stop_button.left
 			rightMargin: Lyn.Theme.size["margin"].width
@@ -170,7 +171,6 @@ Rectangle {
 		Widgets.ColourImage {
 			id: left_clip_handle
 			anchors.bottom: left_clip.bottom
-			x: Lyn.Player.current_cut_start / Lyn.Player.current_total_duration * parent.width - width
 
 			visible: Lyn.Player.current_total_duration !== 0
 			colour: Lyn.Theme.colour["foreground"]
@@ -186,6 +186,18 @@ Rectangle {
 				drag.minimumX: -width
 				drag.maximumX: right_clip_handle.x - width
 				drag.threshold: 0
+			}
+
+			Connections {
+				target: Lyn.Player
+				function onSong_changed() {
+					left_clip_handle.x = Lyn.Player.current_cut_start / Lyn.Player.current_total_duration * player_progress.width - left_clip_handle.width;
+				}
+			}
+
+			onXChanged:
+			{
+				Lyn.Player.current_cut_start = (x + width) / parent.width * Lyn.Player.current_total_duration;
 			}
 		}
 
@@ -206,7 +218,7 @@ Rectangle {
 		Widgets.ColourImage {
 			id: right_clip_handle
 			anchors.bottom: right_clip.bottom
-			x: Lyn.Player.current_cut_end / Lyn.Player.current_total_duration * parent.width
+			//x: Lyn.Player.current_cut_end / Lyn.Player.current_total_duration * parent.width
 
 			visible: Lyn.Player.current_total_duration !== 0
 			colour: Lyn.Theme.colour["foreground"]
@@ -222,6 +234,18 @@ Rectangle {
 				drag.minimumX: left_clip_handle.x + left_clip_handle.width
 				drag.maximumX: parent.parent.width
 				drag.threshold: 0
+			}
+
+			Connections {
+				target: Lyn.Player
+				function onSong_changed() {
+					right_clip_handle.x = Lyn.Player.current_cut_end / Lyn.Player.current_total_duration * player_progress.width;
+				}
+			}
+
+			onXChanged:
+			{
+				Lyn.Player.current_cut_end = x / parent.width * Lyn.Player.current_total_duration;
 			}
 		}
 
@@ -242,6 +266,25 @@ Rectangle {
 				colour: Lyn.Theme.colour["foreground"]
 				source: Lyn.Theme.icon["progress_bar"]
 
+				Connections {
+					target: Lyn.Player
+					function onCurrent_cut_start_changed() {
+						let progress = Lyn.Player.current_progress();
+						progress_animation.from = progress * player_progress.width - left_clip.width;
+						progress_animation.duration = (Lyn.Player.current_cut_end - Lyn.Player.current_total_duration * progress) * 1000;
+						progress_animation.restart();
+					}
+					function onCurrent_cut_end_changed() {
+						let progress = Lyn.Player.current_progress();
+						progress_animation.from = progress * player_progress.width - left_clip.width;
+						let new_duration = (Lyn.Player.current_cut_end - Lyn.Player.current_total_duration * progress) * 1000;
+						if(new_duration >= 0) {
+							progress_animation.duration = new_duration;
+						}
+						progress_animation.restart();
+					}
+				}
+
 				NumberAnimation on width {
 					id: progress_animation
 					from: 0
@@ -251,9 +294,6 @@ Rectangle {
 
 					readonly property var __: Connections { //NumberAnimation cannot have child elements. Store this in a property. It still works.
 						target: Lyn.Player
-						function onSong_changed() {
-							progress_animation.restart();
-						}
 						function onIs_playingChanged() {
 							progress_animation.restart();
 							progress_animation.running = Lyn.Player.is_playing;

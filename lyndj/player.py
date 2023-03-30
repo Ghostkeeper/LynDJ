@@ -154,7 +154,6 @@ class Player(PySide6.QtCore.QObject):
 
 		decoded = miniaudio.decode_file(next_song)
 		Player.current_track = lyndj.sound.Sound(decoded.samples.tobytes(), sample_size=decoded.sample_width, channels=decoded.nchannels, frame_rate=decoded.sample_rate)
-		Player.control_track = lyndj.music_control.MusicControl(next_song, Player.current_track, self)
 
 		cut_start = lyndj.metadata.get(next_song, "cut_start")
 		cut_end = lyndj.metadata.get(next_song, "cut_end")
@@ -163,6 +162,8 @@ class Player(PySide6.QtCore.QObject):
 			lyndj.metadata.change(next_song, "cut_start", cut_start)
 			lyndj.metadata.change(next_song, "cut_end", cut_end)
 			lyndj.metadata.change(next_song, "duration", cut_end - cut_start)
+
+		Player.control_track = lyndj.music_control.MusicControl(next_song, Player.current_track, self)
 
 		fourier_file = lyndj.metadata.get(next_song, "fourier")
 		if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
@@ -177,7 +178,9 @@ class Player(PySide6.QtCore.QObject):
 		self.song_changed.emit()  # We loaded up a new song.
 		Player.start_time = time.time()
 		lyndj.playback.current_position = cut_start
+		self.current_cut_start_changed.emit()
 		lyndj.playback.end_position = cut_end
+		self.current_cut_end_changed.emit()
 		lyndj.playback.play(Player.current_track)
 		Player.control_track.play()
 
@@ -224,7 +227,24 @@ class Player(PySide6.QtCore.QObject):
 		fourier_path = lyndj.metadata.get(current_path, "fourier")
 		return PySide6.QtCore.QUrl.fromLocalFile(fourier_path)
 
-	@PySide6.QtCore.Property(float, notify=song_changed)
+	current_cut_start_changed = PySide6.QtCore.Signal()
+	"""
+	Triggered when the song changes as well as when the current start cut changes.
+	"""
+
+	def set_current_cut_start(self, new_cut_start: float) -> None:
+		"""
+		Change the start cut position of the current song.
+		:param new_cut_start: The new start cut position.
+		"""
+		if Player.current_track is None:
+			return  # No track to change.
+		current_path = self.currentPath
+		if new_cut_start != lyndj.metadata.get(current_path, "cut_start"):
+			lyndj.metadata.change(current_path, "cut_start", new_cut_start)
+		self.current_cut_start_changed.emit()
+
+	@PySide6.QtCore.Property(float, fset=set_current_cut_start, notify=current_cut_start_changed)
 	def current_cut_start(self) -> float:
 		"""
 		Get the start cut position of the current song, in seconds.
@@ -239,7 +259,28 @@ class Player(PySide6.QtCore.QObject):
 		current_path = self.currentPath
 		return lyndj.metadata.get(current_path, "cut_start")
 
-	@PySide6.QtCore.Property(float, notify=song_changed)
+	current_cut_end_changed = PySide6.QtCore.Signal()
+	"""
+	Triggered when the song changes as well as when teh current end cut changes.
+	"""
+
+	def set_current_cut_end(self, new_cut_end: float) -> None:
+		"""
+		Change the end cut position of the current song.
+		:param new_cut_end: The new end cut position.
+		"""
+		if Player.current_track is None:
+			return  # No track to change.
+		current_path = self.currentPath
+		lyndj.metadata.change(current_path, "cut_end", new_cut_end)  # Change the metadata for next time.
+		if new_cut_end < lyndj.playback.current_position:  # Cut is moved before our current playback. Stop immediately.
+			self.play_next()
+		else:
+			lyndj.playback.end_position = new_cut_end  # Change the end position in the playback so that the sound stops.
+			Player.control_track.set_song_ends(new_cut_end - lyndj.playback.current_position)  # In the music control track, adjust the song-ends event so that the next song plays.
+			self.current_cut_end_changed.emit()
+
+	@PySide6.QtCore.Property(float, fset=set_current_cut_end, notify=current_cut_end_changed)
 	def current_cut_end(self) -> float:
 		"""
 		Get the end cut position of the current song, in seconds.
@@ -281,12 +322,16 @@ class Player(PySide6.QtCore.QObject):
 		"""
 		Get the current song's progress, as a fraction between 0 (the song just started) and 1 (the song completed).
 
+		The start and end cuts of the song are not taken into account. If they change, this progress will not be changed
+		along. This is necessary since the cut positions may change during the playback of the song, but the progress
+		bar must remain stable.
+
 		If there is no current song playing, this returns -1.
 		:return: The current song's progress.
 		"""
 		if Player.current_track is None:
 			return -1
-		return (lyndj.playback.current_position - self.current_cut_start) / self.current_duration
+		return lyndj.playback.current_position / self.current_total_duration
 
 	@PySide6.QtCore.Property(str, notify=song_changed)
 	def current_title(self) -> str:
