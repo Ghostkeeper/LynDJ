@@ -10,7 +10,6 @@ A collection of functions that generate spectrograph images of music tracks.
 
 import logging
 import math  # Transformation into log space for more human-oriented display in the result images.
-import miniaudio  # To load waveforms of audio files.
 import numpy  # For fast operations on waveform data.
 import os.path  # To find and store Fourier images in the cache.
 import PySide6.QtGui  # The resulting spectrograph images are stored in this format.
@@ -22,27 +21,21 @@ import lyndj.preferences  # To get parameters on how to generate Fourier images.
 import lyndj.sound  # To store waveforms of audio tracks.
 import lyndj.storage  # To find and store Fourier images in the cache.
 
-def load_and_generate_fourier(path: str) -> None:
+def generate_and_save_fourier(path: str, sound: lyndj.sound.Sound) -> None:
 	"""
-	Load a sound waveform and generate a Fourier image with it.
+	Generate a Fourier image for a sound and store it in the database.
 
-	This is less efficient than generating a Fourier image from an already loaded sound. The waveform is discarded
-	afterwards.
 	The resulting Fourier image is stored on disk, to be cached for later use.
 	If there is already a Fourier image for this sound, it is not re-generated.
 	:param path: The path to the file we're generating the Fourier transform for.
+	:param sound: The sound to generate the Fourier transform of.
 	"""
 	logging.debug(f"Caching Fourier image for {path}")
-	fourier_file = lyndj.metadata.get(path, "fourier")
-	if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
-		decoded = miniaudio.decode_file(path)
-		segment = lyndj.sound.Sound(decoded.samples.tobytes(), sample_size=decoded.sample_width, channels=decoded.nchannels, frame_rate=decoded.sample_rate)
-		segment = segment.trim_silence()
-		fourier = generate_fourier(segment, path)
-		filename = os.path.splitext(os.path.basename(path))[0] + uuid.uuid4().hex[:8] + ".png"  # File's filename, but with an 8-character random string to prevent collisions.
-		filepath = os.path.join(lyndj.storage.cache(), "fourier", filename)
-		fourier.save(filepath)
-		lyndj.metadata.change(path, "fourier", filepath)
+	fourier = generate_fourier(sound, path)
+	filename = os.path.splitext(os.path.basename(path))[0] + uuid.uuid4().hex[:8] + ".png"  # File's filename, but with an 8-character random string to prevent collisions.
+	filepath = os.path.join(lyndj.storage.cache(), "fourier", filename)
+	fourier.save(filepath)
+	lyndj.metadata.change(path, "fourier", filepath)
 
 def generate_fourier(sound: lyndj.sound.Sound, path: str) -> PySide6.QtGui.QImage:
 	"""

@@ -6,6 +6,7 @@
 
 import logging
 import math  # To format track duration.
+import miniaudio  # To load waveforms of audio files for pre-processing.
 import os  # To list files in the music directory.
 import os.path  # To list file paths in the music directory.
 import PySide6.QtCore  # To expose this table to QML, and get the standard music directory.
@@ -18,6 +19,7 @@ import lyndj.metadata  # To get information about the files in the music directo
 import lyndj.player  # To cache Fourier images of the tracks in this directory.
 import lyndj.preferences  # To store the sorting order.
 import lyndj.sorting  # To invert a sorting order.
+import lyndj.sound  # To pre-process audio files.
 
 class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 	"""
@@ -217,12 +219,28 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 
 		self._directory = new_directory
 
-		# Add background tasks for caching Fourier images.
-		tasks = lyndj.background_tasks.BackgroundTasks.get_instance()
-		for path in files:
+		# Add background tasks for pre-processing tracks.
+		def preprocess(path: str) -> None:
+			"""
+			Pre-process a single track.
+			:param path: The path to the audio file to pre-process.
+			"""
+			decoded = miniaudio.decode_file(path)
+			segment = lyndj.sound.Sound(decoded.samples.tobytes(), sample_size=decoded.sample_width, channels=decoded.nchannels, frame_rate=decoded.sample_rate)
+
 			fourier_file = lyndj.metadata.get(path, "fourier")
 			if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
-				tasks.add(lambda p=path: lyndj.fourier.load_and_generate_fourier(p), "Generating spectrograph", allow_during_playback=False)
+				lyndj.fourier.generate_and_save_fourier(path, segment)
+			cut_start = lyndj.metadata.get(path, "cut_start")
+			cut_end = lyndj.metadata.get(path, "cut_end")
+			if cut_start is None or cut_start == -1 or cut_end is None or cut_end == -1:
+				cut_start, cut_end = segment.detect_silence()
+				lyndj.metadata.change(path, "cut_start", cut_start)
+				lyndj.metadata.change(path, "cut_end", cut_end)
+
+		tasks = lyndj.background_tasks.BackgroundTasks.get_instance()
+		for path in files:
+			tasks.add(lambda p=path: preprocess(p), "Spectrograph and silence detection", allow_during_playback=False)
 
 	@PySide6.QtCore.Property(str, fset=directory_set)
 	def directory(self) -> str:
