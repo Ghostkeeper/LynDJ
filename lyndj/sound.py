@@ -93,8 +93,8 @@ class Sound:
 		start = max(0.0, min(duration, start))
 		end = max(0.0, min(duration, end))
 		# Convert to positions in the sample array.
-		start = round(start * self.sample_size * self.channels * self.frame_rate)
-		end = round(end * self.sample_size * self.channels * self.frame_rate)
+		start = round(start * self.frame_rate) * self.sample_size * self.channels
+		end = round(end * self.frame_rate) * self.sample_size * self.channels
 		return Sound(self.samples[start:end], self.frame_rate, self.channels, self.sample_size)
 
 	def duration(self) -> float:
@@ -161,7 +161,7 @@ class Sound:
 			end_trim -= slice_size
 
 		logging.debug(f"Silence is {round(start_trim, 2)}s from the start, {round(self.duration() - end_trim, 2)}s from the end of the track.")
-		return (start_trim, end_trim)
+		return start_trim, end_trim
 
 	def trim_silence(self, threshold: float=-64.0) -> "Sound":
 		"""
