@@ -272,13 +272,14 @@ class Player(PySide6.QtCore.QObject):
 		if Player.current_track is None:
 			return  # No track to change.
 		current_path = self.currentPath
-		lyndj.metadata.change(current_path, "cut_end", new_cut_end)  # Change the metadata for next time.
-		if new_cut_end < lyndj.playback.current_position:  # Cut is moved before our current playback. Stop immediately.
-			self.play_next()
-		else:
-			lyndj.playback.end_position = new_cut_end  # Change the end position in the playback so that the sound stops.
-			Player.control_track.set_song_ends(new_cut_end - lyndj.playback.current_position)  # In the music control track, adjust the song-ends event so that the next song plays.
-			self.current_cut_end_changed.emit()
+		if new_cut_end != lyndj.metadata.get(current_path, "cut_end"):
+			lyndj.metadata.change(current_path, "cut_end", new_cut_end)  # Change the metadata for next time.
+			if new_cut_end < lyndj.playback.current_position:  # Cut is moved before our current playback. Stop immediately.
+				self.play_next()
+			else:
+				lyndj.playback.end_position = new_cut_end  # Change the end position in the playback so that the sound stops.
+				Player.control_track.set_song_ends(new_cut_end - lyndj.playback.current_position)  # In the music control track, adjust the song-ends event so that the next song plays.
+				self.current_cut_end_changed.emit()
 
 	@PySide6.QtCore.Property(float, fset=set_current_cut_end, notify=current_cut_end_changed)
 	def current_cut_end(self) -> float:
