@@ -116,6 +116,7 @@ def play_loop() -> None:
 				current_channels = chunk.channels
 				stream = audio_server.open(format=audio_server.get_format_from_width(current_sample_width), rate=current_rate, channels=current_channels, output=True)
 			if current_position >= end_position:  # Playback completed. Stop taking the GIL and go into stand-by.
+				current_position = 0
 				audio_source = None
 				continue
 			stream.write(chunk.samples)
