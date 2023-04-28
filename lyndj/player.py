@@ -272,6 +272,8 @@ class Player(PySide6.QtCore.QObject):
 		if Player.current_track is None:
 			return  # No track to change.
 		current_path = self.currentPath
+		if lyndj.metadata.get(current_path, "cut_end") == new_cut_end:  # No change.
+			return
 		lyndj.metadata.change(current_path, "cut_end", new_cut_end)  # Change the metadata for next time.
 		if new_cut_end < lyndj.playback.current_position:  # Cut is moved before our current playback. Stop immediately.
 			self.play_next()
