@@ -225,14 +225,17 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			Pre-process a single track.
 			:param path: The path to the audio file to pre-process.
 			"""
+			fourier_file = lyndj.metadata.get(path, "fourier")
+			cut_start = lyndj.metadata.get(path, "cut_start")
+			cut_end = lyndj.metadata.get(path, "cut_end")
+			if fourier_file != "" and os.path.exists(fourier_file) and cut_start is not None and cut_start != -1 and cut_end is not None and cut_end != -1:
+				return  # These were computed in the meanwhile. Perhaps the song played in the meanwhile.
+
 			decoded = miniaudio.decode_file(path)
 			segment = lyndj.sound.Sound(decoded.samples.tobytes(), sample_size=decoded.sample_width, channels=decoded.nchannels, frame_rate=decoded.sample_rate)
 
-			fourier_file = lyndj.metadata.get(path, "fourier")
 			if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
 				lyndj.fourier.generate_and_save_fourier(path, segment)
-			cut_start = lyndj.metadata.get(path, "cut_start")
-			cut_end = lyndj.metadata.get(path, "cut_end")
 			if cut_start is None or cut_start == -1 or cut_end is None or cut_end == -1:
 				cut_start, cut_end = segment.detect_silence()
 				lyndj.metadata.change(path, "cut_start", cut_start)
