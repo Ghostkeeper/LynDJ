@@ -352,6 +352,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 			logging.error("Trying to end a transition before starting it.")
 			return
 		current_time = time.time() - lyndj.player.Player.start_time
+		if current_time < 10:  # Most likely, the user intended to adjust the starting volume.
+			self.ongoing_transition_start_time = 0
+			current_time = 0.1
 		logging.debug(f"Ending transition from {self.ongoing_transition_start_time} to {current_time}, level {end_level}.")
 		self.add_transition(self.ongoing_transition_start_time, current_time, end_level)
 		self.ongoing_transition_start_time = None  # Reset this one for the next transition.
