@@ -260,16 +260,16 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		"""
 		# First find where in the current set of transitions this new transition starts.
 		for pos_start in range(len(self.waypoints)):
-			if self.waypoints[pos_start][0] > time_start:
+			if self.waypoints[pos_start][0] >= time_start:
 				break  # Insert before this waypoint.
 		else:
 			pos_start = len(self.waypoints)
 
 		# Test whether this waypoint is within a transition or in between transitions.
 		if pos_start == 0:
-			starts_within = False  # Before the first waypoint is never inside of a transition.
+			starts_within = False  # Before the first waypoint is never inside a transition.
 		elif pos_start == len(self.waypoints):
-			starts_within = False  # After the last waypoint is never inside of a transition.
+			starts_within = False  # After the last waypoint is never inside a transition.
 		elif self.waypoints[pos_start - 1][1] == self.waypoints[pos_start][1]:
 			starts_within = False  # If the levels around the new waypoint are the same, that's not within a transition.
 		else:
@@ -284,6 +284,15 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		if pos_end != 0 and pos_end != len(self.waypoints) and self.waypoints[pos_end - 1][1] != self.waypoints[pos_end][1]:
 			pos_end += 1
 
+		# Test whether the end is within a transition or in between transitions.
+		if pos_end == 0:
+			ends_within = False  # Before the first waypoint is never inside a transition.
+		elif pos_end == len(self.waypoints):
+			ends_within = False  # After the last waypoint is never inside a transition.
+		elif self.waypoints[pos_end - 1][1] == self.waypoints[pos_end][1]:
+			ends_within = False  # If the levels around the waypoint are the same,that's not within a transition.
+		else:
+			ends_within = True
 
 		# Figure out the starting level.
 		if pos_start == 0:  # Must be the starting level then, i.e. the starting level of the first transition.
@@ -300,7 +309,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 			level_start = self.waypoints[pos_start - 1][1]  # (Actually, do take before since it might also be after the last one.)
 
 		# If there are waypoints afterwards, adjust the next waypoint to honour the new current volume.
-		if pos_end < len(self.waypoints) - 1 and self.waypoints[pos_end - 1][1] == self.waypoints[pos_end][1]:
+		if pos_end < len(self.waypoints) - 1 and not ends_within:
 			self.waypoints[pos_end] = (self.waypoints[pos_end][0], level_end)
 
 		# Remove the waypoints that would get overridden.
