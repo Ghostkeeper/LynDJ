@@ -26,37 +26,22 @@ class Sound:
 		:param right: The right audio channel.
 		:return: A combined stereo channel.
 		"""
-		assert left.channels == 1
-		assert right.channels == 1
+		assert len(left.samples) == 1
+		assert len(right.samples) == 1
 		assert left.frame_rate == right.frame_rate
-		assert left.sample_size == right.sample_size
-		assert len(left.samples) == len(right.samples)
+		assert len(left.samples[0]) == len(right.samples[0])
 
-		new_data = bytes(len(left.samples) * 2)
-		new_data[0::2] = left.samples
-		new_data[1::2] = right.samples
-		return Sound(new_data, frame_rate=left.frame_rate, channels=2, sample_size=left.sample_size)
+		return Sound([left.samples[0], right.samples[0]], frame_rate=left.frame_rate)
 
-	def __init__(self, samples: bytes, frame_rate: int=44100, channels: int=2, sample_size: int=2) -> None:
+	def __init__(self, samples: list[numpy.array], frame_rate: int=44100) -> None:
 		"""
 		Construct a new audio sample using the raw sample data.
-		:param samples: Raw sample data of the audio waveforms. This data enumerates each of the frames in a row. Each
-		frame enumerates the samples for each channel in a row. Each sample is ``sample_size`` bytes.
+		:param samples: Audio signal waveforms. This is a list of arrays, one array of audio data for each channel. Each
+		array enumerates the samples for that channel.
 		:param frame_rate: The number of frames to play per second (Hz).
-		:param channels: The number of audio channels to play. For instance, 2 channels is stereo sound.
-		:param sample_size: The size of each sample in each channel in each frame, in bytes. For instance, a sample size
-		of 2 represents 16-bit audio.
 		"""
-		# If the bytes is not divisible by integer number of frames, cut off the end.
-		bytes_per_frame = sample_size * channels
-		extraneous_bytes = len(samples) % bytes_per_frame
-		if extraneous_bytes > 0:
-			samples = samples[:-extraneous_bytes]
-
 		self.samples = samples
 		self.frame_rate = frame_rate
-		self.channels = channels
-		self.sample_size = sample_size
 
 	def __getitem__(self, index: typing.Union[int, float, slice]) -> "Sound":
 		"""
@@ -93,33 +78,17 @@ class Sound:
 		start = max(0.0, min(duration, start))
 		end = max(0.0, min(duration, end))
 		# Convert to positions in the sample array.
-		start = round(start * self.frame_rate) * self.sample_size * self.channels
-		end = round(end * self.frame_rate) * self.sample_size * self.channels
-		return Sound(self.samples[start:end], self.frame_rate, self.channels, self.sample_size)
+		start = round(start * self.frame_rate)
+		end = round(end * self.frame_rate)
+		clipped = [channel[start:end] for channel in self.samples]
+		return Sound(clipped, self.frame_rate)
 
 	def duration(self) -> float:
 		"""
 		Get the length of the sound, in seconds.
 		:return: How long it takes to play this sound.
 		"""
-		return len(self.samples) / self.sample_size / self.channels / self.frame_rate
-
-	def sample_array(self) -> array.array:
-		"""
-		Get the samples in this sound as an array.
-
-		The array contains each sample as a separate element. The array will have a length of the length of the sample
-		byte array divided by the sample size. The channels are still interweaved in this array.
-		:return: An array of samples.
-		"""
-		size_to_array_type = {
-			1: "b",
-			2: "h",
-			4: "i"
-		}
-		sample_array = array.array(size_to_array_type[self.sample_size])
-		sample_array.frombytes(self.samples)
-		return sample_array
+		return len(self.samples[0]) / self.frame_rate
 
 	def rms(self) -> float:
 		"""
@@ -128,10 +97,11 @@ class Sound:
 		This is a measure of roughly how loud the signal is.
 		:return: The RMS of this sound, in values (not dB, but between 0 and the maximum possible sample value).
 		"""
-		num_samples = len(self.samples) / self.sample_size
-		if num_samples == 0:
-			return 0.0
-		sum_squares = sum(sample ** 2 for sample in self.sample_array())
+		sum_squares = 0
+		num_samples = 0
+		for channel in self.samples:
+			sum_squares += channel.square().sum()
+			num_samples += len(channel)
 		return int(math.sqrt(sum_squares / num_samples))
 
 	def detect_silence(self, threshold: float=-64.0) -> typing.Tuple[float, float]:
@@ -141,7 +111,7 @@ class Sound:
 		:return: A tuple containing two timestamps: One near the start of the track, one near the end. Both timestamps
 		are relative to the start of the track.
 		"""
-		max_value = (2 ** (self.sample_size * 8 - 1))
+		max_value = (2 ** (self.samples[0].dtype.itemsize * 8 - 1))
 		threshold_value = 10 ** (threshold / 20) * max_value
 		slice_size = 0.01  # Break the audio in 10ms slices, to check each slice for its volume.
 
@@ -177,14 +147,14 @@ class Sound:
 		Mix this sound to mono.
 		:return: A new sound with only one channel, where the audio has been mixed to mono.
 		"""
-		if self.channels == 1:  # Already mono.
+		if len(self.samples) == 1:  # Already mono.
 			return self
 
-		waveform_dtype = numpy.byte if self.sample_size == 1 else numpy.short if self.sample_size == 2 else int
-		waveform_numpy = numpy.frombuffer(self.samples, dtype=waveform_dtype)
-		mixed_samples = sum([waveform_numpy[channel::self.channels] // self.channels for channel in range(self.channels)])
-		mixed_data = mixed_samples.tobytes()
-		return Sound(mixed_data, frame_rate=self.frame_rate, channels=1, sample_size=self.sample_size)
+		mixed_channels = numpy.zeros((len(self.samples[0]), ))
+		for channel in self.samples:
+			mixed_channels += channel
+		mixed_channels /= len(self.samples)
+		return Sound([mixed_channels], frame_rate=self.frame_rate)
 
 	def __mul__(self, volume: float) -> "Sound":
 		"""
@@ -192,7 +162,5 @@ class Sound:
 		:param volume: A volume factor.
 		:return: A new sound, with the amplitude multiplied by the given volume factor.
 		"""
-		sample_array = self.sample_array()
-		for i in range(len(sample_array)):
-			sample_array[i] = round(sample_array[i] * volume)
-		return Sound(sample_array.tobytes(), frame_rate=self.frame_rate, channels=self.channels, sample_size=self.sample_size)
+		new_channels = [channel * volume for channel in self.samples]
+		return Sound(new_channels, frame_rate=self.frame_rate)
