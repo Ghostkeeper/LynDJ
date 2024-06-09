@@ -1,10 +1,9 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2024 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
-import array  # For fast operations on wave data.
 import logging
 import math  # To calculate audio RMS.
 import numpy  # For fast operations on wave data.
@@ -14,8 +13,7 @@ class Sound:
 	"""
 	This class represents an audio segment.
 
-	It contains the raw audio data (samples), as well as some metadata on how to interpret it, such as frame rate,
-	number of channels and sample size.
+	It contains the raw audio data (samples), as well as some metadata on how to interpret it, such as frame rate.
 	"""
 
 	@classmethod
@@ -26,21 +24,22 @@ class Sound:
 		:param right: The right audio channel.
 		:return: A combined stereo channel.
 		"""
-		assert len(left.samples) == 1
-		assert len(right.samples) == 1
+		assert len(left.channels) == 1
+		assert len(right.channels) == 1
 		assert left.frame_rate == right.frame_rate
-		assert len(left.samples[0]) == len(right.samples[0])
+		assert len(left.channels[0]) == len(right.channels[0])
 
-		return Sound([left.samples[0], right.samples[0]], frame_rate=left.frame_rate)
+		return Sound([left.channels[0], right.channels[0]], frame_rate=left.frame_rate)
 
-	def __init__(self, samples: list[numpy.array], frame_rate: int=44100) -> None:
+	def __init__(self, channels: list[numpy.array], frame_rate: int=44100) -> None:
 		"""
-		Construct a new audio sample using the raw sample data.
-		:param samples: Audio signal waveforms. This is a list of arrays, one array of audio data for each channel. Each
-		array enumerates the samples for that channel.
+		Construct a new audio clip using the raw sample data.
+		:param channels: Audio signal waveforms. This is a list of arrays, one array of audio data for each channel.
+		Each array enumerates the audio samples for that channel. The data type of these waveforms can vary depending on
+		the bit depth of the audio signal, but should always be integer-based.
 		:param frame_rate: The number of frames to play per second (Hz).
 		"""
-		self.samples = samples
+		self.channels = channels
 		self.frame_rate = frame_rate
 
 	def __getitem__(self, index: typing.Union[int, float, slice]) -> "Sound":
@@ -80,7 +79,7 @@ class Sound:
 		# Convert to positions in the sample array.
 		start = round(start * self.frame_rate)
 		end = round(end * self.frame_rate)
-		clipped = [channel[start:end] for channel in self.samples]
+		clipped = [channel[start:end] for channel in self.channels]
 		return Sound(clipped, self.frame_rate)
 
 	def duration(self) -> float:
@@ -88,7 +87,7 @@ class Sound:
 		Get the length of the sound, in seconds.
 		:return: How long it takes to play this sound.
 		"""
-		return len(self.samples[0]) / self.frame_rate
+		return len(self.channels[0]) / self.frame_rate
 
 	def rms(self) -> float:
 		"""
@@ -99,7 +98,7 @@ class Sound:
 		"""
 		sum_squares = 0
 		num_samples = 0
-		for channel in self.samples:
+		for channel in self.channels:
 			sum_squares += channel.square().sum()
 			num_samples += len(channel)
 		return int(math.sqrt(sum_squares / num_samples))
@@ -111,7 +110,7 @@ class Sound:
 		:return: A tuple containing two timestamps: One near the start of the track, one near the end. Both timestamps
 		are relative to the start of the track.
 		"""
-		max_value = (2 ** (self.samples[0].dtype.itemsize * 8 - 1))
+		max_value = (2 ** (self.channels[0].dtype.itemsize * 8 - 1))
 		threshold_value = 10 ** (threshold / 20) * max_value
 		slice_size = 0.01  # Break the audio in 10ms slices, to check each slice for its volume.
 
@@ -147,13 +146,13 @@ class Sound:
 		Mix this sound to mono.
 		:return: A new sound with only one channel, where the audio has been mixed to mono.
 		"""
-		if len(self.samples) == 1:  # Already mono.
+		if len(self.channels) == 1:  # Already mono.
 			return self
 
-		mixed_channels = numpy.zeros((len(self.samples[0]), ))
-		for channel in self.samples:
+		mixed_channels = numpy.zeros((len(self.channels[0]), ))
+		for channel in self.channels:
 			mixed_channels += channel
-		mixed_channels /= len(self.samples)
+		mixed_channels /= len(self.channels)
 		return Sound([mixed_channels], frame_rate=self.frame_rate)
 
 	def __mul__(self, volume: float) -> "Sound":
@@ -162,5 +161,5 @@ class Sound:
 		:param volume: A volume factor.
 		:return: A new sound, with the amplitude multiplied by the given volume factor.
 		"""
-		new_channels = [channel * volume for channel in self.samples]
+		new_channels = [channel * volume for channel in self.channels]
 		return Sound(new_channels, frame_rate=self.frame_rate)
