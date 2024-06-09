@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2024 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -52,13 +52,11 @@ def generate_fourier(sound: lyndj.sound.Sound, path: str) -> PySide6.QtGui.QImag
 	prefs = lyndj.preferences.Preferences.get_instance()
 	num_chunks = prefs.get("player/fourier_samples")
 	num_channels = prefs.get("player/fourier_channels")
-	if len(sound.samples) == 0:  # We were unable to read the audio file.
+	if len(sound.channels[0]) == 0:  # We were unable to read the audio file.
 		logging.error(f"Unable to read waveform from audio file to generate Fourier: {path}")
 		return PySide6.QtGui.QImage(numpy.zeros((num_channels, num_chunks), dtype=numpy.ubyte), num_chunks, num_channels, PySide6.QtGui.QImage.Format_Grayscale8)
 
-	waveform_dtype = numpy.byte if sound.sample_size == 1 else numpy.short if sound.sample_size == 2 else int
-	waveform_numpy = numpy.frombuffer(sound.samples, dtype=waveform_dtype)
-	chunks = numpy.array_split(waveform_numpy, num_chunks)  # Split the sound in chunks, each of which will be displayed as 1 horizontal pixel.
+	chunks = numpy.array_split(sound.channels[0], num_chunks)  # Split the sound in chunks, each of which will be displayed as 1 horizontal pixel.
 	chunk_size = len(chunks[0])
 	split_points = numpy.logspace(1, math.log10(chunk_size), num_channels).astype(numpy.int32)  # We'll display a certain number of frequencies as vertical pixels. They are logarithmically spaced on the frequency spectrum.
 	split_points = split_points[:-1]  # The last one is not a split point, but the end. No need to split there.

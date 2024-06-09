@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2024 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -7,7 +7,7 @@
 """
 A collection of functions to actually play audio on the system.
 """
-
+import numpy  # To export Sound objects to a playback buffer.
 import pyaudio  # Used to play audio.
 import time  # To sleep the thread when there is no audio to play.
 import threading  # The audio is played on a different thread.
@@ -106,20 +106,23 @@ def play_loop() -> None:
 			chunk_size = lyndj.preferences.Preferences.get_instance().get("player/buffer_size") / 1000.0
 			chunk = audio_source[current_position:current_position + chunk_size]
 			chunk = filter(chunk)
-			if chunk.sample_size != current_sample_width or chunk.frame_rate != current_rate or chunk.channels != current_channels:
+			if chunk.channels[0].itemsize != current_sample_width or chunk.frame_rate != current_rate or len(chunk.channels) != current_channels:
 				# New audio source, so re-generate the stream.
 				if stream:
 					stream.stop_stream()
 					stream.close()
-				current_sample_width = chunk.sample_size
+				current_sample_width = chunk.channels[0].itemsize
 				current_rate = chunk.frame_rate
-				current_channels = chunk.channels
+				current_channels = len(chunk.channels)
 				stream = audio_server.open(format=audio_server.get_format_from_width(current_sample_width), rate=current_rate, channels=current_channels, output=True)
 			if current_position >= end_position:  # Playback completed. Stop taking the GIL and go into stand-by.
 				current_position = 0
 				audio_source = None
 				continue
-			stream.write(chunk.samples)
+			samples = numpy.empty(chunk.channels[0].size * len(chunk.channels), dtype=chunk.channels[0].dtype)
+			for channel_num, channel in enumerate(chunk.channels):
+				samples[channel_num::len(chunk.channels)] = channel
+			stream.write(samples.tobytes())
 			current_position += chunk_size
 	finally:
 		if stream:

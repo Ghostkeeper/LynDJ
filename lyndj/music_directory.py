@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2024 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -7,6 +7,7 @@
 import logging
 import math  # To format track duration.
 import miniaudio  # To load waveforms of audio files for pre-processing.
+import numpy  # To load waveforms into our own Sound objects.
 import os  # To list files in the music directory.
 import os.path  # To list file paths in the music directory.
 import PySide6.QtCore  # To expose this table to QML, and get the standard music directory.
@@ -232,7 +233,11 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 				return  # These were computed in the meanwhile. Perhaps the song played in the meanwhile.
 
 			decoded = miniaudio.decode_file(path)
-			segment = lyndj.sound.Sound(decoded.samples.tobytes(), sample_size=decoded.sample_width, channels=decoded.nchannels, frame_rate=decoded.sample_rate)
+			samples = numpy.asarray(decoded.samples)
+			channels = []
+			for channel_num in range(decoded.nchannels):
+				channels.append(samples[channel_num::decoded.nchannels])
+			segment = lyndj.sound.Sound(channels, frame_rate=decoded.sample_rate)
 
 			if fourier_file == "" or not os.path.exists(fourier_file):  # Not generated yet.
 				lyndj.fourier.generate_and_save_fourier(path, segment)

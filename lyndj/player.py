@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2024 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -8,6 +8,7 @@ import logging
 import miniaudio  # To decode audio files.
 import os.path  # To cache Fourier transform images.
 import PySide6.QtCore  # Exposing the player to QML.
+import numpy  # Loading wave data into a Sound object.
 import time  # To track playtime.
 import typing
 import uuid  # To generate filenames for the Fourier transform cache.
@@ -153,7 +154,11 @@ class Player(PySide6.QtCore.QObject):
 		logging.info(f"Starting playback of track: {next_song}")
 
 		decoded = miniaudio.decode_file(next_song)
-		Player.current_track = lyndj.sound.Sound(decoded.samples.tobytes(), sample_size=decoded.sample_width, channels=decoded.nchannels, frame_rate=decoded.sample_rate)
+		samples = numpy.asarray(decoded.samples)
+		channels = []
+		for channel_num in range(decoded.nchannels):
+			channels.append(samples[channel_num::decoded.nchannels])
+		Player.current_track = lyndj.sound.Sound(channels, frame_rate=decoded.sample_rate)
 
 		cut_start = lyndj.metadata.get(next_song, "cut_start")
 		cut_end = lyndj.metadata.get(next_song, "cut_end")

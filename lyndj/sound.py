@@ -152,7 +152,7 @@ class Sound:
 		mixed_channels = numpy.zeros((len(self.channels[0]), ))
 		for channel in self.channels:
 			mixed_channels += channel
-		mixed_channels /= len(self.channels)
+		mixed_channels = (mixed_channels / len(self.channels)).astype(self.channels[0].dtype)
 		return Sound([mixed_channels], frame_rate=self.frame_rate)
 
 	def __mul__(self, volume: float) -> "Sound":
@@ -161,5 +161,5 @@ class Sound:
 		:param volume: A volume factor.
 		:return: A new sound, with the amplitude multiplied by the given volume factor.
 		"""
-		new_channels = [channel * volume for channel in self.channels]
+		new_channels = [(channel * volume).astype(channel.dtype) for channel in self.channels]
 		return Sound(new_channels, frame_rate=self.frame_rate)
