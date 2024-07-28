@@ -99,7 +99,7 @@ class Sound:
 		sum_squares = 0
 		num_samples = 0
 		for channel in self.channels:
-			sum_squares += channel.square().sum()
+			sum_squares += numpy.square(channel).sum()
 			num_samples += len(channel)
 		return int(math.sqrt(sum_squares / num_samples))
 
