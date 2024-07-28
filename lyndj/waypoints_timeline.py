@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2024 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -358,3 +358,15 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		logging.debug(f"Ending transition from {self.ongoing_transition_start_time} to {current_time}, level {end_level}.")
 		self.add_transition(self.ongoing_transition_start_time, current_time, end_level)
 		self.ongoing_transition_start_time = None  # Reset this one for the next transition.
+
+	@PySide6.QtCore.Slot()
+	def clear(self) -> None:
+		"""
+		Remove all waypoints from the timeline.
+		"""
+		self.waypoints.clear()
+
+		# Store this information and re-render.
+		lyndj.metadata.change(self.current_path, self.current_field, self.serialise_waypoints(self.waypoints))
+		self.generate_graph()
+		self.update()

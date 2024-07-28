@@ -195,6 +195,20 @@ class Player(PySide6.QtCore.QObject):
 		for filename in os.listdir(directory):
 			os.remove(os.path.join(directory, filename))
 
+	@PySide6.QtCore.Slot()
+	def clear_current_waypoints(self) -> None:
+		"""
+		Clear the waypoints of the currently showing song.
+
+		If no song was showing, nothing happens.
+		"""
+		current_playlist = lyndj.preferences.Preferences.get_instance().get("playlist/playlist")
+		if len(current_playlist) == 0:
+			return
+		current_path = current_playlist[0]
+		logging.info(f"Clearing waypoints for {current_path}")
+		lyndj.metadata.change(current_path, "volume_waypoints", "")
+
 	song_finished = PySide6.QtCore.Signal(str)
 	"""
 	Emitted when a song has finished playing or is stopped towards the end of the track.
