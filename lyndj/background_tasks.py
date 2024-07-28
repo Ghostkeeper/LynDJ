@@ -69,7 +69,7 @@ class BackgroundTasks(PySide6.QtCore.QObject):
 		This function never returns. It should be ran on a background daemon thread.
 		"""
 		while True:
-			time.sleep(0.1)  # 0.1 seconds gives reasonably low priority to checking if there are any tasks to run.
+			time.sleep(0.01)  # 0.01 seconds gives reasonably low priority to checking if there are any tasks to run.
 			try:
 				task, description, allow_during_playback = self.tasks.get(block=False)
 			except queue.Empty:
