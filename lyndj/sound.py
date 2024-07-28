@@ -43,6 +43,7 @@ class Sound:
 		:return: A Sound containing the audio data from that file.
 		"""
 		_, extension = os.path.splitext(filepath)
+		extension = extension.lower()
 		if extension in {".flac", ".mp3", ".ogg", ".wav"}:
 			decoded = miniaudio.decode_file(filepath)
 			samples = numpy.asarray(decoded.samples)
