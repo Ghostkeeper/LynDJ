@@ -4,10 +4,13 @@
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
+import ctypes  # For converting Opus files to Numpy.
 import logging
 import math  # To calculate audio RMS.
-import miniaudio  # To decode audio files.
+import miniaudio  # To decode wav, mp3, flac and ogg audio files.
 import numpy  # For fast operations on wave data.
+import os.path  # To decode audio files depending on file extension.
+import pyogg  # To decode opus audio files.
 import typing
 
 class Sound:
@@ -39,10 +42,23 @@ class Sound:
 		:param filepath: The path to the file to load.
 		:return: A Sound containing the audio data from that file.
 		"""
-		decoded = miniaudio.decode_file(filepath)
-		samples = numpy.asarray(decoded.samples)
-		channels = [samples[channel_num::decoded.nchannels] for channel_num in range(decoded.nchannels)]
-		return Sound(channels, frame_rate=decoded.sample_rate)
+		_, extension = os.path.splitext(filepath)
+		if extension in {".flac", ".mp3", ".ogg", ".wav"}:
+			decoded = miniaudio.decode_file(filepath)
+			samples = numpy.asarray(decoded.samples)
+			channels = [samples[channel_num::decoded.nchannels] for channel_num in range(decoded.nchannels)]
+			sample_rate = decoded.sample_rate
+		elif extension in {".opus"}:
+			opus_file = pyogg.OpusFile(filepath)
+			# PyOgg has an as_array method but it seems to have been removed from the latest release on PIPy.
+			# So we re-implement it ourselves.
+			bytes_per_sample = ctypes.sizeof(pyogg.opus.opus_int16)
+			channels = numpy.ctypeslib.as_array(opus_file.buffer, (opus_file.buffer_length // bytes_per_sample // opus_file.channels, opus_file.channels))
+			channels = channels.transpose()
+			sample_rate = opus_file.frequency
+		else:
+			raise ValueError(f"Trying to decode unsupported file extension {extension}.")
+		return Sound(channels, frame_rate=sample_rate)
 
 	def __init__(self, channels: list[numpy.array], frame_rate: int=44100) -> None:
 		"""

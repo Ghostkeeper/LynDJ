@@ -6,8 +6,6 @@
 
 import logging
 import math  # To format track duration.
-import miniaudio  # To load waveforms of audio files for pre-processing.
-import numpy  # To load waveforms into our own Sound objects.
 import os  # To list files in the music directory.
 import os.path  # To list file paths in the music directory.
 import PySide6.QtCore  # To expose this table to QML, and get the standard music directory.

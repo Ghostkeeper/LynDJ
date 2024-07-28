@@ -29,6 +29,7 @@ The file formats supported are:
 * MP3
 * FLAC
 * OGG/Vorbis
+* OGG/Opus
 
 Installation
 ------------

@@ -3,4 +3,5 @@ mutagen >=1.45.1
 numpy >=1.21.0
 PySide6-Essentials ==6.7.1
 pyaudio >= 0.2.13
+pyogg >= 0.6.14a1
 scipy >=1.8.0
