@@ -45,5 +45,13 @@ Dialog {
 
 			onAccepted: change_metadata_dialogue.accept();
 		}
+
+		Widgets.Button {
+			id: bpm_estimate_button
+			visible: field === "bpm"
+
+			text: "Estimate BPM"
+			onClicked: textfield.text = music_directory.estimate_tempo(path);
+		}
 	}
 }

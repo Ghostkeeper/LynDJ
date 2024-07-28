@@ -306,3 +306,15 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		# Looking up where in the table the data changed is much more expensive than just triggering an update of the entire column.
 		column = self.column_fields.index(key)
 		self.dataChanged.emit(self.createIndex(0, column), self.createIndex(len(self.music) - 1, column))
+
+	@PySide6.QtCore.Slot(str, result=int)
+	def estimate_tempo(self, path: str) -> int:
+		"""
+		Estimate the tempo of a sound file in BPM.
+		:param path: The path to the file to estimate the tempo of.
+		:return: The tempo of the music in that file.
+		"""
+		sound = lyndj.sound.Sound.decode(path)
+		tempo = sound.tempo()
+		logging.info(f"Estimated tempo of {path} to be {tempo}")
+		return tempo

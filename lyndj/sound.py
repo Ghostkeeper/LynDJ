@@ -5,12 +5,14 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import ctypes  # For converting Opus files to Numpy.
+import librosa.feature  # For estimating BPM.
 import logging
 import math  # To calculate audio RMS.
 import miniaudio  # To decode wav, mp3, flac and ogg audio files.
 import numpy  # For fast operations on wave data.
 import os.path  # To decode audio files depending on file extension.
 import pyogg  # To decode opus audio files.
+import statistics  # For estimating BPM.
 import typing
 
 class Sound:
@@ -132,6 +134,20 @@ class Sound:
 			sum_squares += numpy.square(channel).sum()
 			num_samples += len(channel)
 		return int(math.sqrt(sum_squares / num_samples))
+
+	def tempo(self) -> int:
+		"""
+		Estimate the tempo of the music in this sound.
+
+		The estimation tends to have difficulty distinguishing beats with their double-time beats. The tempo might be
+		estimated at half or double the actual (human-estimated) bpm.
+		:return: The estimated tempo of the music, in beats per minute (bpm).
+		"""
+		samples = self.to_mono().channels[0]
+		samples = samples.astype(float) / numpy.iinfo(samples.dtype).max
+		tempos = librosa.feature.tempo(y=samples, sr=self.frame_rate, start_bpm=150, aggregate=None)
+		tempo = statistics.median(tempos[:1000])
+		return round(tempo)
 
 	def detect_silence(self, threshold: float=-64.0) -> typing.Tuple[float, float]:
 		"""
