@@ -5,10 +5,8 @@
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
 
 import logging
-import miniaudio  # To decode audio files.
 import os.path  # To cache Fourier transform images.
 import PySide6.QtCore  # Exposing the player to QML.
-import numpy  # Loading wave data into a Sound object.
 import time  # To track playtime.
 import typing
 import uuid  # To generate filenames for the Fourier transform cache.
