@@ -133,7 +133,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		"""
 		if role != PySide6.QtCore.Qt.DisplayRole:
 			return None
-		if orientation == PySide6.QtCore.Qt.Orientation.Horizontal:
+		if orientation == 1:  # PySide6.QtCore.Qt.Orientation.Horizontal is an enum, but the QML doesn't give us that.
 			return ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy"][section]
 		elif orientation == PySide6.QtCore.Qt.Orientation.Vertical:
 			return self.music[section]["path"]
