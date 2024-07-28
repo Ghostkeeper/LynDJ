@@ -153,12 +153,7 @@ class Player(PySide6.QtCore.QObject):
 		next_song = current_playlist[0]
 		logging.info(f"Starting playback of track: {next_song}")
 
-		decoded = miniaudio.decode_file(next_song)
-		samples = numpy.asarray(decoded.samples)
-		channels = []
-		for channel_num in range(decoded.nchannels):
-			channels.append(samples[channel_num::decoded.nchannels])
-		Player.current_track = lyndj.sound.Sound(channels, frame_rate=decoded.sample_rate)
+		Player.current_track = lyndj.sound.Sound.decode(next_song)
 
 		cut_start = lyndj.metadata.get(next_song, "cut_start")
 		cut_end = lyndj.metadata.get(next_song, "cut_end")

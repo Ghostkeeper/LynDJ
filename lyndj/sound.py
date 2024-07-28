@@ -6,6 +6,7 @@
 
 import logging
 import math  # To calculate audio RMS.
+import miniaudio  # To decode audio files.
 import numpy  # For fast operations on wave data.
 import typing
 
@@ -30,6 +31,18 @@ class Sound:
 		assert len(left.channels[0]) == len(right.channels[0])
 
 		return Sound([left.channels[0], right.channels[0]], frame_rate=left.frame_rate)
+
+	@classmethod
+	def decode(cls, filepath: str) -> "Sound":
+		"""
+		Decode an encoded sound file, loading it in as a Sound instance.
+		:param filepath: The path to the file to load.
+		:return: A Sound containing the audio data from that file.
+		"""
+		decoded = miniaudio.decode_file(filepath)
+		samples = numpy.asarray(decoded.samples)
+		channels = [samples[channel_num::decoded.nchannels] for channel_num in range(decoded.nchannels)]
+		return Sound(channels, frame_rate=decoded.sample_rate)
 
 	def __init__(self, channels: list[numpy.array], frame_rate: int=44100) -> None:
 		"""
