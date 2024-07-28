@@ -43,6 +43,8 @@ class MusicControl:
 
 		# Create a list of events for this track.
 		self.events: typing.List[PySide6.QtCore.QTimer] = []
+		# Separate list for volume change events so that we can cancel them separately.
+		self.volume_change_events: typing.List[PySide6.QtCore.QTimer] = []
 
 		# Song ends.
 		duration = lyndj.metadata.get(path, "cut_end") - lyndj.metadata.get(path, "cut_start")
@@ -82,7 +84,7 @@ class MusicControl:
 					volume_change_timer.setSingleShot(True)
 					volume_change_timer.timeout.connect(lambda v=new_volume: player.set_volume(v))
 					volume_change_timer.setTimerType(PySide6.QtCore.Qt.PreciseTimer)
-					self.events.append(volume_change_timer)
+					self.volume_change_events.append(volume_change_timer)
 					volume = new_volume
 				t += 0.05
 
@@ -92,11 +94,15 @@ class MusicControl:
 		"""
 		for event in self.events:
 			event.start()
+		for event in self.volume_change_events:
+			event.start()
 
 	def stop(self) -> None:
 		"""
 		Cancel all of the timers for the events, interrupting them from being executed.
 		"""
+		for event in self.volume_change_events:
+			event.stop()
 		for event in self.events:
 			event.stop()
 
@@ -107,6 +113,7 @@ class MusicControl:
 		"""
 		self.stop()  # Stop all normal events first.
 		self.events = []
+		self.volume_change_events = []
 		time = 0.1
 		start_volume = self.player.volume
 		while time < duration:
@@ -116,7 +123,7 @@ class MusicControl:
 			timer.setSingleShot(True)
 			timer.timeout.connect(lambda v=new_volume: self.player.set_volume(v))
 			timer.setTimerType(PySide6.QtCore.Qt.PreciseTimer)
-			self.events.append(timer)
+			self.volume_change_events.append(timer)
 			time += 0.05  # Adjust volume every 0.05s.
 		# And another event for the final 0 volume.
 		def fadeout_done():
@@ -131,6 +138,8 @@ class MusicControl:
 		timer.setTimerType(PySide6.QtCore.Qt.PreciseTimer)
 		self.events.append(timer)
 		for event in self.events:
+			event.start()
+		for event in self.volume_change_events:
 			event.start()
 
 	def set_song_ends(self, duration: float) -> None:
