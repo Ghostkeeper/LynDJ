@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2024 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -56,37 +56,62 @@ class MusicControl:
 		self.song_end_timer_index = 0
 
 		# Volume transitions.
-		volume_waypoints = lyndj.metadata.get(path, "volume_waypoints")
+		self.recalculate_volume_waypoints(0)
+
+	def recalculate_volume_waypoints(self, current_position: float) -> None:
+		"""
+		(Re-)calculate the volume waypoint timers for this track.
+
+		All current volume change events will be discarded, and new ones will be added according to the current state of
+		the waypoints timeline. This can be used to correctly change the events when the waypoints timeline is updated,
+		or just to load them initially.
+		:param current_position: The current time in the track, how long it has already been playing in seconds. This is
+		used to adjust the timers so that they trigger at the right real time.
+		"""
+		logging.debug(f"Recalculating volume waypoints from starting point: {current_position}")
+		for event in self.volume_change_events:
+			event.stop()
+		self.volume_change_events = []
+		# Volume transitions.
+		volume_waypoints = lyndj.metadata.get(self.path, "volume_waypoints")
 		volume_waypoints = lyndj.waypoints_timeline.WaypointsTimeline.parse_waypoints(volume_waypoints)
 		if len(volume_waypoints) > 0:
-			volume = 0.5
+			volume = None
 			pos = -1
-			t = 0.025
-			while t < duration:
-				if t >= volume_waypoints[pos + 1][0]:
-					pos += 1
+			while pos + 1 < len(volume_waypoints) and volume_waypoints[pos + 1][0] < current_position:
+				pos += 1
+			if pos < len(volume_waypoints) - 1:  # Not yet after last waypoint.
+				t = current_position + 0.025
+				duration = lyndj.metadata.get(self.path, "cut_end") - lyndj.metadata.get(self.path, "cut_start")
+				while t < duration:
+					if t >= volume_waypoints[pos + 1][0]:
+						pos += 1
 					if pos >= len(volume_waypoints) - 1:
-						break  # After last waypoint.
-				if pos < 0:
-					t += 0.05
-					continue  # Before first waypoint.
-				# Interpolate the new volume.
-				time_start, level_start = volume_waypoints[pos]
-				time_end, level_end = volume_waypoints[pos + 1]
-				if level_start == level_end:
-					new_volume = level_start  # Common case: Flat between transitions.
-				else:
-					ratio = (t - time_start) / (time_end - time_start)
-					new_volume = level_start + ratio * (level_end - level_start)
-				if new_volume != volume:
-					volume_change_timer = PySide6.QtCore.QTimer()
-					volume_change_timer.setInterval(round(t * 1000))
-					volume_change_timer.setSingleShot(True)
-					volume_change_timer.timeout.connect(lambda v=new_volume: player.set_volume(v))
-					volume_change_timer.setTimerType(PySide6.QtCore.Qt.PreciseTimer)
-					self.volume_change_events.append(volume_change_timer)
+						break  # Reached past last waypoint.
+					if pos < 0:
+						t += 0.05
+						continue  # Before first waypoint.
+					# Interpolate the new volume.
+					time_start, level_start = volume_waypoints[pos]
+					time_end, level_end = volume_waypoints[pos + 1]
+					if level_start == level_end:
+						new_volume = level_start  # Common case: Flat between transitions.
+					else:
+						ratio = (t - time_start) / (time_end - time_start)
+						new_volume = level_start + ratio * (level_end - level_start)
+					if volume is not None and new_volume != volume:
+						volume_change_timer = PySide6.QtCore.QTimer()
+						volume_change_timer.setInterval(round((t - current_position) * 1000))
+						volume_change_timer.setSingleShot(True)
+						volume_change_timer.timeout.connect(lambda v=new_volume: self.player.set_volume(v))
+						volume_change_timer.setTimerType(PySide6.QtCore.Qt.PreciseTimer)
+						self.volume_change_events.append(volume_change_timer)
 					volume = new_volume
-				t += 0.05
+					t += 0.05
+
+		if current_position > 0:  # The song is playing, so start the new timers immediately.
+			for event in self.volume_change_events:
+				event.start()
 
 	def play(self) -> None:
 		"""

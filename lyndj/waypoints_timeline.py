@@ -12,7 +12,7 @@ import time  # To generate timestamps for the graph.
 import typing
 
 import lyndj.metadata  # To get the waypoints of a song.
-import lyndj.player  # To get the current play time.
+import lyndj.player  # To get the current play time and update the control track.
 import lyndj.theme  # To get the colours to draw the graph in.
 
 if typing.TYPE_CHECKING:
@@ -239,6 +239,9 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		self.svg = svg
 		self.renderer = PySide6.QtSvg.QSvgRenderer(svg.encode("UTF-8"))
 		self.update()
+		if lyndj.player.Player.start_time is not None:  # Currently playing.
+			current_time = time.time() - lyndj.player.Player.start_time
+			lyndj.player.Player.control_track.recalculate_volume_waypoints(current_time)
 
 	def paint(self, painter: "PySide6.QtGui.QPainter") -> None:
 		"""
@@ -321,7 +324,6 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		# Store this information and re-render.
 		lyndj.metadata.change(self.current_path, self.current_field, self.serialise_waypoints(self.waypoints))
 		self.generate_graph()
-		self.update()
 
 	@PySide6.QtCore.Slot()
 	def start_transition(self) -> None:
@@ -369,4 +371,3 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		# Store this information and re-render.
 		lyndj.metadata.change(self.current_path, self.current_field, self.serialise_waypoints(self.waypoints))
 		self.generate_graph()
-		self.update()
