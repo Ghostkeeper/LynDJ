@@ -32,7 +32,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		"""
 		super().__init__(parent)
 
-		self.column_fields = ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy"]
+		self.column_fields = ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy", "autodj_exclude"]
 
 		self._directory = ""
 		prefs = lyndj.preferences.Preferences.get_instance()
@@ -44,14 +44,18 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		if not prefs.has("directory/browse_path"):
 			prefs.add("directory/browse_path", browse_path)
 		if not prefs.has("directory/sort_order"):
-			prefs.add("directory/sort_order", ["bpm", "last_played", "age", "style", "energy", "title", "duration", "author", "comment"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
+			prefs.add("directory/sort_order", ["bpm", "last_played", "age", "style", "energy", "title", "duration", "author", "comment", "autodj_exclude"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
 		if not prefs.has("directory/sort_direction"):
-			prefs.add("directory/sort_direction", [False, False, False, False, False, False, False, False, False])  # For each sort order, whether it is descending (True) or ascending (False).
+			prefs.add("directory/sort_direction", [False, False, False, False, False, False, False, False, False, False])  # For each sort order, whether it is descending (True) or ascending (False).
 		self.music: typing.List[typing.Dict[str, typing.Any]] = []  # The actual data contained in this table.
 
 		if not prefs.has("directory/column_width"):
 			fraction = 1.0 / len(self.column_fields)  # Equal fraction for each column.
-			prefs.add("directory/column_width", [fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction])
+			prefs.add("directory/column_width", [fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction])
+		column_widths = prefs.get("directory/column_width")
+		while len(column_widths) < len(self.column_fields):  # Maybe old version of config file, need to upgrade.
+			column_widths.append(0)
+			prefs.set("directory/column_width", column_widths)
 
 	def rowCount(self, parent: typing.Optional[PySide6.QtCore.QModelIndex]=PySide6.QtCore.QModelIndex()) -> int:
 		"""
@@ -109,6 +113,12 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			if difference < day * 1.5:
 				return "Yesterday"
 			return str(round(difference / day)) + " days"
+		if field == "autodj_exclude":
+			# Use invisible characters to communicate the value to the GUI!
+			if value == 0:
+				return ""
+			else:
+				return " "
 		return str(value)  # Default, just convert to string.
 
 	def flags(self, index: PySide6.QtCore.QModelIndex) -> int:
@@ -134,7 +144,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		if role != PySide6.QtCore.Qt.DisplayRole:
 			return None
 		if orientation == 1:  # PySide6.QtCore.Qt.Orientation.Horizontal is an enum, but the QML doesn't give us that.
-			return ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy"][section]
+			return ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy", "autodj_exclude"][section]
 		elif orientation == 2:
 			return self.music[section]["path"]
 		else:
@@ -302,6 +312,8 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		:param key: The metadata entry to change.
 		:param value: The new value for this metadata entry.
 		"""
+		if key == "autodj_exclude":
+			value = int(value)
 		lyndj.metadata.change(path, key, value)
 		# Looking up where in the table the data changed is much more expensive than just triggering an update of the entire column.
 		column = self.column_fields.index(key)

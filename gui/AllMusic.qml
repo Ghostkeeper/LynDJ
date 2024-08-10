@@ -1,5 +1,5 @@
 //Music player software aimed at Lindy Hop DJs.
-//Copyright (C) 2022 Ghostkeeper
+//Copyright (C) 2024 Ghostkeeper
 //This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 //This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 //You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -134,6 +134,7 @@ Item {
 			}
 		}
 		Widgets.TableHeader {
+			id: header_energy
 			width: music_table.columnWidthProvider(8)
 
 			text: "Energy"
@@ -144,6 +145,19 @@ Item {
 			Widgets.ColumnResizer {
 				previous_column_width: header_style.width
 				previous_index: 7
+			}
+		}
+		Widgets.TableHeader {
+			width: music_table.columnWidthProvider(9)
+
+			text: "AutoDJ"
+			onWidthChanged: music_table.forceLayout()
+			role: "autodj_exclude"
+			table: music_table.model
+
+			Widgets.ColumnResizer {
+				previous_column_width: header_energy.width
+				previous_index: 8
 			}
 		}
 	}
@@ -183,6 +197,14 @@ Item {
 				elide: Text.ElideRight
 				font: Lyn.Theme.font["default"]
 
+				Widgets.ColourImage {
+					anchors.centerIn: parent
+
+					visible: display === " " && music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "autodj_exclude"
+					colour: Lyn.Theme.colour["foreground"]
+					source: Lyn.Theme.icon["cross"]
+				}
+
 				MouseArea {
 					anchors.fill: parent
 
@@ -201,6 +223,14 @@ Item {
 								change_dialogue.path = music_directory.headerData(row, Qt.Vertical, Qt.DisplayRole);
 								change_dialogue.value = display; //Put the old value in the text box.
 								change_dialogue.open();
+							}
+							if(field === "autodj_exclude") { //Toggle this one.
+								const path = music_directory.headerData(row, Qt.Vertical, Qt.DisplayRole);
+								if(display === "") {
+									music_directory.change_metadata(path, field, 1); //Enable.
+								} else {
+									music_directory.change_metadata(path, field, 0); //Disable.
+								}
 							}
 						}
 					}
