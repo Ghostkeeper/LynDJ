@@ -11,7 +11,7 @@
 # Override some environment variables to prevent executing unsecure code.
 here=$(dirname $0)
 export LD_LIBRARY_PATH=$here
-export PYTHONPATH=$here/lib/python3.12
+export PYTHONPATH=$here/lib/python3.12:$here/lib/python3.11:$here/lib/python3.10:$here/lib/python3.9
 export QT_PLUGIN_PATH=$here/PySide6/Qt/plugins
 export QML2_IMPORT_PATH=$here/PySide6/Qt/qml
 
