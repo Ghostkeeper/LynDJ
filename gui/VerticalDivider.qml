@@ -1,5 +1,5 @@
 //Music player software aimed at Lindy Hop DJs.
-//Copyright (C) 2022 Ghostkeeper
+//Copyright (C) 2024 Ghostkeeper
 //This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 //This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 //You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -55,9 +55,32 @@ Item {
 		onClicked: unqueueButtonHandler()
 	}
 	Widgets.ColourImage {
+		id: pause_divider
 		anchors {
 			horizontalCenter: parent.horizontalCenter
 			top: unqueue_button.bottom
+		}
+		height: Lyn.Theme.size["margin"].height
+
+		source: Lyn.Theme.icon["vertical_divider"]
+		colour: Lyn.Theme.colour["lining"]
+	}
+	Widgets.ImageButton {
+		id: pause_button
+		anchors {
+			horizontalCenter: parent.horizontalCenter
+			top: pause_divider.bottom
+		}
+
+		backgroundSource: Lyn.Theme.icon["pause_background"]
+		backgroundColour: Lyn.Theme.colour["lining"]
+		source: Lyn.Theme.icon["pause_foreground"]
+		colour: Lyn.Theme ? Lyn.Theme.colour[enabled ? (hovered ? "highlight_foreground" : "foreground") : "disabled_foreground"] : "transparent"
+	}
+	Widgets.ColourImage {
+		anchors {
+			horizontalCenter: parent.horizontalCenter
+			top: pause_button.bottom
 			bottom: handle.top
 		}
 

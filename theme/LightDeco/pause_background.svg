@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<svg width="30" height="42" xmlns="http://www.w3.org/2000/svg">
+<g stroke="black" fill="none">
+	<g stroke-width="2">
+		<line x1="15" y1="0" x2="15" y2="2" />
+		<polygon points="15,2 29,16 29,26 15,40 1,26 1,16" />
+		<line x1="15" y1="40" x2="15" y2="42" />
+	</g>
+	<g stroke-width="4">
+		<path d="M22,0 v2 l-4,4" />
+		<path d="M8,0 v2 l4,4" />
+		<path d="M22,42 v-2 l-4,-4" />
+		<path d="M8,42 v-2 l4,-4" />
+	</g>
+</g>
+</svg>
