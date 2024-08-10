@@ -49,10 +49,11 @@ def load() -> None:
 	if not os.path.exists(db_file):
 		return  # No metadata to read.
 	connection = sqlite3.connect(db_file)
+	upgrade(connection)
 	logging.debug("Reading metadata from database.")
 
 	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
-	for path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime, cut_start, cut_end in connection.execute("SELECT * FROM metadata"):
+	for path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime, cut_start, cut_end, autodj_exclude in connection.execute("SELECT * FROM metadata"):
 		new_metadata[path] = {
 			"path": path,
 			"title": title,
@@ -71,10 +72,33 @@ def load() -> None:
 			"treble_waypoints": treble_waypoints,
 			"cachetime": cachetime,
 			"cut_start": cut_start,
-			"cut_end": cut_end
+			"cut_end": cut_end,
+			"autodj_exclude": autodj_exclude,
 		}
 	with metadata_lock:
 		metadata.update(new_metadata)
+
+def upgrade(connection):
+	"""
+	Makes sure that the metadata database is updated to the most recent version.
+
+	If it is already up-to-date, nothing happens.
+	:param connection: A database connection object allowing interaction with the metadata database.
+	"""
+	latest_version = 1
+	current_version = connection.execute("PRAGMA user_version").fetchone()[0]
+	if current_version == latest_version:
+		return  # Nothing to do.
+	if current_version > latest_version:
+		logging.warning("The metadata database version is too modern! We might not interpret the metadata properly or write to it correctly.")
+		return
+
+	if current_version == 0:  # Upgrade to v1.
+		logging.info("Upgrading database v0 -> v1")
+		connection.execute("ALTER TABLE metadata ADD COLUMN autodj_exclude integer NOT NULL DEFAULT 0")
+		connection.execute("PRAGMA user_version = 1")
+
+	connection.commit()
 
 # When we change the database, save the database to disk after a short delay.
 # If there's multiple changes in short succession, those will be combined into a single write.
@@ -139,7 +163,8 @@ def store() -> None:
 			treble_waypoints text,
 			cachetime real,
 			cut_start real,
-			cut_end real
+			cut_end real,
+			autodj_exclude integer
 		)""")
 	else:
 		connection = sqlite3.connect(db_file)
@@ -147,8 +172,8 @@ def store() -> None:
 	local_metadata = metadata  # Cache locally for performance.
 	with metadata_lock:
 		for path, entry in local_metadata.items():
-			connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime, cut_start, cut_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-				(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"], entry["cut_start"], entry["cut_end"]))
+			connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime, cut_start, cut_end, autodj_exclude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"], entry["cut_start"], entry["cut_end"], entry["autodj_exclude"]))
 	connection.commit()
 
 def has(path: str) -> bool:
@@ -270,7 +295,8 @@ def add_file(path: str) -> None:
 		"treble_waypoints": treble_waypoints,
 		"cachetime": last_modified,
 		"cut_start": cut_start,
-		"cut_end": cut_end
+		"cut_end": cut_end,
+		"autodj_exclude": 0,
 	})
 
 def change(path: str, key: str, value: typing.Any) -> None:
