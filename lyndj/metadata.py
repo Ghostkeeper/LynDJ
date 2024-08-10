@@ -46,6 +46,7 @@ def load() -> None:
 	All of the metadata in the database file will get stored in the ``metadata`` dict.
 	"""
 	db_file = os.path.join(lyndj.storage.data(), "metadata.db")
+	logging.info(f"Reading track metadata from: {db_file}")
 	if not os.path.exists(db_file):
 		return  # No metadata to read.
 	connection = sqlite3.connect(db_file)

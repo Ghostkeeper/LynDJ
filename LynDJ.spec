@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2024 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -13,7 +13,7 @@ if platform.system() == "Linux":
 	import os.path  # To get the installed location of PySide6.
 	import PySide6  # To get the installed location of PySide6.
 	pyside_location = os.path.dirname(PySide6.__file__)
-	additional_binaries = [(os.path.join(pyside_location, "QtOpenGL.abi3.so"), "PySide6"), (os.path.join(pyside_location, "libpyside6qml.abi3.so.6.3"), ".")]
+	additional_binaries = [(os.path.join(pyside_location, "QtOpenGL.abi3.so"), "PySide6"), (os.path.join(pyside_location, "libpyside6qml.abi3.so.6.7"), ".")]
 else:
 	additional_binaries = []
 
