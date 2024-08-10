@@ -2,19 +2,30 @@
 ----
 In this update, some bugs were fixed that got brought up when the application was exposed to the field. Some features were built that didn't initially fit into the release schedule for 1.0.
 
-New features:
-* Added a system to upgrade configuration files when first running a new version of the application.
-* When the configuration files are incompatible or corrupt, a dialogue will be shown at start-up to ask the user what to do about it.
+New features:"
+* Added a button to automatically detect the BPM of a track.
+* You can now exclude certain tracks from being selected by the AutoDJ.
+* Added a button to reset the volume waypoints of a track.
+* Added support for the Opus file format.
 * You can now manually adjust the trimming of audio from the start and end of each track.
   * The default for this trim is the automatic silence detection, so the default behaviour is the same.
   * The trim is shown with caliper-like sliders across the bottom of the window.
   * As a background task, the trim is pre-calculated and stored. This improves performance when starting playback of a new track.
   * To facilitate changing the trimming, the silence is now included in the spectrograph. Spectrograph should be re-generated for this version.
+* You can now add a "pause" entry to the playlist, which will cause playback to pause until you press play again.
+* When adjusting the volume within 10 seconds of the start of the track, it now adjusts the volume from the start.
+* Added a system to upgrade configuration files when first running a new version of the application.
+* When the configuration files are incompatible or corrupt, a dialogue will be shown at start-up to ask the user what to do about it.
 
 Bug fixes:
+* Fix adjusting existing waypoints during playback when volume is changed before the last waypoint.
+* Modified waypoints during playback are now properly edited as well, triggering the proper, new volume setpoints.
 * Rapidly restarting the music after stopping it will no longer continue the fade-out.
 * Music now actually stops after the fade-out when stopping playback, rather than continuing at 0 volume.
-* No longer show Opus files in the file browsers since it is not supported.
+* Fix track sometimes sounding incredibly noisy due to mis-aligned audio chunks.
+* Background tasks now process significantly faster.
+* Greatly improved efficiency of loading and playing audio files by preventing copies of the audio data.
+* Fix packaging on newer Ubuntu, newer Debian, newer Python and newer Qt versions.
 
 1.0.0 - Let's Dance
 ----
