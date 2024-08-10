@@ -273,7 +273,7 @@ class Player(PySide6.QtCore.QObject):
 
 	current_cut_end_changed = PySide6.QtCore.Signal()
 	"""
-	Triggered when the song changes as well as when teh current end cut changes.
+	Triggered when the song changes as well as when the current end cut changes.
 	"""
 
 	def set_current_cut_end(self, new_cut_end: float) -> None:

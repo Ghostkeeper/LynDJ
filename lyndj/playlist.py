@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2024 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -149,6 +149,22 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 			"autodj/last_played_influence"
 		}:
 			self.update()  # The playlist changed, so update my model.
+
+	def metadata_changed(self, key: str) -> None:
+		"""
+		Triggered if a track's metadata changes, which means that this model has to update its data in order to possibly
+		suggest a different track through the AutoDJ.
+		:param key: The metadata key that was changed.
+		"""
+		if key in {
+			"age",
+			"style",
+			"energy",
+			"bpm",
+			"last_played",
+			"autodj_exclude",
+		}:
+			self.update()  # The AutoDJ-influencing fields changed, which may influence our decision for which track to suggest.
 
 	def rowCount(self, parent: typing.Optional[PySide6.QtCore.QModelIndex]=PySide6.QtCore.QModelIndex()) -> int:
 		"""

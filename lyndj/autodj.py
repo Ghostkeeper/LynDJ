@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2024 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -54,8 +54,8 @@ class AutoDJ:
 		directory = prefs.get("directory/browse_path")
 		candidates = set(filter(lyndj.metadata.is_music_file, [os.path.join(directory, filename) for filename in os.listdir(directory)]))
 
-		# Files without BPM are special and shouldn't be suggested.
-		candidates = {path for path in candidates if lyndj.metadata.has(path) and lyndj.metadata.get(path, "bpm") >= 0}
+		# Don't suggest excluded files.
+		candidates = {path for path in candidates if lyndj.metadata.has(path) and lyndj.metadata.get(path, "autodj_exclude") == 0}
 
 		candidates -= set(prefs.get("playlist/playlist"))  # Anything in the playlist is not allowed to be in there twice.
 		if len(candidates) == 0:

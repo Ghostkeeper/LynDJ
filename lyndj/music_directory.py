@@ -16,6 +16,7 @@ import lyndj.background_tasks  # To generate spectrograph images in the backgrou
 import lyndj.fourier  # To generate spectrograph images in the background.
 import lyndj.metadata  # To get information about the files in the music directory.
 import lyndj.player  # To cache Fourier images of the tracks in this directory.
+import lyndj.playlist  # To update the AutoDJ track when metadata changes.
 import lyndj.preferences  # To store the sorting order.
 import lyndj.sorting  # To invert a sorting order.
 import lyndj.sound  # To pre-process audio files.
@@ -318,6 +319,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		# Looking up where in the table the data changed is much more expensive than just triggering an update of the entire column.
 		column = self.column_fields.index(key)
 		self.dataChanged.emit(self.createIndex(0, column), self.createIndex(len(self.music) - 1, column))
+		lyndj.playlist.Playlist.get_instance().metadata_changed(key)
 
 	@PySide6.QtCore.Slot(str, result=int)
 	def estimate_tempo(self, path: str) -> int:
