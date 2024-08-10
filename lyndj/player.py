@@ -118,8 +118,9 @@ class Player(PySide6.QtCore.QObject):
 		elif Player.current_track is not None and not new_is_playing:
 			logging.info(f"Stopping playback.")
 			self.control_track.fadeout(lyndj.preferences.Preferences.get_instance().get("player/fadeout"))
-			if (time.time() - Player.start_time) / self.current_duration > 0.5:  # Count it as "played" if we're over halfway through the track.
-				self.song_finished.emit(lyndj.preferences.Preferences.get_instance().get("playlist/playlist")[0])
+			if not lyndj.preferences.Preferences.get_instance().get("playlist/playlist")[0].startswith(":"):
+				if (time.time() - Player.start_time) / self.current_duration > 0.5:  # Count it as "played" if we're over halfway through the track.
+					self.song_finished.emit(lyndj.preferences.Preferences.get_instance().get("playlist/playlist")[0])
 			Player.current_track = None
 			Player.start_time = None
 		self.is_playing_changed.emit()
@@ -150,6 +151,12 @@ class Player(PySide6.QtCore.QObject):
 
 		next_song = current_playlist[0]
 		logging.info(f"Starting playback of track: {next_song}")
+
+		if next_song == ":pause:":
+			self.is_playing_set(False)  # Stop playing.
+			current_playlist = current_playlist[1:]  # Remove it from the playlist immediately.
+			lyndj.preferences.Preferences.get_instance().set("playlist/playlist", current_playlist)
+			return
 
 		Player.current_track = lyndj.sound.Sound.decode(next_song)
 
