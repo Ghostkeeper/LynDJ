@@ -184,6 +184,9 @@ ApplicationWindow {
 					Lyn.Playlist.remove(playlist.currentIndex);
 				}
 			}
+			pauseButtonHandler: function() {
+				Lyn.Playlist.add(":pause:")
+			}
 			queueButtonEnabled: file_browser.selectedFilePath !== ""
 			unqueueButtonEnabled: playlist.currentIndex != -1 && !(playlist.currentIndex == 0 && Lyn.Player.is_playing) && !(playlist.currentIndex == playlist.count - 1 && Lyn.Playlist.has_suggested_track)
 		}

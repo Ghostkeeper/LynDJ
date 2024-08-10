@@ -17,6 +17,7 @@ Item {
 
 	property var queueButtonHandler
 	property var unqueueButtonHandler
+	property var pauseButtonHandler
 	property alias queueButtonEnabled: queue_button.enabled
 	property alias unqueueButtonEnabled: unqueue_button.enabled
 
@@ -76,6 +77,7 @@ Item {
 		backgroundColour: Lyn.Theme.colour["lining"]
 		source: Lyn.Theme.icon["pause_foreground"]
 		colour: Lyn.Theme ? Lyn.Theme.colour[enabled ? (hovered ? "highlight_foreground" : "foreground") : "disabled_foreground"] : "transparent"
+		onClicked: pauseButtonHandler()
 	}
 	Widgets.ColourImage {
 		anchors {
