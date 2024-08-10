@@ -100,9 +100,18 @@ class Playlist(PySide6.QtCore.QAbstractListModel):
 					if suggested_track != "":
 						paths.append(suggested_track)
 		for path in paths:
-			if not lyndj.metadata.has(path):
-				lyndj.metadata.add_file(path)
-			file_metadata = copy.copy(lyndj.metadata.metadata[path])  # Make a copy that we can add information to.
+			if path == ":pause:":
+				file_metadata = {
+					"duration": 0,
+					"title": "(Pause playback)",
+					"path": ":pause:",
+					"comment": "Pause music playback when reaching this point in the playlist.",
+					"bpm": 0,
+				}
+			else:
+				if not lyndj.metadata.has(path):
+					lyndj.metadata.add_file(path)
+				file_metadata = copy.copy(lyndj.metadata.metadata[path])  # Make a copy that we can add information to.
 			if len(new_track_data) == 0:
 				file_metadata["cumulative_duration"] = file_metadata["duration"]
 				file_metadata["cumulative_endtime"] = time.time() + file_metadata["duration"]

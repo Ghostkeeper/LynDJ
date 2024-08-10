@@ -159,4 +159,6 @@ class AutoDJ:
 		"""
 		history = [track["path"] for track in lyndj.history.History.get_instance().track_data]
 		playlist = lyndj.preferences.Preferences.get_instance().get("playlist/playlist")
-		return list(reversed(playlist)) + history
+		result = list(reversed(playlist)) + history
+		result = filter(lambda track: not track.startswith(":"), result)
+		return list(result)
