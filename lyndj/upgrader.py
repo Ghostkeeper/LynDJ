@@ -215,6 +215,7 @@ class Upgrader:
 			connection = sqlite3.connect(metadata_path)
 			connection.execute("ALTER TABLE metadata ADD cut_start real")
 			connection.execute("ALTER TABLE metadata ADD cut_end real")
+			connection.execute("ALTER TABLE metadata ADD autodj_exclude integer NOT NULL DEFAULT 0")
 			connection.commit()
 			logging.debug("Upgraded metadata database to 1.1.0.")
 		except sqlite3.OperationalError as e:

@@ -50,7 +50,6 @@ def load() -> None:
 	if not os.path.exists(db_file):
 		return  # No metadata to read.
 	connection = sqlite3.connect(db_file)
-	upgrade(connection)
 	logging.debug("Reading metadata from database.")
 
 	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
@@ -78,28 +77,6 @@ def load() -> None:
 		}
 	with metadata_lock:
 		metadata.update(new_metadata)
-
-def upgrade(connection):
-	"""
-	Makes sure that the metadata database is updated to the most recent version.
-
-	If it is already up-to-date, nothing happens.
-	:param connection: A database connection object allowing interaction with the metadata database.
-	"""
-	latest_version = 1
-	current_version = connection.execute("PRAGMA user_version").fetchone()[0]
-	if current_version == latest_version:
-		return  # Nothing to do.
-	if current_version > latest_version:
-		logging.warning("The metadata database version is too modern! We might not interpret the metadata properly or write to it correctly.")
-		return
-
-	if current_version == 0:  # Upgrade to v1.
-		logging.info("Upgrading database v0 -> v1")
-		connection.execute("ALTER TABLE metadata ADD COLUMN autodj_exclude integer NOT NULL DEFAULT 0")
-		connection.execute("PRAGMA user_version = 1")
-
-	connection.commit()
 
 # When we change the database, save the database to disk after a short delay.
 # If there's multiple changes in short succession, those will be combined into a single write.
