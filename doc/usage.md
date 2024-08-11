@@ -61,6 +61,18 @@ Across the bottom of the screen is a spectrograph of the track. This shows a fre
 
 ![A frequency spectrograph for a track](usage_spectrograph.png)
 
+If any volume changes have been made before during this track, a graph will be shown on top of the spectograph to indicate when the volume will automatically be adjusted to replay the changes made before.
+
+![A graph showing incoming volume changes](usage_waypoints.png)
+
+If you don't want the volume changes replayed, you can erase the stored volume changes by pressing the reset button to the top right of it.
+
+![The volume changes reset button](usage_reset_waypoints.png)
+
+Some tracks have talking at the start or at the end. LynDJ also has a feature to cut that off! By default, it will cut off silence at the start and end of the track so that the break in between tracks is kept equal. However this can be manually adjusted in order to cut off more or less by adjusting the calipers at the bottom of the spectrograph.
+
+![The end clip adjuster](usage_clip_end.png)
+
 Finally, there is also the option to play audio in mono only. This can be useful if you regularly play in different places or the speaker system where you're playing is not well set up. To toggle between mono and stereo, press the button in the top bar that looks like a circle with waves coming out from one or two of its sides.
 
 ![The button to toggle mono or stereo](usage_toggle_mono.png)
@@ -82,6 +94,10 @@ The playlist shows some information about each track:
 For more information about a track, you can also select it in the playlist. The track will then also be selected in the music directory on the left, where you can see the rest of the metadata (like when it was last played).
 
 You can re-order tracks in the queue by dragging them. You can remove them from the playlist as well by pressing the `<<` button to the left of the queue, moving them back to the track directory as it were. If a track is currently playing, that track cannot be re-ordered or removed from the queue. Tracks can also not be moved to be played after any AutoDJ-suggested track.
+
+If you need to pause playback after a certain track, you can press the pause button. This will add a "track" to the queue to indicate where it will pause. Drag the pause track to indicate where it should pause.
+
+![The pause button](usage_pause.png)
 
 The AutoDJ
 ----------
@@ -133,6 +149,10 @@ Transferring files from one computer to another will preserve those metadata fie
 To change metadata of a file, simply right-click on a cell in the table. This will bring up a small dialogue where the new value for the metadata can be entered.
 
 ![The dialogue to change metadata](usage_change_metadata.png)
+
+If you right-click the BPM field, an additional button appears that allows you to automatically measure the BPM of a track. This isn't 100% reliable, especially with extreme tempo, but if it works it should be very accurate.
+
+![The dialogue to change BPM](usage_change_bpm.png)
 
 *The duration and last played fields cannot be adjusted.*
 
