@@ -8,7 +8,7 @@
 !define WEBSITE "https://github.com/Ghostkeeper/LynDJ"
 !define DESCRIPTION "Plays music in a way that is easy for Lindy Hop DJs"
 !define VERSIONMAJOR 1
-!define VERSIONMINOR 1
+!define VERSIONMINOR 2
 !define VERSIONPATCH 0
 
 # Need administrative rights in order to install to Program Files.

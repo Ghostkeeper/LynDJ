@@ -2,7 +2,7 @@
 ----
 In this update, some bugs were fixed that got brought up when the application was exposed to the field. Some features were built that didn't initially fit into the release schedule for 1.0.
 
-New features:"
+New features:
 * Added a button to automatically detect the BPM of a track.
 * You can now exclude certain tracks from being selected by the AutoDJ.
 * Added a button to reset the volume waypoints of a track.
