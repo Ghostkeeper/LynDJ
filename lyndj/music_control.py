@@ -56,7 +56,7 @@ class MusicControl:
 		self.song_end_timer_index = 0
 
 		# Volume transitions.
-		self.recalculate_volume_waypoints(0)
+		self.recalculate_volume_waypoints(lyndj.metadata.get(path, "cut_start"))
 
 	def recalculate_volume_waypoints(self, current_position: float) -> None:
 		"""
@@ -99,7 +99,7 @@ class MusicControl:
 					else:
 						ratio = (t - time_start) / (time_end - time_start)
 						new_volume = level_start + ratio * (level_end - level_start)
-					if volume is not None and new_volume != volume:
+					if new_volume != volume:
 						volume_change_timer = PySide6.QtCore.QTimer()
 						volume_change_timer.setInterval(round((t - current_position) * 1000))
 						volume_change_timer.setSingleShot(True)
