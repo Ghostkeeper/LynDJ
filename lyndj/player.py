@@ -242,6 +242,8 @@ class Player(PySide6.QtCore.QObject):
 		current_playlist = lyndj.preferences.Preferences.get_instance().get("playlist/playlist")
 		if len(current_playlist) == 0:
 			return PySide6.QtCore.QUrl()
+		if current_playlist[0] == ":pause:":
+			return PySide6.QtCore.QUrl()
 		current_path = current_playlist[0]
 		fourier_path = lyndj.metadata.get(current_path, "fourier")
 		return PySide6.QtCore.QUrl.fromLocalFile(fourier_path)
@@ -363,6 +365,8 @@ class Player(PySide6.QtCore.QObject):
 		current_playlist = lyndj.preferences.Preferences.get_instance().get("playlist/playlist")
 		if len(current_playlist) == 0:
 			return ""
+		if current_playlist[0] == ":pause:":
+			return "Paused"
 		current_path = current_playlist[0]  # Don't request from the playlist, which may be outdated. Get directly from metadata.
 		return lyndj.metadata.get(current_path, "title")
 

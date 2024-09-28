@@ -152,7 +152,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		:param new_path: The new path to store the waypoints of.
 		"""
 		self.current_path = new_path
-		if new_path != "":
+		if new_path != "" and new_path != ":pause:":
 			self.waypoints = self.parse_waypoints(lyndj.metadata.get(new_path, self.current_field))  # Update the waypoints to represent the new path.
 		else:
 			self.waypoints = []
@@ -204,7 +204,7 @@ class WaypointsTimeline(PySide6.QtQuick.QQuickPaintedItem):
 		"""
 		if lyndj.player.Player.current_track is not None:
 			self.duration = lyndj.player.Player.current_track.duration()
-		elif self.current_path == "":
+		elif self.current_path == "" or self.current_path == ":pause:":
 			self.duration = 0
 		else:
 			self.duration = lyndj.metadata.get(self.current_path, "duration")
