@@ -180,9 +180,9 @@ class Player(PySide6.QtCore.QObject):
 
 		self.set_volume(0.5)  # Back to default for the next song.
 
-		self.song_changed.emit()  # We loaded up a new song.
 		Player.start_time = time.time()
 		lyndj.playback.current_position = cut_start
+		self.song_changed.emit()  # We loaded up a new song.
 		self.current_cut_start_changed.emit()
 		lyndj.playback.end_position = cut_end
 		self.current_cut_end_changed.emit()
