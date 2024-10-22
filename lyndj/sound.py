@@ -131,9 +131,10 @@ class Sound:
 		sum_squares = 0
 		num_samples = 0
 		for channel in self.channels:
-			sum_squares += numpy.square(channel).sum()
+			channel_float = channel.astype(numpy.float32)
+			sum_squares += numpy.square(channel_float).sum()
 			num_samples += len(channel)
-		return int(math.sqrt(sum_squares / num_samples))
+		return math.sqrt(sum_squares / num_samples)
 
 	def tempo(self) -> int:
 		"""
