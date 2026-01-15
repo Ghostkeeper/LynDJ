@@ -203,6 +203,8 @@ class Upgrader:
 			try:
 				prefs = json.load(f)
 				prefs["version"] = "1.1.0"  # Upgrade the version number.
+				prefs["directory/sort_direction"].append(False)  # Add an entry to the columns for display.
+				prefs["directory/column_width"].append(0.01)
 				with open(preferences_path, "w") as f:
 					json.dump(prefs, f, indent="\t")
 				logging.debug("Upgraded preferences file to 1.1.0.")
@@ -234,6 +236,8 @@ class Upgrader:
 			try:
 				prefs = json.load(f)
 				prefs["version"] = "1.2.0"  # Upgrade the version number.
+				prefs["directory/sort_direction"].append(False)  # Add an entry to the columns for display.
+				prefs["directory/column_width"].append(0.02)
 				with open(preferences_path, "w") as f:
 					json.dump(prefs, f, indent="\t")
 				logging.debug("Upgraded preferences file to 1.2.0.")

@@ -1,5 +1,5 @@
 //Music player software aimed at Lindy Hop DJs.
-//Copyright (C) 2024 Ghostkeeper
+//Copyright (C) 2026 Ghostkeeper
 //This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 //This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 //You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -148,7 +148,21 @@ Item {
 			}
 		}
 		Widgets.TableHeader {
+			id: header_rating
 			width: music_table.columnWidthProvider(9)
+
+			text: "Rating"
+			onWidthChanged: music_table.forceLayout()
+			role: "rating"
+			table: music_table.model
+
+			Widgets.ColumnResizer {
+				previous_column_width: header_energy.width
+				previous_index: 8
+			}
+		}
+		Widgets.TableHeader {
+			width: music_table.columnWidthProvider(10)
 
 			text: "AutoDJ"
 			onWidthChanged: music_table.forceLayout()
@@ -156,8 +170,8 @@ Item {
 			table: music_table.model
 
 			Widgets.ColumnResizer {
-				previous_column_width: header_energy.width
-				previous_index: 8
+				previous_column_width: header_rating.width
+				previous_index: 9
 			}
 		}
 	}

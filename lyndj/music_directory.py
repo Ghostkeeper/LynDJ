@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2024 Ghostkeeper
+# Copyright (C) 2026 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -47,12 +47,12 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		if not prefs.has("directory/sort_order"):
 			prefs.add("directory/sort_order", ["bpm", "last_played", "age", "style", "energy", "title", "duration", "author", "comment", "autodj_exclude"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
 		if not prefs.has("directory/sort_direction"):
-			prefs.add("directory/sort_direction", [False, False, False, False, False, False, False, False, False, False])  # For each sort order, whether it is descending (True) or ascending (False).
+			prefs.add("directory/sort_direction", [False, False, False, False, False, False, False, False, False, False, False])  # For each sort order, whether it is descending (True) or ascending (False).
 		self.music: typing.List[typing.Dict[str, typing.Any]] = []  # The actual data contained in this table.
 
 		if not prefs.has("directory/column_width"):
 			fraction = 1.0 / len(self.column_fields)  # Equal fraction for each column.
-			prefs.add("directory/column_width", [fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction])
+			prefs.add("directory/column_width", [fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction, fraction])
 		column_widths = prefs.get("directory/column_width")
 		while len(column_widths) < len(self.column_fields):  # Maybe old version of config file, need to upgrade.
 			column_widths.append(0)
@@ -145,7 +145,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		if role != PySide6.QtCore.Qt.DisplayRole:
 			return None
 		if orientation == 1:  # PySide6.QtCore.Qt.Orientation.Horizontal is an enum, but the QML doesn't give us that.
-			return ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy", "autodj_exclude"][section]
+			return ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy", "rating", "autodj_exclude"][section]
 		elif orientation == 2:
 			return self.music[section]["path"]
 		else:
