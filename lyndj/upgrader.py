@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2026 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -145,7 +145,8 @@ class Upgrader:
 
 		# Map upgrades to finally arrive at the current version.
 		upgrade_table = {
-			"1.0.0": self.upgrade_1_0_0_to_1_1_0
+			"1.0.0": self.upgrade_1_0_0_to_1_1_0,
+			"1.1.0": self.upgrade_1_1_0_to_1_2_0,
 		}
 
 		while version_str in upgrade_table:
@@ -218,5 +219,34 @@ class Upgrader:
 			connection.execute("ALTER TABLE metadata ADD autodj_exclude integer NOT NULL DEFAULT 0")
 			connection.commit()
 			logging.debug("Upgraded metadata database to 1.1.0.")
+		except sqlite3.OperationalError as e:
+			logging.error(f"Failed to upgrade metadata table. Configuration might get corrupt! Error: {e}")  # But do continue.
+
+	def upgrade_1_1_0_to_1_2_0(self) -> None:
+		"""
+		Upgrades the configuration from version 1.1.0 to version 1.2.0.
+		"""
+		logging.info("Upgrading configuration from 1.1.0 to 1.2.0.")
+		# Upgrade preferences file:
+		# * Update version number.
+		preferences_path = os.path.join(lyndj.storage.config(), "preferences.json")
+		with open(preferences_path) as f:
+			try:
+				prefs = json.load(f)
+				prefs["version"] = "1.2.0"  # Upgrade the version number.
+				with open(preferences_path, "w") as f:
+					json.dump(prefs, f, indent="\t")
+				logging.debug("Upgraded preferences file to 1.2.0.")
+			except json.JSONDecodeError:
+				logging.error("Failed to load preferences file while upgrading. Configuration might get corrupt!")  # But do continue trying to upgrade the rest to minimise damage.
+
+		# Update metadata database:
+		# * Add rating column
+		metadata_path = os.path.join(lyndj.storage.data(), "metadata.db")
+		try:
+			connection = sqlite3.connect(metadata_path)
+			connection.execute("ALTER TABLE metadata ADD rating real")
+			connection.commit()
+			logging.debug("Upgraded metadata database to 1.2.0.")
 		except sqlite3.OperationalError as e:
 			logging.error(f"Failed to upgrade metadata table. Configuration might get corrupt! Error: {e}")  # But do continue.

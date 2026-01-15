@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2023 Ghostkeeper
+# Copyright (C) 2026 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -53,7 +53,7 @@ def load() -> None:
 	logging.debug("Reading metadata from database.")
 
 	new_metadata = {}  # First store it in a local variable (faster). Merge afterwards.
-	for path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime, cut_start, cut_end, autodj_exclude in connection.execute("SELECT * FROM metadata"):
+	for path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime, cut_start, cut_end, rating, autodj_exclude in connection.execute("SELECT path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime, cut_start, cut_end, rating, autodj_exclude FROM metadata"):
 		new_metadata[path] = {
 			"path": path,
 			"title": title,
@@ -73,6 +73,7 @@ def load() -> None:
 			"cachetime": cachetime,
 			"cut_start": cut_start,
 			"cut_end": cut_end,
+			"rating": rating,
 			"autodj_exclude": autodj_exclude,
 		}
 	with metadata_lock:
@@ -142,6 +143,7 @@ def store() -> None:
 			cachetime real,
 			cut_start real,
 			cut_end real,
+			rating real,
 			autodj_exclude integer
 		)""")
 	else:
@@ -150,8 +152,8 @@ def store() -> None:
 	local_metadata = metadata  # Cache locally for performance.
 	with metadata_lock:
 		for path, entry in local_metadata.items():
-			connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime, cut_start, cut_end, autodj_exclude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-				(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"], entry["cut_start"], entry["cut_end"], entry["autodj_exclude"]))
+			connection.execute("INSERT OR REPLACE INTO metadata (path, title, author, comment, duration, bpm, last_played, age, style, energy, fourier, volume_waypoints, bass_waypoints, mids_waypoints, treble_waypoints, cachetime, cut_start, cut_end, rating, autodj_exclude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				(path, entry["title"], entry["author"], entry["comment"], entry["duration"], entry["bpm"], entry["last_played"], entry["age"], entry["style"], entry["energy"], entry["fourier"], entry["volume_waypoints"], entry["bass_waypoints"], entry["mids_waypoints"], entry["treble_waypoints"], entry["cachetime"], entry["cut_start"], entry["cut_end"], entry["rating"], entry["autodj_exclude"]))
 	connection.commit()
 
 def has(path: str) -> bool:
@@ -210,6 +212,7 @@ def add_file(path: str) -> None:
 		treble_waypoints = local_metadata[path]["treble_waypoints"]
 		cut_start = local_metadata[path]["cut_start"]
 		cut_end = local_metadata[path]["cut_end"]
+		rating = local_metadata[path]["rating"]
 	else:
 		last_played = -1  # Never played.
 		age = ""
@@ -221,6 +224,7 @@ def add_file(path: str) -> None:
 		treble_waypoints = ""
 		cut_start = -1
 		cut_end = -1
+		rating = -1  # Not rated
 	logging.debug(f"Updating metadata for {path}")
 
 	try:
@@ -274,6 +278,7 @@ def add_file(path: str) -> None:
 		"cachetime": last_modified,
 		"cut_start": cut_start,
 		"cut_end": cut_end,
+		"rating": rating,
 		"autodj_exclude": 0,
 	})
 
