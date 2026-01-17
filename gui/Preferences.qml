@@ -618,6 +618,34 @@ Window {
 					elide: Text.ElideRight
 				}
 			}
+
+			Item {
+				width: parent.width
+				height: childrenRect.height
+
+				Widgets.SliderHorizontal {
+					id: autodj_rating_influence
+					anchors.right: parent.right
+
+					value: Lyn.Preferences.preferences["autodj/rating_influence"]
+					from: 0
+					to: 100
+					onMoved: Lyn.Preferences.set("autodj/rating_influence", value)
+				}
+				Text {
+					anchors {
+						verticalCenter: autodj_rating_influence.verticalCenter
+						left: parent.left
+						right: autodj_rating_influence.left
+						rightMargin: Lyn.Theme.size["margin"].width
+					}
+
+					text: "Prefer highly rated tracks"
+					font: Lyn.Theme.font["default"]
+					color: Lyn.Theme.colour["foreground"]
+					elide: Text.ElideRight
+				}
+			}
 		}
 	}
 }
