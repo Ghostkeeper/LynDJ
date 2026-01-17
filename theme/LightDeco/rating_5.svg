@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<svg width="27" height="12" xmlns="http://www.w3.org/2000/svg">
+<defs>
+	<path id="star" d="M3.5,0 L4.676,1.882 L6.829,2.418 L5.402,4.118 L5.557,6.332 L3.5,5.5 L1.443,6.332 L1.598,4.118 L0.171,2.418 L2.324,1.882 z" />
+</defs>
+<use href="#star" x="0" y="5" />
+<use href="#star" x="5" y="0" />
+<use href="#star" x="10" y="5" />
+<use href="#star" x="15" y="0" />
+<use href="#star" x="20" y="5" />
+</svg>

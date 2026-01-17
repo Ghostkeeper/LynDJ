@@ -33,7 +33,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		"""
 		super().__init__(parent)
 
-		self.column_fields = ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy", "autodj_exclude"]
+		self.column_fields = ["title", "author", "duration", "bpm", "comment", "last_played", "age", "style", "energy", "rating", "autodj_exclude"]
 
 		self._directory = ""
 		prefs = lyndj.preferences.Preferences.get_instance()
@@ -45,7 +45,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		if not prefs.has("directory/browse_path"):
 			prefs.add("directory/browse_path", browse_path)
 		if not prefs.has("directory/sort_order"):
-			prefs.add("directory/sort_order", ["bpm", "last_played", "age", "style", "energy", "title", "duration", "author", "comment", "autodj_exclude"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
+			prefs.add("directory/sort_order", ["bpm", "last_played", "rating", "age", "style", "energy", "title", "duration", "author", "comment", "autodj_exclude"])  # You can sort multiple fields at the same time. These two lists are in order of priority.
 		if not prefs.has("directory/sort_direction"):
 			prefs.add("directory/sort_direction", [False, False, False, False, False, False, False, False, False, False, False])  # For each sort order, whether it is descending (True) or ascending (False).
 		self.music: typing.List[typing.Dict[str, typing.Any]] = []  # The actual data contained in this table.
@@ -114,6 +114,12 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 			if difference < day * 1.5:
 				return "Yesterday"
 			return str(round(difference / day)) + " days"
+		if field == "rating":
+			if type(value) == float or type(value) == int:
+				value = round(value)
+				if 1 <= value <= 5:
+					return " " * value
+			return ""
 		if field == "autodj_exclude":
 			# Use invisible characters to communicate the value to the GUI!
 			if value == 0:
@@ -313,7 +319,7 @@ class MusicDirectory(PySide6.QtCore.QAbstractTableModel):
 		:param key: The metadata entry to change.
 		:param value: The new value for this metadata entry.
 		"""
-		if key == "autodj_exclude":
+		if key in ["rating", "autodj_exclude"]:
 			value = int(value)
 		lyndj.metadata.change(path, key, value)
 		# Looking up where in the table the data changed is much more expensive than just triggering an update of the entire column.

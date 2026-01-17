@@ -213,10 +213,11 @@ Item {
 
 				Widgets.ColourImage {
 					anchors.centerIn: parent
-
-					visible: display === " " && music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "autodj_exclude"
+					width: music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "rating" ? 27 : 12  //TODO: Not automatically updated when source changes.
+					height: 12
+					visible: display !== "" && music_directory && (music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "autodj_exclude" || music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "rating")
 					colour: Lyn.Theme.colour["foreground"]
-					source: Lyn.Theme.icon["cross"]
+					source: (music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "rating" && display !== "") ? Lyn.Theme.icon["rating_" + display.length] : Lyn.Theme.icon["cross"]
 				}
 
 				MouseArea {
@@ -245,6 +246,14 @@ Item {
 								} else {
 									music_directory.change_metadata(path, field, 0); //Disable.
 								}
+							}
+							if(field === "rating") { //Increment the rating with this one.
+								const path = music_directory.headerData(row, Qt.Vertical, Qt.DisplayRole);
+								let new_rating = display.length + 1;
+								if(new_rating > 5) {
+									new_rating = 1;
+								}
+								music_directory.change_metadata(path, field, new_rating);
 							}
 						}
 					}
