@@ -1,5 +1,5 @@
 # Music player software aimed at Lindy Hop DJs.
-# Copyright (C) 2024 Ghostkeeper
+# Copyright (C) 2026 Ghostkeeper
 # This application is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for details.
 # You should have received a copy of the GNU Affero General Public License along with this application. If not, see <https://gnu.org/licenses/>.
@@ -27,6 +27,7 @@ class AutoDJ:
 	The suggestion for the best track to play depends on:
 	* The music directory, to select tracks from.
 	* The track's BPM, to have a regular cadence of fast and slow tracks.
+	* The track's rating, to prioritise tracks with higher ratings.
 	* The age and style of the track, to maximise variation in the playlist.
 	* When it was last played, to prioritise tracks that are rarely played.
 	* The energy level and BPM of the track, to match audience energy levels as configured by the user.
@@ -107,6 +108,7 @@ class AutoDJ:
 		autodj_bpm_precision = prefs.get("autodj/bpm_precision")
 		autodj_slider_power = prefs.get("autodj/energy_slider_power")
 		autodj_last_played_influence = prefs.get("autodj/last_played_influence")
+		autodj_rating_influence = prefs.get("autodj/rating_influence")
 		best_rating = float("-inf")
 		best_track = ""
 		for path in sorted(candidates):
@@ -138,6 +140,10 @@ class AutoDJ:
 
 			# Penalties for tracks that are far from the target BPM.
 			rating -= abs(lyndj.metadata.get(path, "bpm") - bpm_target) * autodj_bpm_precision
+
+			# Bonus for tracks with high ratings.
+			track_rating = lyndj.metadata.get(path, "rating") or 3  # Unrated equals 3 stars.
+			rating += track_rating * autodj_rating_influence
 
 			if rating > best_rating:
 				best_track = path
