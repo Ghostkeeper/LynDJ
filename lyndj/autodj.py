@@ -135,6 +135,7 @@ class AutoDJ:
 			# Bonus for tracks that are played long ago.
 			if autodj_last_played_influence > 0:
 				long_ago = time.time() - lyndj.metadata.get(path, "last_played")
+				long_ago = min(long_ago, 3600 * 24 * 7 * 26)  # Cap to about half a year.
 				long_ago /= 3600 * 24 * 7 * autodj_last_played_influence
 				rating += long_ago
 
