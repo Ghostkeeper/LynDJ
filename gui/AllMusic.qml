@@ -213,11 +213,11 @@ Item {
 
 				Widgets.ColourImage {
 					anchors.centerIn: parent
-					width: music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "rating" ? 27 : 12  //TODO: Not automatically updated when source changes.
+					width: (music_directory && music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "rating") ? 27 : 12  //TODO: Not automatically updated when source changes.
 					height: 12
 					visible: display !== "" && music_directory && (music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "autodj_exclude" || music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "rating")
 					colour: Lyn.Theme.colour["foreground"]
-					source: (music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "rating" && display !== "") ? Lyn.Theme.icon["rating_" + display.length] : Lyn.Theme.icon["cross"]
+					source: (music_directory && music_directory.headerData(column, Qt.Horizontal, Qt.DisplayRole) === "rating" && display !== "") ? Lyn.Theme.icon["rating_" + display.length] : Lyn.Theme.icon["cross"]
 				}
 
 				MouseArea {
